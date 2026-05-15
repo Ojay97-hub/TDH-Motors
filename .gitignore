@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if you ever use npm for tooling)
+node_modules/
+npm-debug.log*
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# WordPress uploads / generated files
+uploads/
+*.log
