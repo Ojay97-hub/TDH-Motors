@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Oswald, Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-const oswald = Oswald({
-  variable: "--font-oswald",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -45,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${oswald.variable} ${inter.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" className={nunito.variable}>
       <body className="min-h-screen flex flex-col bg-bg text-text">
         <SiteHeader />
         <main className="flex-1">{children}</main>

@@ -13,8 +13,8 @@
   --color-brand-dark: #1b4332;
   --color-accent: #d4a373;
 
-  --font-display: var(--font-oswald);
-  --font-sans: var(--font-inter);
+  --font-display: var(--font-nunito);
+  --font-sans: var(--font-nunito);
 }
 
 @layer base {
