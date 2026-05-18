@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function WhoWeArePage() {
   return (
     <>
-      <section className="relative h-[60vh] min-h-[480px] flex items-end overflow-hidden bg-stone-900">
+      <section className="relative h-[80vh] min-h-[600px] flex items-end overflow-hidden bg-stone-900">
         <Image
           src="/tdh-warehouse.jpg"
           alt="TDH Motors warehouse"
@@ -21,11 +21,11 @@ export default function WhoWeArePage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
-        <div className="relative container-page pb-16">
-          <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Our Story</div>
-          <h1 className="font-display text-5xl md:text-7xl tracking-tight max-w-3xl font-bold">
+        <div className="relative container-page pb-4 text-center">
+          <h1 className="font-display text-5xl md:text-7xl tracking-tight max-w-3xl font-bold mx-auto mb-3">
             Built on a passion for performance.
           </h1>
+          <div className="text-xs tracking-[0.3em] uppercase text-brand">Our Story</div>
         </div>
       </section>
 

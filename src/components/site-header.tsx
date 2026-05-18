@@ -5,11 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const leftNav = [
   { href: "/", label: "Home" },
-  { href: "/inventory", label: "Inventory" },
   { href: "/services", label: "Services" },
 ];
 
@@ -37,7 +35,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-border">
-      <div className="container-page grid grid-cols-[1fr_auto_1fr] items-center h-24 lg:h-28 gap-4">
+      <div className="container-page flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between h-24 lg:h-28 gap-4">
         <nav className="hidden lg:flex items-center gap-7 justify-self-start">
           {leftNav.map((item) => (
             <Link
@@ -50,7 +48,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link href="/" className="flex items-center gap-3 justify-self-center group">
+        <Link href="/" className="flex items-center gap-3 lg:justify-self-center group">
           <Image
             src="/tdh-logo.jpg"
             alt="The Dog House"
@@ -82,13 +80,11 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <ThemeToggle />
-
           <Link
             href="/inventory"
             className="hidden lg:inline-flex items-center px-5 py-2.5 bg-brand hover:bg-brand-light text-on-brand font-medium text-sm tracking-wider uppercase transition-colors"
           >
-            View Stock
+            Inventory
           </Link>
 
           <button
@@ -119,7 +115,7 @@ export function SiteHeader() {
               onClick={() => setOpen(false)}
               className="inline-flex items-center justify-center px-5 py-3 bg-brand hover:bg-brand-light text-on-brand font-medium tracking-wider uppercase transition-colors mt-2"
             >
-              View Stock
+              Inventory
             </Link>
           </nav>
         </div>

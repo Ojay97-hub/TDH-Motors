@@ -41,14 +41,14 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
       </div>
 
       <div>
-        <label className="block text-xs uppercase tracking-wider text-text-subtle mb-2">
+        <label className="block text-xs uppercase tracking-wider text-text-muted mb-2">
           Enquiry Type
         </label>
         <div className="flex flex-wrap gap-2">
           {["Viewing", "Part-Exchange", "Bespoke Sourcing", "General"].map((type) => (
             <label key={type} className="cursor-pointer">
               <input type="radio" name="type" value={type} className="peer sr-only" defaultChecked={type === "Viewing"} />
-              <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text-muted peer-checked:text-on-brand transition-colors">
+              <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text peer-checked:text-on-brand transition-colors">
                 {type}
               </span>
             </label>
@@ -57,7 +57,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-xs uppercase tracking-wider text-text-subtle mb-2">
+        <label htmlFor="message" className="block text-xs uppercase tracking-wider text-text-muted mb-2">
           Message
         </label>
         <textarea
@@ -102,7 +102,7 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-xs uppercase tracking-wider text-text-subtle mb-2">
+      <label htmlFor={name} className="block text-xs uppercase tracking-wider text-text-muted mb-2">
         {label} {required && <span className="text-brand-light">*</span>}
       </label>
       <input

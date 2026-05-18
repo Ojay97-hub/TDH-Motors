@@ -175,8 +175,8 @@ function FilterGroup({
 }) {
   return (
     <div>
-      <h3 className="text-xs uppercase tracking-widest font-semibold text-text mb-4">{title}</h3>
-      <ul className="space-y-2.5">
+      <h3 className="text-sm uppercase tracking-widest font-semibold text-text mb-4">{title}</h3>
+      <ul className="space-y-3">
         {options.map((opt) => (
           <li key={opt}>
             <label className="flex items-center gap-3 cursor-pointer group">
@@ -186,7 +186,7 @@ function FilterGroup({
                 onChange={() => onToggle(opt)}
                 className="w-4 h-4 accent-brand shrink-0"
               />
-              <span className="text-sm text-text-muted group-hover:text-text transition-colors">
+              <span className="text-base text-text-muted group-hover:text-text transition-colors">
                 {labelMap?.[opt] ?? opt}
               </span>
             </label>
@@ -244,7 +244,11 @@ function ListCard({ car }: { car: Car }) {
   return (
     <div className="group grid grid-cols-1 md:grid-cols-[55%_45%] py-6 gap-0 hover:bg-bg-elevated transition-colors">
       {/* Large image */}
-      <div className="relative aspect-16/10 overflow-hidden bg-bg-elevated">
+      <Link
+        href={`/inventory/${car.slug}`}
+        className="relative aspect-16/10 overflow-hidden bg-bg-elevated block"
+        aria-label={`${car.year} ${car.make} ${car.model}`}
+      >
         <Image
           src={car.images[0]}
           alt={`${car.year} ${car.make} ${car.model}`}
@@ -262,7 +266,7 @@ function ListCard({ car }: { car: Car }) {
             Sold
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Details */}
       <div className="flex flex-col justify-between px-8 py-4 md:py-0">

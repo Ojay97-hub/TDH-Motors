@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Award, Wrench, Shield, Search } from "lucide-react";
+import { ArrowRight, Award, Wrench, Shield, Search, MapPin } from "lucide-react";
 import { CarCard } from "@/components/car-card";
 import { ShowroomVideo } from "@/components/showroom-video";
 import { getFeaturedCars } from "@/lib/cars";
@@ -18,7 +18,7 @@ export default function Home() {
           fill
           sizes="100vw"
           priority
-          className="object-cover"
+          className="object-cover object-[20%_center] md:object-center"
         />
         {/* Subtle bottom fade so the white site continues out of the photo */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-bg to-transparent" />
@@ -82,7 +82,7 @@ export default function Home() {
           </div>
 
           {/* Right: portrait video */}
-          <div className="w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto">
+          <div className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
             <ShowroomVideo />
           </div>
         </div>
@@ -180,6 +180,53 @@ export default function Home() {
           >
             Book a Viewing <ArrowRight size={16} />
           </Link>
+        </div>
+      </section>
+
+      {/* Find Us — full-width map then location details */}
+      <section className="border-t border-border bg-bg-elevated">
+        <div className="relative h-[380px] md:h-[520px] bg-bg overflow-hidden">
+          <iframe
+            src="https://maps.google.com/maps?q=P5WG%2BRV+Aylesbury%2C+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            title="The Dog House — showroom location"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full border-0"
+          />
+        </div>
+
+        <div className="container-page pt-16 md:pt-20 pb-20 md:pb-24">
+          <div className="max-w-2xl mb-10">
+            <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Find Us</div>
+            <h2 className="font-display text-3xl md:text-4xl tracking-tight font-bold mb-3">
+              Better yet, see us in person.
+            </h2>
+            <p className="text-text-muted leading-relaxed">
+              Viewing is by appointment only — give us a call or drop us a line and
+              we&apos;ll get the kettle on.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10">
+            <div className="flex gap-3">
+              <MapPin className="text-brand-light shrink-0 mt-1" size={22} strokeWidth={1.5} />
+              <div>
+                <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Showroom</div>
+                <div className="text-text font-medium">P5WG+RV Aylesbury</div>
+                <div className="text-text-muted text-sm">Buckinghamshire, UK</div>
+              </div>
+            </div>
+
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=P5WG%2BRV+Aylesbury%2C+UK"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm:ml-auto inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+            >
+              Get Directions <ArrowRight size={16} />
+            </a>
+          </div>
         </div>
       </section>
     </>
