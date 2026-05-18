@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
@@ -8,14 +9,16 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-sm border border-brand flex items-center justify-center">
-                <span className="font-display font-bold text-brand-light text-sm tracking-widest">
-                  TDH
-                </span>
-              </div>
+              <Image
+                src="/tdh-logo.jpg"
+                alt="The Dog House"
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-sm object-cover"
+              />
               <div>
-                <div className="font-display font-semibold tracking-widest leading-none">
-                  TDH MOTORS
+                <div className="font-display font-bold tracking-wide leading-none">
+                  The Dog House
                 </div>
                 <div className="text-[10px] tracking-[0.2em] text-text-subtle uppercase mt-1">
                   Performance · Chilterns

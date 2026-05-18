@@ -76,7 +76,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+            className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             Get In Touch <ArrowRight size={16} />
           </Link>

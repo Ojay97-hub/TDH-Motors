@@ -18,12 +18,12 @@ export function CarCard({ car }: { car: Car }) {
           className="object-cover group-hover:scale-105 transition-transform duration-700"
         />
         {car.status === "reserved" && (
-          <div className="absolute top-4 left-4 bg-accent text-bg px-3 py-1 text-xs uppercase tracking-widest font-medium">
+          <div className="absolute top-4 left-4 bg-accent text-stone-900 px-3 py-1 text-xs uppercase tracking-widest font-medium">
             Reserved
           </div>
         )}
         {car.status === "sold" && (
-          <div className="absolute top-4 left-4 bg-red-600 text-text px-3 py-1 text-xs uppercase tracking-widest font-medium">
+          <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 text-xs uppercase tracking-widest font-medium">
             Sold
           </div>
         )}

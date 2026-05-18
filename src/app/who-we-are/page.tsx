@@ -11,19 +11,19 @@ export const metadata: Metadata = {
 export default function WhoWeArePage() {
   return (
     <>
-      <section className="relative h-[60vh] min-h-[480px] flex items-end overflow-hidden">
+      <section className="relative h-[60vh] min-h-[480px] flex items-end overflow-hidden bg-stone-900">
         <Image
-          src="https://images.unsplash.com/photo-1493238792000-8113da705763?w=2400&q=85"
-          alt="Country road in the Chilterns"
+          src="/tdh-warehouse.jpg"
+          alt="TDH Motors warehouse"
           fill
           sizes="100vw"
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
         <div className="relative container-page pb-16">
-          <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Our Story</div>
-          <h1 className="font-display text-5xl md:text-7xl tracking-tight max-w-3xl">
+          <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Our Story</div>
+          <h1 className="font-display text-5xl md:text-7xl tracking-tight max-w-3xl font-bold">
             Built on a passion for performance.
           </h1>
         </div>
@@ -32,7 +32,7 @@ export default function WhoWeArePage() {
       <section className="container-page py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 lg:col-start-3">
-            <div className="prose prose-invert max-w-none">
+            <div className="max-w-none">
               <p className="text-xl md:text-2xl font-display text-text leading-relaxed mb-8">
                 TDH Motors is a small, family-run dealership based in the Chilterns —
                 with one principle that drives everything we do.
@@ -103,7 +103,7 @@ export default function WhoWeArePage() {
         </p>
         <Link
           href="/contact"
-          className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+          className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
         >
           Book a Visit <ArrowRight size={16} />
         </Link>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Award, Wrench, Shield, Search } from "lucide-react";
 import { CarCard } from "@/components/car-card";
+import { ShowroomVideo } from "@/components/showroom-video";
 import { getFeaturedCars } from "@/lib/cars";
 
 export default function Home() {
@@ -10,46 +11,79 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[92vh] min-h-[640px] flex items-end overflow-hidden">
+      <section className="relative h-[88vh] min-h-[620px] overflow-hidden bg-stone-900">
         <Image
-          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=2400&q=85"
-          alt="Performance car"
+          src="/tdh-warehouse.jpg"
+          alt="TDH Motors warehouse"
           fill
           sizes="100vw"
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-bg/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-bg/80 to-transparent" />
+        {/* Subtle bottom fade so the white site continues out of the photo */}
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-bg to-transparent" />
 
-        <div className="relative container-page pb-24 md:pb-32">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 mb-6 text-xs tracking-[0.3em] uppercase text-brand-light">
-              <span className="w-8 h-px bg-brand-light" />
+        {/* Text card in bottom-right, with its own backdrop so the photo stays visible */}
+        <div className="relative h-full container-page flex items-end justify-end pb-12 md:pb-16">
+          <div className="max-w-md w-full bg-bg/85 backdrop-blur-sm p-8 md:p-10 border-l-4 border-brand">
+            <div className="inline-flex items-center gap-2 mb-4 text-[10px] tracking-[0.3em] uppercase text-brand">
+              <span className="w-8 h-px bg-brand" />
               Established in the Chilterns
             </div>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-semibold leading-[0.95] mb-6 tracking-tight">
+            <h1 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4 tracking-tight">
               Performance Cars,<br />
-              <span className="text-brand-light">Hand-Picked.</span>
+              <span className="text-brand">Hand-Picked.</span>
             </h1>
-            <p className="text-lg md:text-xl text-text-muted max-w-xl mb-10 leading-relaxed">
-              Sourced for enthusiasts, by enthusiasts. From iconic sports cars to flagship
-              luxury — every car in our inventory is selected on its own merit.
+            <p className="text-text-muted mb-8 leading-relaxed">
+              Sourced for enthusiasts, by enthusiasts — every car on our forecourt selected on its own merit.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/inventory"
-                className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-6 py-3 font-medium tracking-wider uppercase text-xs transition-colors"
               >
-                Browse Inventory <ArrowRight size={16} />
+                Browse Inventory <ArrowRight size={14} />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 border border-border hover:border-text text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+                className="inline-flex items-center justify-center gap-2 border border-text/30 hover:border-text text-text px-6 py-3 font-medium tracking-wider uppercase text-xs transition-colors"
               >
                 Book a Viewing
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Step Inside (video) */}
+      <section className="container-page py-20 md:py-28">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left: about copy */}
+          <div>
+            <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Who We Are</div>
+            <h2 className="font-display text-4xl md:text-5xl tracking-tight font-bold mb-6">
+              A proper passion for cars.
+            </h2>
+            <p className="text-text-muted text-lg leading-relaxed mb-5">
+              The Dog House is a small, family-run dealership tucked away in the Chilterns. We started it because buying a performance car should feel as good as driving one.
+            </p>
+            <p className="text-text-muted leading-relaxed mb-5">
+              Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. No high-pressure sales floor, no commission targets — just an honest conversation and cars we're genuinely proud of.
+            </p>
+            <p className="text-text-muted leading-relaxed mb-10">
+              Come and see us by appointment. We'll put the kettle on.
+            </p>
+            <Link
+              href="/who-we-are"
+              className="inline-flex items-center gap-2 text-sm tracking-wider uppercase text-text border-b border-brand hover:border-brand-light pb-1 transition-colors"
+            >
+              Our Story <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {/* Right: portrait video */}
+          <div className="w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto">
+            <ShowroomVideo />
           </div>
         </div>
       </section>
@@ -93,45 +127,6 @@ export default function Home() {
           {featured.map((car) => (
             <CarCard key={car.slug} car={car} />
           ))}
-        </div>
-      </section>
-
-      {/* About Teaser */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
-        <div className="container-page grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div className="relative aspect-[4/5] lg:aspect-[3/4]">
-            <Image
-              src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=85"
-              alt="TDH Motors workshop"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-            <div className="absolute -inset-px border border-brand pointer-events-none" />
-          </div>
-          <div>
-            <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Who We Are</div>
-            <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">
-              Built on a Passion for<br />Performance.
-            </h2>
-            <p className="text-text-muted text-lg leading-relaxed mb-6">
-              TDH Motors began with a simple idea: that buying a performance car should
-              be as exciting as driving one. We're a small, family-run dealership in the
-              heart of the Chilterns, with decades of combined experience across the
-              marques we love.
-            </p>
-            <p className="text-text-muted leading-relaxed mb-8">
-              From hot hatches to grand tourers, every car we offer has been chosen on
-              its own merit — not its margin. We invite you to come and see them for
-              yourself, by appointment.
-            </p>
-            <Link
-              href="/who-we-are"
-              className="inline-flex items-center gap-2 text-sm tracking-wider uppercase text-text border-b border-brand hover:border-brand-light pb-1 transition-colors"
-            >
-              Read Our Story <ArrowRight size={14} />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -181,7 +176,7 @@ export default function Home() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+            className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             Book a Viewing <ArrowRight size={16} />
           </Link>

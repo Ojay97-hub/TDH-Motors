@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Gauge, Fuel, Cog, Calendar, Check } from "lucide-react";
 import { cars, getCarBySlug, formatPrice, formatMileage } from "@/lib/cars";
+import { CarGallery } from "@/components/car-gallery";
 
 export async function generateStaticParams() {
   return cars.map((car) => ({ slug: car.slug }));
@@ -40,7 +40,7 @@ export default async function CarPage({
   ];
 
   return (
-    <>
+    <div className="grid-pattern">
       <div className="container-page pt-8">
         <Link
           href="/inventory"
@@ -52,47 +52,17 @@ export default async function CarPage({
 
       {/* Hero gallery */}
       <section className="container-page pt-8 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 relative aspect-[4/3] bg-bg-elevated overflow-hidden">
-            <Image
-              src={car.images[0]}
-              alt={`${car.year} ${car.make} ${car.model}`}
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 66vw"
-            />
-            {car.status === "reserved" && (
-              <div className="absolute top-4 left-4 bg-accent text-bg px-3 py-1 text-xs uppercase tracking-widest font-medium">
-                Reserved
-              </div>
-            )}
-          </div>
-          <div className="lg:col-span-4 grid grid-cols-2 lg:grid-cols-1 gap-6">
-            {car.images.slice(1, 3).map((img, i) => (
-              <div key={i} className="relative aspect-[4/3] bg-bg-elevated overflow-hidden">
-                <Image
-                  src={img}
-                  alt={`${car.make} ${car.model} detail`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 50vw, 33vw"
-                />
-              </div>
-            ))}
-            {car.images.length < 3 && (
-              <div className="hidden lg:flex aspect-[4/3] bg-bg-elevated border border-dashed border-border items-center justify-center text-xs text-text-subtle tracking-widest uppercase">
-                More Photos On Request
-              </div>
-            )}
-          </div>
-        </div>
+        <CarGallery
+          images={car.images}
+          alt={`${car.year} ${car.make} ${car.model}`}
+          status={car.status}
+        />
       </section>
 
       {/* Details */}
       <section className="container-page pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 bg-bg-elevated border border-border p-6 md:p-10">
             <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">
               {car.category}
             </div>
@@ -159,7 +129,7 @@ export default async function CarPage({
               <div className="space-y-3">
                 <Link
                   href={`/contact?car=${car.slug}`}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-text px-6 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-6 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
                 >
                   Enquire <ArrowRight size={16} />
                 </Link>
@@ -179,6 +149,6 @@ export default async function CarPage({
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

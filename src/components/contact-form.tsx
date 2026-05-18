@@ -48,7 +48,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
           {["Viewing", "Part-Exchange", "Bespoke Sourcing", "General"].map((type) => (
             <label key={type} className="cursor-pointer">
               <input type="radio" name="type" value={type} className="peer sr-only" defaultChecked={type === "Viewing"} />
-              <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text-muted peer-checked:text-text transition-colors">
+              <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text-muted peer-checked:text-on-brand transition-colors">
                 {type}
               </span>
             </label>
@@ -72,7 +72,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
 
       <button
         type="submit"
-        className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+        className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
       >
         Send Enquiry <Send size={16} />
       </button>
