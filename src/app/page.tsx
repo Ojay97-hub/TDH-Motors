@@ -185,7 +185,7 @@ export default function Home() {
 
       {/* Find Us — full-width map then location details */}
       <section className="border-t border-border bg-bg-elevated">
-        <div className="relative h-[380px] md:h-[520px] bg-bg overflow-hidden">
+        <div className="relative h-[480px] md:h-[680px] bg-bg overflow-hidden">
           <iframe
             src="https://maps.google.com/maps?q=P5WG%2BRV+Aylesbury%2C+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
             title="The Dog House — showroom location"

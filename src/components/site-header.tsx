@@ -21,8 +21,8 @@ const mobileNav = [...leftNav, ...rightNav];
 function navClass(pathname: string, href: string, mobile = false) {
   const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
   const base = mobile
-    ? "tracking-wider uppercase transition-colors py-2 text-base"
-    : "text-sm tracking-wider uppercase transition-colors pb-0.5";
+    ? "tracking-wider uppercase transition-colors py-2 text-base font-medium"
+    : "text-sm tracking-wider uppercase transition-colors pb-0.5 font-medium";
   const state = active
     ? "text-text border-b-2 border-brand"
     : "text-text-muted hover:text-text border-b-2 border-transparent";
@@ -34,7 +34,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/80 border-b border-border">
+    <header className="sticky top-0 inset-x-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border/60">
       <div className="container-page flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between h-24 lg:h-28 gap-4">
         <nav className="hidden lg:flex items-center gap-7 justify-self-start">
           {leftNav.map((item) => (
@@ -48,23 +48,15 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link href="/" className="flex items-center gap-3 lg:justify-self-center group">
+        <Link href="/" className="flex items-center lg:justify-self-center group">
           <Image
             src="/tdh-logo.jpg"
             alt="The Dog House"
-            width={72}
-            height={72}
+            width={96}
+            height={96}
             priority
-            className="w-16 h-16 lg:w-[72px] lg:h-[72px] rounded-sm object-cover"
+            className="w-20 h-20 lg:w-24 lg:h-24 rounded-sm object-cover"
           />
-          <div className="hidden sm:block">
-            <div className="font-display font-bold tracking-wide text-lg lg:text-xl leading-none">
-              The Dog House
-            </div>
-            <div className="text-[10px] tracking-[0.2em] text-text-subtle uppercase mt-1">
-              Performance Cars · Chilterns
-            </div>
-          </div>
         </Link>
 
         <div className="flex items-center justify-end gap-5 lg:gap-7 justify-self-end">
@@ -89,7 +81,7 @@ export function SiteHeader() {
 
           <button
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-text"
+            className="lg:hidden p-2 text-text transition-colors"
             aria-label="Toggle menu"
           >
             {open ? <X size={24} /> : <Menu size={24} />}

@@ -16,7 +16,7 @@ export default async function ContactPage({
 
   return (
     <>
-      <section className="container-page pt-16 md:pt-24 pb-12">
+      <section className="container-page pt-32 md:pt-40 pb-12">
         <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Get In Touch</div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Contact Us</h1>
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
