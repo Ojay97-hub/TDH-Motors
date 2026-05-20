@@ -2,17 +2,16 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
-import { apiVersion, dataset, projectId } from "./src/sanity/env";
 
 export default defineConfig({
   name: "tdh-motors",
   title: "TDH Motors",
-  projectId,
-  dataset,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "sk5os0jg",
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
   basePath: "/studio",
   schema: { types: schemaTypes },
   plugins: [
     structureTool(),
-    visionTool({ defaultApiVersion: apiVersion }),
+    visionTool({ defaultApiVersion: "2025-05-20" }),
   ],
 });
