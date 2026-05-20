@@ -4,14 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { ArrowUpRight, ChevronDown, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
-import { cars, Car, formatPrice, formatMileage } from "@/lib/cars";
+import { Car, formatPrice, formatMileage } from "@/lib/cars";
 
 type ViewMode = "grid" | "list";
 type SortKey = "year-desc" | "year-asc" | "price-desc" | "price-asc";
-
-const allMakes = [...new Set(cars.map((c) => c.make))].sort();
-const allBodyTypes = [...new Set(cars.map((c) => c.bodyType))].sort();
-const allCategories = [...new Set(cars.map((c) => c.category))].sort();
 
 const categoryLabel: Record<string, string> = {
   classic: "Classic",
@@ -21,13 +17,17 @@ const categoryLabel: Record<string, string> = {
   sports: "Sports",
 };
 
-export function InventoryBrowser() {
+export function InventoryBrowser({ cars }: { cars: Car[] }) {
   const [view, setView] = useState<ViewMode>("grid");
   const [sort, setSort] = useState<SortKey>("year-desc");
   const [selectedMakes, setSelectedMakes] = useState<string[]>([]);
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const allMakes = useMemo(() => [...new Set(cars.map((c) => c.make))].sort(), [cars]);
+  const allBodyTypes = useMemo(() => [...new Set(cars.map((c) => c.bodyType))].sort(), [cars]);
+  const allCategories = useMemo(() => [...new Set(cars.map((c) => c.category))].sort(), [cars]);
 
   const activeFilterCount = selectedMakes.length + selectedBodyTypes.length + selectedCategories.length;
 
@@ -43,7 +43,7 @@ export function InventoryBrowser() {
       case "year-asc": result.sort((a, b) => a.year - b.year); break;
     }
     return result;
-  }, [selectedMakes, selectedBodyTypes, selectedCategories, sort]);
+  }, [cars, selectedMakes, selectedBodyTypes, selectedCategories, sort]);
 
   const hasFilters = selectedMakes.length > 0 || selectedBodyTypes.length > 0 || selectedCategories.length > 0;
 

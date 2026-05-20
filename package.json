@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "studio": "sanity dev",
+    "seed": "node --env-file=.env --import tsx scripts/seed-sanity.ts"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
@@ -18,6 +20,7 @@
     "sanity": "^5.25.1"
   },
   "devDependencies": {
+    "@sanity/vision": "^5.26.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

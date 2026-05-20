@@ -5,8 +5,8 @@ import { CarCard } from "@/components/car-card";
 import { ShowroomVideo } from "@/components/showroom-video";
 import { getFeaturedCars } from "@/lib/cars";
 
-export default function Home() {
-  const featured = getFeaturedCars();
+export default async function Home() {
+  const featured = await getFeaturedCars();
 
   return (
     <>
