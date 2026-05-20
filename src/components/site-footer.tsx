@@ -1,8 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { sanityClient } from "@/sanity/client";
+import { siteSettingsQuery } from "@/sanity/queries";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const settings = await sanityClient.fetch(
+    siteSettingsQuery,
+    {},
+    { next: { revalidate: 60, tags: ["siteSettings"] } },
+  );
+
+  const phone = settings?.phone ?? "+44 (0) 1000 000 000";
+  const email = settings?.email ?? "hello@tdhmotors.co.uk";
+  const addressLine1 = settings?.addressLine1 ?? "Aylesbury, Buckinghamshire";
+  const addressLine2 = settings?.addressLine2 ?? "HP-area, UK";
+  const hoursLabel = settings?.hoursLabel ?? "Monday – Saturday";
+  const hoursDetail = settings?.hoursDetail ?? "09:00 – 17:00 (by appointment)";
+
   return (
     <footer className="border-t border-border bg-bg-elevated">
       <div className="container-page py-16">
@@ -50,11 +65,11 @@ export function SiteFooter() {
             <ul className="space-y-3 text-sm text-text-muted">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 text-brand-light shrink-0" />
-                <span>Aylesbury, Buckinghamshire<br />HP-area, UK</span>
+                <span>{addressLine1}<br />{addressLine2}</span>
               </li>
               <li className="flex items-start gap-3">
                 <Clock size={16} className="mt-0.5 text-brand-light shrink-0" />
-                <span>09:00 – 17:00<br />By appointment only</span>
+                <span>{hoursLabel}<br />{hoursDetail}</span>
               </li>
             </ul>
           </div>
@@ -66,14 +81,14 @@ export function SiteFooter() {
             <ul className="space-y-3 text-sm text-text-muted">
               <li className="flex items-center gap-3">
                 <Phone size={16} className="text-brand-light shrink-0" />
-                <a href="tel:+441000000000" className="hover:text-text transition-colors">
-                  +44 (0) 1000 000 000
+                <a href={`tel:${phone.replace(/\s/g, "")}`} className="hover:text-text transition-colors">
+                  {phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-brand-light shrink-0" />
-                <a href="mailto:hello@tdhmotors.co.uk" className="hover:text-text transition-colors">
-                  hello@tdhmotors.co.uk
+                <a href={`mailto:${email}`} className="hover:text-text transition-colors">
+                  {email}
                 </a>
               </li>
             </ul>

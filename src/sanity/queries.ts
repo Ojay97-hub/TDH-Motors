@@ -43,3 +43,11 @@ export const carBySlugQuery = defineQuery(`
 export const allCarSlugsQuery = defineQuery(`
   *[_type == "car" && defined(slug.current)].slug.current
 `);
+
+export const siteSettingsQuery = defineQuery(`*[_type == "siteSettings"][0]`);
+
+export const homePageQuery = defineQuery(`*[_type == "homePage"][0]`);
+
+export const servicesPageQuery = defineQuery(`*[_type == "servicesPage"][0]`);
+
+export const whoWeArePageQuery = defineQuery(`*[_type == "whoWeArePage"][0]`);

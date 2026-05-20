@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
+import { sanityClient } from "@/sanity/client";
+import { siteSettingsQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -12,7 +14,17 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ car?: string }>;
 }) {
-  const { car } = await searchParams;
+  const [{ car }, settings] = await Promise.all([
+    searchParams,
+    sanityClient.fetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
+  ]);
+
+  const phone = settings?.phone ?? "+44 (0) 1000 000 000";
+  const email = settings?.email ?? "hello@tdhmotors.co.uk";
+  const addressLine1 = settings?.addressLine1 ?? "Aylesbury, Buckinghamshire";
+  const addressLine2 = settings?.addressLine2 ?? "Exact address shared on booking";
+  const hoursLabel = settings?.hoursLabel ?? "Monday – Saturday";
+  const hoursDetail = settings?.hoursDetail ?? "09:00 – 17:00 (by appointment)";
 
   return (
     <>
@@ -40,16 +52,16 @@ export default async function ContactPage({
                   <MapPin size={20} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
                   <div>
                     <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Address</div>
-                    <div className="text-text">Aylesbury, Buckinghamshire</div>
-                    <div className="text-text-muted text-sm">Exact address shared on booking</div>
+                    <div className="text-text">{addressLine1}</div>
+                    <div className="text-text-muted text-sm">{addressLine2}</div>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
                   <Phone size={20} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
                   <div>
                     <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Phone</div>
-                    <a href="tel:+441000000000" className="text-text hover:text-brand-light transition-colors">
-                      +44 (0) 1000 000 000
+                    <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-text hover:text-brand-light transition-colors">
+                      {phone}
                     </a>
                   </div>
                 </li>
@@ -57,8 +69,8 @@ export default async function ContactPage({
                   <Mail size={20} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
                   <div>
                     <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Email</div>
-                    <a href="mailto:hello@tdhmotors.co.uk" className="text-text hover:text-brand-light transition-colors">
-                      hello@tdhmotors.co.uk
+                    <a href={`mailto:${email}`} className="text-text hover:text-brand-light transition-colors">
+                      {email}
                     </a>
                   </div>
                 </li>
@@ -66,8 +78,8 @@ export default async function ContactPage({
                   <Clock size={20} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
                   <div>
                     <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Hours</div>
-                    <div className="text-text">Monday – Saturday</div>
-                    <div className="text-text-muted text-sm">09:00 – 17:00 (by appointment)</div>
+                    <div className="text-text">{hoursLabel}</div>
+                    <div className="text-text-muted text-sm">{hoursDetail}</div>
                   </div>
                 </li>
               </ul>
