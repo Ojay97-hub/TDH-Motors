@@ -25,7 +25,7 @@ export function CarGallery({ images, alt, status }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-[16/9] bg-bg-elevated overflow-hidden">
+      <div className="relative aspect-video bg-bg-elevated overflow-hidden">
         <Image
           src={images[active]}
           alt={alt}
@@ -79,7 +79,7 @@ export function CarGallery({ images, alt, status }: Props) {
                 onClick={() => setActive(i)}
                 aria-label={`View image ${i + 1}`}
                 aria-pressed={i === active}
-                className={`relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[4/3] overflow-hidden snap-start transition-all ${
+                className={`relative shrink-0 w-24 sm:w-28 md:w-32 aspect-4/3 overflow-hidden snap-start transition-all ${
                   i === active
                     ? "ring-2 ring-brand opacity-100"
                     : "opacity-55 hover:opacity-100"

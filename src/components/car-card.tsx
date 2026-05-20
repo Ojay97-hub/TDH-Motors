@@ -9,7 +9,7 @@ export function CarCard({ car }: { car: Car }) {
       href={`/inventory/${car.slug}`}
       className="group block bg-bg-elevated border border-border hover:border-brand dark:hover:border-white hover:ring-2 hover:ring-brand dark:hover:ring-white transition-all overflow-hidden"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+      <div className="relative aspect-4/3 overflow-hidden bg-surface">
         <Image
           src={car.images[0]}
           alt={`${car.year} ${car.make} ${car.model}`}

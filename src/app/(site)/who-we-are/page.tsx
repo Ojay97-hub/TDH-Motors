@@ -20,7 +20,7 @@ export default function WhoWeArePage() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-bg via-bg/50 to-transparent" />
         <div className="relative container-page pb-4 text-center">
           <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Our Story</div>
           <h1 className="font-display text-5xl md:text-7xl tracking-tight max-w-3xl font-bold mx-auto">

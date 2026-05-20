@@ -21,7 +21,7 @@ export default async function Home() {
           className="object-cover object-[20%_center] md:object-center"
         />
         {/* Subtle bottom fade so the white site continues out of the photo */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-bg to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-bg to-transparent" />
 
         {/* Text card in bottom-right, with its own backdrop so the photo stays visible */}
         <div className="relative h-full container-page flex items-end justify-end pb-12 md:pb-16">
