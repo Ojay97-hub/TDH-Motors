@@ -11,11 +11,18 @@ function getThemeSnapshot() {
 }
 
 function subscribeToTheme(onStoreChange: () => void) {
+  function handleStorageChange(e: StorageEvent) {
+    if (e.key === "theme" && e.newValue) {
+      document.documentElement.setAttribute("data-theme", e.newValue);
+    }
+    onStoreChange();
+  }
+
   window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
-  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("storage", handleStorageChange);
   return () => {
     window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
-    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("storage", handleStorageChange);
   };
 }
 

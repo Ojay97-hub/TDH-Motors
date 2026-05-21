@@ -4,9 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
-
-const VALID_STATUSES = ["new", "contacted", "done"] as const;
-type Status = (typeof VALID_STATUSES)[number];
+import { VALID_STATUSES, type Status } from "@/lib/constants";
 
 export async function updateEnquiryStatus(id: string, status: string) {
   if (!id || typeof id !== "string") throw new Error("Invalid enquiry ID");
