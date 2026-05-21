@@ -1,26 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 
-export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const [dark, setDark] = useState(false);
+const THEME_CHANGE_EVENT = "tdh-theme-change";
 
-  useEffect(() => {
-    setMounted(true);
-    setDark(document.documentElement.getAttribute("data-theme") === "dark");
-  }, []);
+function getThemeSnapshot() {
+  if (typeof document === "undefined") return "light";
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
+function subscribeToTheme(onStoreChange: () => void) {
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
+  window.addEventListener("storage", onStoreChange);
+  return () => {
+    window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+  };
+}
+
+export function ThemeToggle() {
+  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => "light");
+  const dark = theme === "dark";
 
   function toggle() {
     const next = !dark;
-    setDark(next);
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
     localStorage.setItem("theme", next ? "dark" : "light");
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
-
-  // Placeholder keeps layout stable during hydration
-  if (!mounted) return <div className="w-9 h-9" />;
 
   return (
     <button

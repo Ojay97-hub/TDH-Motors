@@ -1,5 +1,6 @@
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { createServiceClient } from "@/lib/supabase-server";
+import Link from "next/link";
 import { SignOutButton } from "../../_components/SignOutButton";
 import { InviteUserForm } from "../../_components/InviteUserForm";
 import { DeleteUserButton } from "../../_components/DeleteUserButton";
@@ -36,12 +37,12 @@ export default async function UsersPage() {
       <header className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/"
               className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors"
             >
               TDH Motors
-            </a>
+            </Link>
             <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
               Admin
             </span>
@@ -50,12 +51,12 @@ export default async function UsersPage() {
             <span className="text-sm text-text-muted hidden sm:block">
               {currentUser?.email}
             </span>
-            <a
+            <Link
               href="/admin"
               className="text-sm text-text-muted hover:text-text transition-colors hidden sm:block"
             >
               ← Dashboard
-            </a>
+            </Link>
             <SignOutButton />
           </div>
         </div>

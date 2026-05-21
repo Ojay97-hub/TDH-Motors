@@ -7,6 +7,7 @@ create table if not exists enquiries (
   car         text,
   type        text not null default 'General',
   message     text not null,
+  notes       text,
   status      text not null default 'new'
 );
 

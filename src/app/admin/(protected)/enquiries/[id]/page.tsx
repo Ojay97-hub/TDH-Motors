@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
+import Link from "next/link";
 import { SignOutButton } from "../../../_components/SignOutButton";
 import { StatusSelect } from "../../../_components/StatusSelect";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -67,12 +68,12 @@ export default async function EnquiryDetailPage({
       <header className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/"
               className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors"
             >
               TDH Motors
-            </a>
+            </Link>
             <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
               Admin
             </span>
@@ -82,12 +83,12 @@ export default async function EnquiryDetailPage({
             <span className="text-sm text-text-muted hidden sm:block">
               {user?.email}
             </span>
-            <a
+            <Link
               href="/admin/enquiries"
               className="text-sm text-text-muted hover:text-text transition-colors hidden sm:block"
             >
               ← Enquiries
-            </a>
+            </Link>
             <SignOutButton />
           </div>
         </div>
@@ -97,13 +98,13 @@ export default async function EnquiryDetailPage({
         {/* Back + title row */}
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
-            <a
+            <Link
               href="/admin/enquiries"
               className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text transition-colors mb-3"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               Back to enquiries
-            </a>
+            </Link>
             <h1 className="text-2xl font-bold text-text">{enquiry.name}</h1>
             <p className="text-sm text-text-muted mt-0.5">
               Received {formatDate(enquiry.created_at)}

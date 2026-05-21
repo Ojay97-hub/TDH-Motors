@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 
-const VALID_STATUSES = ["new", "contacted", "completed", "closed"] as const;
+const VALID_STATUSES = ["new", "contacted", "done"] as const;
 type Status = (typeof VALID_STATUSES)[number];
 
 export async function updateEnquiryStatus(id: string, status: string) {
@@ -25,7 +25,7 @@ export async function updateEnquiryStatus(id: string, status: string) {
     .eq("id", id);
   if (error) throw new Error("Failed to update enquiry status");
 
-  revalidatePath("/admin");
+  revalidatePath("/admin/enquiries");
 }
 
 export async function signOut() {

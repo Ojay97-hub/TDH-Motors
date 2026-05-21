@@ -1,4 +1,5 @@
 import { createAuthServerClient } from "@/lib/supabase-ssr";
+import Link from "next/link";
 import { SignOutButton } from "../_components/SignOutButton";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -14,12 +15,12 @@ export default async function AdminDashboardPage() {
       <header className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/"
               className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors"
             >
               TDH Motors
-            </a>
+            </Link>
             <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
               Admin
             </span>
@@ -29,12 +30,12 @@ export default async function AdminDashboardPage() {
             <span className="text-sm text-text-muted hidden sm:block">
               {user?.email}
             </span>
-            <a
+            <Link
               href="/"
               className="text-sm text-text-muted hover:text-text transition-colors hidden sm:block"
             >
               ← Back to site
-            </a>
+            </Link>
             <SignOutButton />
           </div>
         </div>
@@ -70,12 +71,12 @@ export default async function AdminDashboardPage() {
                 Manage admin accounts and access permissions.
               </p>
             </div>
-            <a
+            <Link
               href="/admin/users"
               className="inline-flex items-center justify-center rounded-lg bg-brand text-white text-sm font-medium px-4 py-2 hover:bg-brand/90 transition-colors"
             >
               Manage Users
-            </a>
+            </Link>
           </div>
 
           {/* Sanity Studio */}
@@ -138,12 +139,12 @@ export default async function AdminDashboardPage() {
                 View and manage customer booking enquiries.
               </p>
             </div>
-            <a
+            <Link
               href="/admin/enquiries"
               className="inline-flex items-center justify-center rounded-lg border border-border text-text text-sm font-medium px-4 py-2 hover:bg-bg-elevated transition-colors"
             >
               View Enquiries
-            </a>
+            </Link>
           </div>
         </div>
       </main>

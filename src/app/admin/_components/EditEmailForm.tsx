@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { updateUserEmail } from "../(protected)/users/actions";
 
 type FormState = { error?: string; success?: string };
@@ -8,11 +8,11 @@ const initial: FormState = {};
 
 export function EditEmailForm({ userId, currentEmail }: { userId: string; currentEmail: string }) {
   const [editing, setEditing] = useState(false);
-  const [state, action, pending] = useActionState(updateUserEmail, initial);
-
-  useEffect(() => {
-    if (state.success) setEditing(false);
-  }, [state.success]);
+  const [state, action, pending] = useActionState(async (prev: FormState, formData: FormData) => {
+    const result = await updateUserEmail(prev, formData);
+    if (result.success) setEditing(false);
+    return result;
+  }, initial);
 
   if (!editing) {
     return (

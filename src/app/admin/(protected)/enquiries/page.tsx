@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
+import Link from "next/link";
 import { StatusSelect } from "../../_components/StatusSelect";
 import { SignOutButton } from "../../_components/SignOutButton";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -90,12 +91,12 @@ export default async function EnquiriesPage({
       <header className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/"
               className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors"
             >
               TDH Motors
-            </a>
+            </Link>
             <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
               Admin
             </span>
@@ -105,12 +106,12 @@ export default async function EnquiriesPage({
             <span className="text-sm text-text-muted hidden sm:block">
               {user?.email}
             </span>
-            <a
+            <Link
               href="/admin"
               className="text-sm text-text-muted hover:text-text transition-colors hidden sm:block"
             >
               ← Dashboard
-            </a>
+            </Link>
             <SignOutButton />
           </div>
         </div>
@@ -128,7 +129,7 @@ export default async function EnquiriesPage({
                 ? "/admin/enquiries"
                 : `/admin/enquiries?filter=${stat.filter}`;
             return (
-              <a
+              <Link
                 key={stat.label}
                 href={href}
                 className={`bg-surface border rounded-xl p-4 transition-all hover:bg-bg-elevated ${
@@ -141,7 +142,7 @@ export default async function EnquiriesPage({
                   {stat.label}
                 </p>
                 <p className={`text-3xl font-bold ${stat.style}`}>{stat.value}</p>
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -153,12 +154,12 @@ export default async function EnquiriesPage({
               Showing:{" "}
               <span className="font-medium text-text capitalize">{activeFilter}</span>
             </span>
-            <a
+            <Link
               href="/admin/enquiries"
               className="text-xs text-text-muted hover:text-text underline underline-offset-2"
             >
               Clear filter
-            </a>
+            </Link>
           </div>
         )}
 
@@ -218,13 +219,13 @@ export default async function EnquiriesPage({
                         <StatusSelect id={e.id} current={e.status} />
                       </td>
                       <td className={`${cell} rounded-r-xl border-r whitespace-nowrap`}>
-                        <a
+                        <Link
                           href={`/admin/enquiries/${e.id}`}
                           className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-text-muted hover:text-text hover:border-text-muted transition-colors"
                         >
                           View details
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   );

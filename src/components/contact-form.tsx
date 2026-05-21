@@ -55,7 +55,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
       <div ref={successRef} className="bg-bg-elevated border border-brand p-10 text-center">
         <div className="font-display text-3xl tracking-wide mb-4">Thank you.</div>
         <p className="text-text-muted leading-relaxed">
-          We've received your message and will be in touch within one working day.
+          We&apos;ve received your message and will be in touch within one working day.
         </p>
       </div>
     );

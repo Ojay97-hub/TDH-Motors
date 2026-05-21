@@ -177,7 +177,9 @@ async function upsert(doc) {
 
   if (existingId && existingId !== doc._id) {
     // Existing doc has a different auto-generated ID — patch it in place
-    const { _id, _type, ...fields } = doc;
+    const fields = { ...doc };
+    delete fields._id;
+    delete fields._type;
     await client.patch(existingId).set(fields).commit();
     console.log(`  patched  ${name}  (${existingId})`);
     // Also delete any drafts for this doc
