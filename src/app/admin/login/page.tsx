@@ -72,6 +72,15 @@ export default async function LoginPage({ searchParams }: Props) {
               Sign in
             </button>
           </form>
+
+          <div className="text-center mt-4">
+            <a
+              href="/auth/reset-password"
+              className="text-sm text-text-muted hover:text-text transition-colors"
+            >
+              Forgot password?
+            </a>
+          </div>
         </div>
       </div>
     </div>

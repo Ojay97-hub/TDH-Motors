@@ -1,65 +1,11 @@
-import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
-import { StatusSelect } from "../_components/StatusSelect";
 import { SignOutButton } from "../_components/SignOutButton";
 
-type Enquiry = {
-  id: string;
-  created_at: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  car: string | null;
-  type: string;
-  message: string;
-  status: string;
-};
-
-const TYPE_BADGE: Record<string, string> = {
-  Viewing: "bg-brand/10 text-brand",
-  "Part-Exchange": "bg-accent/10 text-accent",
-  "Bespoke Sourcing": "bg-purple-100 text-purple-700",
-  General: "bg-bg-elevated text-text-muted",
-};
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-export default async function AdminPage() {
-  const [supabaseAuth, supabaseService] = await Promise.all([
-    createAuthServerClient(),
-    Promise.resolve(createServiceClient()),
-  ]);
-
+export default async function AdminDashboardPage() {
+  const supabase = await createAuthServerClient();
   const {
     data: { user },
-  } = await supabaseAuth.auth.getUser();
-
-  const { data: enquiries, error: enquiriesError } = await supabaseService
-    .from("enquiries")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (enquiriesError) throw new Error("Failed to load enquiries");
-
-  const rows = (enquiries ?? []) as Enquiry[];
-
-  const counts = rows.reduce(
-    (acc, e) => {
-      acc.total++;
-      if (e.status === "new") acc.new++;
-      else if (e.status === "contacted") acc.contacted++;
-      else if (e.status === "completed") acc.completed++;
-      else if (e.status === "closed") acc.closed++;
-      return acc;
-    },
-    { total: 0, new: 0, contacted: 0, completed: 0, closed: 0 }
-  );
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-screen bg-bg">
@@ -92,118 +38,112 @@ export default async function AdminPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold text-text mb-6">Enquiries</h1>
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <h1 className="text-2xl font-bold text-text mb-2">Dashboard</h1>
+        <p className="text-text-muted mb-10">Welcome back, {user?.email}</p>
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: "Total", value: counts.total, style: "text-text" },
-            { label: "New", value: counts.new, style: "text-brand" },
-            { label: "Contacted", value: counts.contacted, style: "text-accent" },
-            {
-              label: "Done",
-              value: counts.completed + counts.closed,
-              style: "text-text-muted",
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-surface border border-border rounded-xl p-4"
-            >
-              <p className="text-xs uppercase tracking-wider text-text-subtle mb-1">
-                {stat.label}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {/* User Management */}
+          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
+            <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-brand"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-text mb-1">User Management</h2>
+              <p className="text-sm text-text-muted leading-snug">
+                Manage admin accounts and access permissions.
               </p>
-              <p className={`text-3xl font-bold ${stat.style}`}>{stat.value}</p>
             </div>
-          ))}
-        </div>
+            <a
+              href="/admin/users"
+              className="inline-flex items-center justify-center rounded-lg bg-brand text-white text-sm font-medium px-4 py-2 hover:bg-brand/90 transition-colors"
+            >
+              Manage Users
+            </a>
+          </div>
 
-        {/* Table */}
-        {rows.length === 0 ? (
-          <div className="bg-surface border border-border rounded-xl p-12 text-center text-text-subtle">
-            No enquiries yet.
-          </div>
-        ) : (
-          <div className="bg-surface border border-border rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-bg-elevated">
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Date
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Name
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Contact
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Type
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Car interest
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Message
-                    </th>
-                    <th className="text-left px-4 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {rows.map((e) => (
-                    <tr
-                      key={e.id}
-                      className="hover:bg-bg-elevated transition-colors"
-                    >
-                      <td className="px-4 py-3 text-text-muted whitespace-nowrap">
-                        {formatDate(e.created_at)}
-                      </td>
-                      <td className="px-4 py-3 font-medium text-text whitespace-nowrap">
-                        {e.name}
-                      </td>
-                      <td className="px-4 py-3">
-                        <a
-                          href={`mailto:${e.email}`}
-                          className="text-brand hover:underline block"
-                        >
-                          {e.email}
-                        </a>
-                        {e.phone && (
-                          <a
-                            href={`tel:${e.phone}`}
-                            className="text-text-muted hover:underline block text-xs mt-0.5"
-                          >
-                            {e.phone}
-                          </a>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${TYPE_BADGE[e.type] ?? TYPE_BADGE.General}`}
-                        >
-                          {e.type}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-text-muted max-w-[140px] truncate">
-                        {e.car ?? <span className="text-text-subtle">—</span>}
-                      </td>
-                      <td className="px-4 py-3 text-text-muted max-w-[220px]">
-                        <p className="line-clamp-2 leading-snug">{e.message}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusSelect id={e.id} current={e.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Sanity Studio */}
+          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-accent"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M3 9h18" />
+                <path d="M9 21V9" />
+              </svg>
             </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-text mb-1">Sanity Studio</h2>
+              <p className="text-sm text-text-muted leading-snug">
+                Edit site content, car listings, and marketing copy.
+              </p>
+            </div>
+            <a
+              href="https://www.sanity.io/@oIYAL9sDV/studio/bwp3bixqbg6nz5vosnu0osa6/tdh-motors/structure"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-lg bg-accent text-white text-sm font-medium px-4 py-2 hover:bg-accent/90 transition-colors"
+            >
+              Open Studio
+            </a>
           </div>
-        )}
+
+          {/* View Enquiries */}
+          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-purple-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-text mb-1">Enquiries</h2>
+              <p className="text-sm text-text-muted leading-snug">
+                View and manage customer booking enquiries.
+              </p>
+            </div>
+            <a
+              href="/admin/enquiries"
+              className="inline-flex items-center justify-center rounded-lg border border-border text-text text-sm font-medium px-4 py-2 hover:bg-bg-elevated transition-colors"
+            >
+              View Enquiries
+            </a>
+          </div>
+        </div>
       </main>
     </div>
   );
