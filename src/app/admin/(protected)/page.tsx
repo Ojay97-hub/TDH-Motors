@@ -1,5 +1,6 @@
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { SignOutButton } from "../_components/SignOutButton";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function AdminDashboardPage() {
   const supabase = await createAuthServerClient();
@@ -24,6 +25,7 @@ export default async function AdminDashboardPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <span className="text-sm text-text-muted hidden sm:block">
               {user?.email}
             </span>
