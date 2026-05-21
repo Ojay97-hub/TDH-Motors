@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -8,6 +8,16 @@ export default function CompleteSetupPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) router.replace("/admin/login");
+    });
+  }, [router]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,15 +32,19 @@ export default function CompleteSetupPage() {
     }
 
     startTransition(async () => {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) {
-        setError(error.message);
-      } else {
-        router.replace("/admin");
+      try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) {
+          setError(error.message);
+        } else {
+          router.replace("/admin");
+        }
+      } catch {
+        setError("Something went wrong. Please try again.");
       }
     });
   }

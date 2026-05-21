@@ -34,17 +34,18 @@ export async function inviteUser(_prev: { error?: string; success?: string }, fo
   return { success: `Invite sent to ${email}.` };
 }
 
-export async function deleteUser(userId: string) {
-  if (!userId || typeof userId !== "string") throw new Error("Invalid user ID");
+export async function deleteUser(userId: string): Promise<{ error?: string }> {
+  if (!userId || typeof userId !== "string") return { error: "Invalid user ID." };
 
   const caller = await requireAuth();
-  if (caller.id === userId) throw new Error("You cannot delete your own account.");
+  if (caller.id === userId) return { error: "You cannot delete your own account." };
 
   const supabase = createServiceClient();
   const { error } = await supabase.auth.admin.deleteUser(userId);
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/admin/users");
+  return {};
 }
 
 export async function updateUserEmail(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { inviteUser } from "../(protected)/users/actions";
 
 type FormState = { error?: string; success?: string };
@@ -10,9 +10,9 @@ export function InviteUserForm() {
   const [state, action, pending] = useActionState(inviteUser, initial);
   const formRef = useRef<HTMLFormElement>(null);
 
-  if (state.success && formRef.current) {
-    formRef.current.reset();
-  }
+  useEffect(() => {
+    if (state.success) formRef.current?.reset();
+  }, [state.success]);
 
   return (
     <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
