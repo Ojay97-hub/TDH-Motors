@@ -51,7 +51,8 @@ export default async function WhoWeArePage() {
           alt="TDH Motors warehouse"
           fill
           sizes="100vw"
-          priority
+          loading="eager"
+          fetchPriority="high"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-linear-to-t from-bg via-bg/50 to-transparent" />

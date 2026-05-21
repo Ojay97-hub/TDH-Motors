@@ -54,7 +54,8 @@ export function SiteHeader() {
             alt="The Dog House"
             width={96}
             height={96}
-            priority
+            loading="eager"
+            fetchPriority="high"
             className="w-20 h-20 lg:w-24 lg:h-24 rounded-sm object-cover"
           />
         </Link>

@@ -58,7 +58,8 @@ export default async function Home() {
           alt="TDH Motors warehouse"
           fill
           sizes="100vw"
-          priority
+          loading="eager"
+          fetchPriority="high"
           className="object-cover object-[20%_center] md:object-center"
         />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-bg to-transparent" />
