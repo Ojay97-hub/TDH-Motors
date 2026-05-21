@@ -40,10 +40,12 @@ export default async function AdminPage() {
     data: { user },
   } = await supabaseAuth.auth.getUser();
 
-  const { data: enquiries } = await supabaseService
+  const { data: enquiries, error: enquiriesError } = await supabaseService
     .from("enquiries")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (enquiriesError) throw new Error("Failed to load enquiries");
 
   const rows = (enquiries ?? []) as Enquiry[];
 

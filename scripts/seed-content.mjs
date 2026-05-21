@@ -26,11 +26,17 @@ try {
   }
 } catch { /* .env optional */ }
 
+const token = process.env.SANITY_API_WRITE_TOKEN;
+if (!token) {
+  console.error("Error: SANITY_API_WRITE_TOKEN is not set. Add it to your .env file.");
+  process.exit(1);
+}
+
 const client = createClient({
   projectId: "sk5os0jg",
   dataset: "production",
   apiVersion: "2025-05-20",
-  token: process.env.SANITY_API_WRITE_TOKEN,
+  token,
   useCdn: false,
 });
 
