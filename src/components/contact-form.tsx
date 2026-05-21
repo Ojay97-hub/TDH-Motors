@@ -1,20 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 
 export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const successRef = useRef<HTMLDivElement>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (submitted) {
+      successRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [submitted]);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // TODO: wire to API route / form service (Resend, Formspree, etc.)
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(null);
+
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value || undefined,
+      car: (form.elements.namedItem("car") as HTMLInputElement).value || undefined,
+      type: (form.elements.namedItem("type") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    try {
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        setError("Something went wrong. Please try again or call us directly.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again or call us directly.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
     return (
-      <div className="bg-bg-elevated border border-brand p-10 text-center">
+      <div ref={successRef} className="bg-bg-elevated border border-brand p-10 text-center">
         <div className="font-display text-3xl tracking-wide mb-4">Thank you.</div>
         <p className="text-text-muted leading-relaxed">
           We've received your message and will be in touch within one working day.
@@ -70,11 +108,16 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
         />
       </div>
 
+      {error && (
+        <p className="text-sm text-red-500">{error}</p>
+      )}
+
       <button
         type="submit"
-        className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+        disabled={submitting}
+        className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Send Enquiry <Send size={16} />
+        {submitting ? "Sending…" : <><span>Send Enquiry</span> <Send size={16} /></>}
       </button>
 
       <p className="text-xs text-text-subtle">
