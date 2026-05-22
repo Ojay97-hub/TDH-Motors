@@ -86,26 +86,44 @@ export default async function CarPage({
         />
       </section>
 
-      {/* Video (uploaded file takes priority, falls back to YouTube/TikTok URL) */}
-      {(car.videoFile || (car.videoUrl && getEmbedUrl(car.videoUrl))) && (
+      {/* Videos */}
+      {car.videos && car.videos.length > 0 && (
         <section className="container-page pb-16">
-          <div className="aspect-video bg-black overflow-hidden">
-            {car.videoFile ? (
-              <video
-                src={car.videoFile}
-                controls
-                playsInline
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <iframe
-                src={getEmbedUrl(car.videoUrl!)!}
-                title={`${car.year} ${car.make} ${car.model} video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            )}
+          <div className="mb-8">
+            <h2 className="font-display text-2xl tracking-wide">Videos</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {car.videos.map((video, idx) => {
+              const embedUrl = video.videoUrl ? getEmbedUrl(video.videoUrl) : null;
+              return (
+                <div key={idx} className="bg-black overflow-hidden">
+                  <div className="aspect-video">
+                    {video.videoFile ? (
+                      <video
+                        src={video.videoFile}
+                        controls
+                        playsInline
+                        className="w-full h-full object-contain"
+                      />
+                    ) : embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={video.title || `${car.year} ${car.make} ${car.model} video`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                        sandbox="allow-same-origin allow-scripts allow-presentation"
+                      />
+                    ) : null}
+                  </div>
+                  {video.title && (
+                    <div className="p-4 bg-bg-elevated border-t border-border">
+                      <div className="font-display text-sm tracking-wide">{video.title}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

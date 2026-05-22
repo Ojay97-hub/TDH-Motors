@@ -66,6 +66,18 @@ export const detailingPage = defineType({
               if (!obj?.afterImage && !obj?.afterVideo) {
                 return "Upload either an After image or After video";
               }
+              if (obj?.beforeImage && obj?.beforeVideo) {
+                return "Choose either a Before image or video, not both";
+              }
+              if (obj?.afterImage && obj?.afterVideo) {
+                return "Choose either an After image or video, not both";
+              }
+              if (!obj?.beforeImage && !obj?.beforeVideo) {
+                const hasAfter = obj?.afterImage || obj?.afterVideo;
+                if (!hasAfter) {
+                  return "Upload at least a Before or After image/video";
+                }
+              }
               return true;
             }),
           ],
@@ -122,6 +134,14 @@ export const detailingPage = defineType({
               title: "External video URL",
               type: "url",
               description: "YouTube or Vimeo URL. Used when no file is uploaded.",
+            }),
+          ],
+          validation: (r) => [
+            r.custom((obj) => {
+              if (!obj?.videoFile && !obj?.videoUrl) {
+                return "Upload a video file or paste an external URL";
+              }
+              return true;
             }),
           ],
           preview: { select: { title: "title" } },

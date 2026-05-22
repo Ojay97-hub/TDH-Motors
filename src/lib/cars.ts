@@ -6,7 +6,13 @@ import {
   featuredCarsQuery,
 } from "@/sanity/queries";
 
-export type Car = {
+export type Video = {
+  title?: string | null;
+  videoFile?: string;
+  videoUrl?: string;
+};
+
+type CarRaw = {
   slug: string;
   make: string;
   model: string;
@@ -24,34 +30,60 @@ export type Car = {
   description: string;
   highlights: string[];
   images: string[];
-  videoFile?: string;
-  videoUrl?: string;
+  videos?: Video[];
+  legacyVideoFile?: string;
+  legacyVideoUrl?: string;
   featured?: boolean;
   status: "available" | "reserved" | "sold" | "coming-soon";
 };
 
+export type Car = Omit<CarRaw, "legacyVideoFile" | "legacyVideoUrl"> & {
+  videos?: Video[];
+};
+
+function normalizeCarVideos(car: CarRaw): Car {
+  const videos = [...(car.videos || [])];
+
+  // Only include legacy video if there are no new videos yet
+  if ((videos.length === 0) && (car.legacyVideoFile || car.legacyVideoUrl)) {
+    videos.push({
+      title: null,
+      videoFile: car.legacyVideoFile,
+      videoUrl: car.legacyVideoUrl,
+    });
+  }
+
+  return {
+    ...car,
+    videos: videos.length > 0 ? videos : undefined,
+  };
+}
+
 export async function getAllCars(): Promise<Car[]> {
-  return await sanityClient.fetch<Car[]>(
+  const cars = await sanityClient.fetch<CarRaw[]>(
     allCarsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
   );
+  return cars.map(normalizeCarVideos);
 }
 
 export async function getFeaturedCars(): Promise<Car[]> {
-  return await sanityClient.fetch<Car[]>(
+  const cars = await sanityClient.fetch<CarRaw[]>(
     featuredCarsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
   );
+  return cars.map(normalizeCarVideos);
 }
 
 export async function getCarBySlug(slug: string): Promise<Car | null> {
-  return await sanityClient.fetch<Car | null>(
+  const car = await sanityClient.fetch<CarRaw | null>(
     carBySlugQuery,
     { slug },
     { next: { revalidate: 60, tags: ["car", `car:${slug}`] } },
   );
+  return car ? normalizeCarVideos(car) : null;
 }
 
 export async function getAllCarSlugs(): Promise<string[]> {

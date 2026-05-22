@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 type Props = {
   images: string[];
   alt: string;
-  status?: "available" | "reserved" | "sold";
+  status?: "available" | "reserved" | "sold" | "coming-soon";
 };
 
 export function CarGallery({ images, alt, status }: Props) {

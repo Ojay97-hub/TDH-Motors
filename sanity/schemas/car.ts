@@ -1,4 +1,4 @@
-import { defineType, defineField } from "sanity";
+import { defineType, defineField, defineArrayMember } from "sanity";
 
 export const car = defineType({
   name: "car",
@@ -179,20 +179,22 @@ export const car = defineType({
     }),
     defineField({
       name: "video",
-      title: "Video",
-      description: "Upload a video file (MP4 recommended). Shown on the car detail page.",
+      title: "Video (deprecated — use Videos field below)",
+      description: "DEPRECATED: Use the Videos field below instead. This field is kept for backward compatibility.",
       type: "file",
       group: "media",
       options: {
         accept: "video/*",
       },
+      hidden: true,
     }),
     defineField({
       name: "videoUrl",
-      title: "YouTube / TikTok URL",
-      description: "Alternative: paste a YouTube or TikTok link instead of uploading a file.",
+      title: "YouTube / TikTok URL (deprecated — use Videos field below)",
+      description: "DEPRECATED: Use the Videos field below instead. This field is kept for backward compatibility.",
       type: "string",
       group: "media",
+      hidden: true,
       validation: (r) =>
         r.custom((value) => {
           if (!value) return true;
@@ -205,6 +207,67 @@ export const car = defineType({
           }
           return "Please enter a valid YouTube or TikTok URL.";
         }),
+    }),
+    defineField({
+      name: "videos",
+      title: "Videos",
+      description: "Upload video files or paste external links. Shown on the car detail page.",
+      type: "array",
+      group: "media",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              description: "Optional — e.g. \"Walkaround\", \"Engine Start\"",
+            }),
+            defineField({
+              name: "videoFile",
+              title: "Video file",
+              type: "file",
+              options: { accept: "video/*" },
+              description: "Upload an MP4. Used if no external URL is set.",
+            }),
+            defineField({
+              name: "videoUrl",
+              title: "External video URL",
+              type: "url",
+              description: "YouTube or TikTok URL. Used when no file is uploaded.",
+              validation: (r) =>
+                r.custom((value) => {
+                  if (!value) return true;
+                  if (
+                    value.includes("youtube.com") ||
+                    value.includes("youtu.be") ||
+                    value.includes("tiktok.com")
+                  ) {
+                    return true;
+                  }
+                  return "Please enter a valid YouTube or TikTok URL.";
+                }),
+            }),
+          ],
+          validation: (r) => [
+            r.custom((obj) => {
+              if (!obj?.videoFile && !obj?.videoUrl) {
+                return "Upload a video file or paste an external URL";
+              }
+              return true;
+            }),
+          ],
+          preview: {
+            select: { title: "title", media: "videoFile" },
+            prepare(selection) {
+              return {
+                title: selection.title || "Video",
+              };
+            },
+          },
+        }),
+      ],
     }),
 
     defineField({

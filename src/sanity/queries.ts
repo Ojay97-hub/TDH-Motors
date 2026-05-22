@@ -18,8 +18,13 @@ const carProjection = /* groq */ `
   description,
   highlights,
   "images": images[].asset->url,
-  "videoFile": video.asset->url,
-  videoUrl,
+  "videos": videos[] {
+    title,
+    "videoFile": videoFile.asset->url,
+    videoUrl,
+  },
+  "legacyVideoFile": video.asset->url,
+  "legacyVideoUrl": videoUrl,
   featured,
   status
 `;
@@ -71,3 +76,15 @@ export const detailingPageQuery = defineQuery(`*[_type == "detailingPage"][0] {
     videoUrl,
   }
 }`);
+
+export const merchProductsQuery = defineQuery(`
+  *[_type == "merchProduct" && status != "hidden"] | order(coalesce(sortOrder, 100) asc, _createdAt desc) {
+    _id,
+    title,
+    description,
+    priceLabel,
+    tiktokShopUrl,
+    status,
+    "image": image.asset->url
+  }
+`);

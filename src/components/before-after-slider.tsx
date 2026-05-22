@@ -11,6 +11,8 @@ interface Props {
   afterVideoUrl?: string;
   label?: string;
   serviceTag?: string;
+  isMuted?: boolean;
+  onMutedChange?: (muted: boolean) => void;
 }
 
 function SliderMedia({
@@ -18,11 +20,13 @@ function SliderMedia({
   imageUrl,
   alt,
   videoRef,
+  muted,
 }: {
   videoUrl?: string;
   imageUrl?: string;
   alt: string;
   videoRef?: React.RefObject<HTMLVideoElement | null>;
+  muted?: boolean;
 }) {
   if (videoUrl) {
     return (
@@ -31,7 +35,7 @@ function SliderMedia({
         src={videoUrl}
         autoPlay
         loop
-        muted
+        muted={muted}
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -43,9 +47,8 @@ function SliderMedia({
   return null;
 }
 
-export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVideoUrl, label, serviceTag }: Props) {
+export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVideoUrl, label, serviceTag, isMuted = true, onMutedChange }: Props) {
   const [position, setPosition] = useState(50);
-  const [muted, setMuted] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const beforeVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -63,11 +66,11 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
 
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    const next = !muted;
-    setMuted(next);
+    const next = !isMuted;
+    onMutedChange?.(next);
     if (beforeVideoRef.current) beforeVideoRef.current.muted = next;
     if (afterVideoRef.current) afterVideoRef.current.muted = next;
-  }, [muted]);
+  }, [isMuted, onMutedChange]);
 
   return (
     <div className="bg-bg-elevated border border-border overflow-hidden">
@@ -85,7 +88,7 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
       >
         {/* After — base layer (full width) */}
         <div className="absolute inset-0">
-          <SliderMedia videoUrl={afterVideoUrl} imageUrl={afterUrl} alt="After" videoRef={afterVideoRef} />
+          <SliderMedia videoUrl={afterVideoUrl} imageUrl={afterUrl} alt="After" videoRef={afterVideoRef} muted={isMuted} />
         </div>
 
         {/* Before — clipped to left portion (only render if present) */}
@@ -94,7 +97,7 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
             className="absolute inset-0"
             style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
           >
-            <SliderMedia videoUrl={beforeVideoUrl} imageUrl={beforeUrl} alt="Before" videoRef={beforeVideoRef} />
+            <SliderMedia videoUrl={beforeVideoUrl} imageUrl={beforeUrl} alt="Before" videoRef={beforeVideoRef} muted={isMuted} />
           </div>
         )}
 
@@ -114,9 +117,9 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
             onClick={toggleMute}
             onPointerDown={(e) => e.stopPropagation()}
             className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label={muted ? "Unmute" : "Mute"}
+            aria-label={isMuted ? "Unmute" : "Mute"}
           >
-            {muted
+            {isMuted
               ? <VolumeX size={14} className="text-white" />
               : <Volume2 size={14} className="text-white" />
             }
