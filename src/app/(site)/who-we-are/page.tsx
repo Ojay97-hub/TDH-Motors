@@ -100,6 +100,53 @@ export default async function WhoWeArePage() {
         </div>
       </section>
 
+      <section className="border-t border-border bg-bg-elevated">
+        <div className="container-page py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div>
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Collaboration</div>
+              <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">Business Partners</h2>
+              <p className="text-text-muted text-lg leading-relaxed mb-8">
+                We're always interested in exploring partnerships that align with our values. Whether you're a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we'd like to hear from you.
+              </p>
+              <ul className="space-y-4 mb-10">
+                <li className="flex gap-3">
+                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
+                  <span className="text-text-muted">Exclusive service partnerships</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
+                  <span className="text-text-muted">Product and supplier collaborations</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
+                  <span className="text-text-muted">Event and sponsorship opportunities</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
+                  <span className="text-text-muted">Media and content partnerships</span>
+                </li>
+              </ul>
+              <Link
+                href="/contact?subject=business-partnership"
+                className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
+              >
+                Get In Touch <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            <div className="bg-bg-elevated border border-border p-8 md:p-12">
+              <p className="text-text-muted leading-relaxed mb-6">
+                We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.
+              </p>
+              <p className="text-text-muted text-sm leading-relaxed">
+                Have an opportunity you think we should know about? Drop us a message and let's have a conversation. We're always open to the right opportunity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="container-page py-24 text-center">
         <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">{ctaHeading}</h2>
         <p className="text-text-muted text-lg max-w-xl mx-auto mb-10 leading-relaxed">{ctaBody}</p>

@@ -8,10 +8,13 @@ import { Menu, X } from "lucide-react";
 
 const leftNav = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
+  { href: "/services/detailing", label: "Detailing" },
+  { href: "/services/curated-sales", label: "Curated Sales" },
+  { href: "/services/storage", label: "Storage" },
 ];
 
 const rightNav = [
+  { href: "/services/bespoke-sourcing", label: "Bespoke Sourcing" },
   { href: "/who-we-are", label: "Who We Are" },
   { href: "/contact", label: "Contact" },
 ];

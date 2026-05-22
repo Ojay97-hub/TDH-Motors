@@ -8,6 +8,7 @@ const singletonTypeNames = new Set([
   "homePage",
   "servicesPage",
   "whoWeArePage",
+  "detailingPage",
 ]);
 
 function singletonListItem(S: StructureBuilder, typeName: string, title: string) {
@@ -40,6 +41,7 @@ export default defineConfig({
             singletonListItem(S, "homePage", "Home Page"),
             singletonListItem(S, "servicesPage", "Services Page"),
             singletonListItem(S, "whoWeArePage", "Who We Are"),
+            singletonListItem(S, "detailingPage", "Detailing Page"),
             S.divider(),
             // All non-singleton document types (e.g. Cars)
             ...S.documentTypeListItems().filter(

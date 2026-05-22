@@ -7,6 +7,30 @@ import { CarGallery } from "@/components/car-gallery";
 
 export const revalidate = 60;
 
+function getEmbedUrl(url: string): string | null {
+  if (!url) return null;
+
+  // YouTube
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
+    const videoIdMatch = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+    if (videoIdMatch?.[1]) {
+      return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+    }
+  }
+
+  // TikTok
+  if (url.includes("tiktok.com")) {
+    const videoIdMatch = url.match(/video\/(\d+)/);
+    if (videoIdMatch?.[1]) {
+      return `https://www.tiktok.com/embed/v2/${videoIdMatch[1]}`;
+    }
+  }
+
+  return null;
+}
+
 export async function generateStaticParams() {
   const slugs = await getAllCarSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -61,6 +85,30 @@ export default async function CarPage({
           status={car.status}
         />
       </section>
+
+      {/* Video (uploaded file takes priority, falls back to YouTube/TikTok URL) */}
+      {(car.videoFile || (car.videoUrl && getEmbedUrl(car.videoUrl))) && (
+        <section className="container-page pb-16">
+          <div className="aspect-video bg-black overflow-hidden">
+            {car.videoFile ? (
+              <video
+                src={car.videoFile}
+                controls
+                playsInline
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <iframe
+                src={getEmbedUrl(car.videoUrl!)!}
+                title={`${car.year} ${car.make} ${car.model} video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Details */}
       <section className="container-page pb-24">

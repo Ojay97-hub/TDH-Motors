@@ -83,7 +83,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
           Enquiry Type
         </label>
         <div className="flex flex-wrap gap-2">
-          {["Viewing", "Part-Exchange", "Bespoke Sourcing", "General"].map((type) => (
+          {["Viewing", "Curated Sales", "Part-Exchange", "Detailing", "Storage", "Bespoke Sourcing", "General"].map((type) => (
             <label key={type} className="cursor-pointer">
               <input type="radio" name="type" value={type} className="peer sr-only" defaultChecked={type === "Viewing"} />
               <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text peer-checked:text-on-brand transition-colors">

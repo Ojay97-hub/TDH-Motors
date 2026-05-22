@@ -18,6 +18,8 @@ const carProjection = /* groq */ `
   description,
   highlights,
   "images": images[].asset->url,
+  "videoFile": video.asset->url,
+  videoUrl,
   featured,
   status
 `;
@@ -51,3 +53,21 @@ export const homePageQuery = defineQuery(`*[_type == "homePage"][0]`);
 export const servicesPageQuery = defineQuery(`*[_type == "servicesPage"][0]`);
 
 export const whoWeArePageQuery = defineQuery(`*[_type == "whoWeArePage"][0]`);
+
+export const detailingPageQuery = defineQuery(`*[_type == "detailingPage"][0] {
+  "beforeAfterGallery": beforeAfterGallery[] {
+    label,
+    serviceTag,
+    "beforeImage": beforeImage.asset->url,
+    "beforeVideo": beforeVideo.asset->url,
+    "afterImage": afterImage.asset->url,
+    "afterVideo": afterVideo.asset->url,
+  },
+  "videos": videos[] {
+    title,
+    caption,
+    orientation,
+    "videoFile": videoFile.asset->url,
+    videoUrl,
+  }
+}`);

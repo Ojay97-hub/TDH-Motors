@@ -24,8 +24,10 @@ export type Car = {
   description: string;
   highlights: string[];
   images: string[];
+  videoFile?: string;
+  videoUrl?: string;
   featured?: boolean;
-  status: "available" | "reserved" | "sold";
+  status: "available" | "reserved" | "sold" | "coming-soon";
 };
 
 export async function getAllCars(): Promise<Car[]> {

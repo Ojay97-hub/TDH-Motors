@@ -65,6 +65,7 @@ export const car = defineType({
           { title: "Available", value: "available" },
           { title: "Reserved", value: "reserved" },
           { title: "Sold", value: "sold" },
+          { title: "Coming Soon", value: "coming-soon" },
         ],
         layout: "radio",
       },
@@ -175,6 +176,35 @@ export const car = defineType({
         },
       ],
       validation: (r) => r.required().min(1).error("Add at least one photo."),
+    }),
+    defineField({
+      name: "video",
+      title: "Video",
+      description: "Upload a video file (MP4 recommended). Shown on the car detail page.",
+      type: "file",
+      group: "media",
+      options: {
+        accept: "video/*",
+      },
+    }),
+    defineField({
+      name: "videoUrl",
+      title: "YouTube / TikTok URL",
+      description: "Alternative: paste a YouTube or TikTok link instead of uploading a file.",
+      type: "string",
+      group: "media",
+      validation: (r) =>
+        r.custom((value) => {
+          if (!value) return true;
+          if (
+            value.includes("youtube.com") ||
+            value.includes("youtu.be") ||
+            value.includes("tiktok.com")
+          ) {
+            return true;
+          }
+          return "Please enter a valid YouTube or TikTok URL.";
+        }),
     }),
 
     defineField({

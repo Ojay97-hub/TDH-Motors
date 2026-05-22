@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Sales, bespoke sourcing, part-exchange, finance, servicing, and detailing — all in one place.",
 };
 
-const SERVICE_ICONS = [Car, Search, Banknote, Shield, Wrench, Sparkles];
+const SERVICE_ICONS = [Car, Search, Banknote, Sparkles];
 
 const SERVICES_DEFAULTS = [
   {
@@ -26,14 +26,6 @@ const SERVICES_DEFAULTS = [
     body: "Whether you're upgrading or downsizing, we offer fair, transparent valuations on any car you'd like to trade. No surprises, no haggling.",
   },
   {
-    title: "Finance",
-    body: "Flexible HP and PCP arrangements through our trusted partners. We'll help you structure a deal that works for you, with no obligation.",
-  },
-  {
-    title: "Servicing & MOT",
-    body: "Our in-house workshop handles preparation, servicing, and MOT for every car we sell — and for our customers, long after they drive away.",
-  },
-  {
     title: "Detailing",
     body: "Full machine polish, paint protection, and ceramic coating from experienced detailers. Every car we sell is presented at its absolute best.",
   },
@@ -46,8 +38,12 @@ export default async function ServicesPage() {
     { next: { revalidate: 60, tags: ["servicesPage"] } },
   );
 
+  const REMOVED = ["finance", "servicing & mot", "servicing and mot", "service & mot"];
   const intro = cms?.intro ?? "We're more than a showroom. From the moment we source a car to the day you drive it home — and every service after — we're here to look after you.";
-  const services = (cms?.services && cms.services.length > 0) ? cms.services : SERVICES_DEFAULTS;
+  const rawServices = (cms?.services && cms.services.length > 0) ? cms.services : SERVICES_DEFAULTS;
+  const services = rawServices.filter(
+    (svc: { title: string }) => !REMOVED.includes(svc.title.toLowerCase())
+  );
   const ctaHeading = cms?.ctaHeading ?? "Looking for something specific?";
   const ctaBody = cms?.ctaBody ?? "Tell us what you'd like to drive next and we'll start the search. No obligation, no pressure — just an honest conversation.";
 
@@ -60,7 +56,7 @@ export default async function ServicesPage() {
       </section>
 
       <section className="container-page pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border border border-border">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border">
           {services.map((svc: { title: string; body: string }, i: number) => {
             const Icon = SERVICE_ICONS[i] ?? Car;
             return (
