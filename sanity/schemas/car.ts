@@ -236,13 +236,14 @@ export const car = defineType({
               title: "External video URL",
               type: "url",
               description: "YouTube or TikTok URL. Used when no file is uploaded.",
-              validation: (r) =>
-                r.custom((value) => {
+              validation: (rule) =>
+                rule.custom((value) => {
                   if (!value) return true;
+                  const url = String(value);
                   if (
-                    value.includes("youtube.com") ||
-                    value.includes("youtu.be") ||
-                    value.includes("tiktok.com")
+                    url.includes("youtube.com") ||
+                    url.includes("youtu.be") ||
+                    url.includes("tiktok.com")
                   ) {
                     return true;
                   }
@@ -250,14 +251,14 @@ export const car = defineType({
                 }),
             }),
           ],
-          validation: (r) => [
-            r.custom((obj) => {
-              if (!obj?.videoFile && !obj?.videoUrl) {
+          validation: (rule) =>
+            rule.custom((obj) => {
+              const item = obj as { videoFile?: unknown; videoUrl?: string } | undefined;
+              if (!item?.videoFile && !item?.videoUrl) {
                 return "Upload a video file or paste an external URL";
               }
               return true;
             }),
-          ],
           preview: {
             select: { title: "title", media: "videoFile" },
             prepare(selection) {

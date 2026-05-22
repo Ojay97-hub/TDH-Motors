@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Gauge, Fuel, Cog, Calendar, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Gauge, Fuel, Cog, Calendar, Check, ExternalLink } from "lucide-react";
 import { getAllCarSlugs, getCarBySlug, formatPrice, formatMileage } from "@/lib/cars";
 import { CarGallery } from "@/components/car-gallery";
 
@@ -29,6 +29,12 @@ function getEmbedUrl(url: string): string | null {
   }
 
   return null;
+}
+
+function getExternalVideoLabel(url: string): string {
+  if (url.includes("tiktok.com")) return "Watch on TikTok";
+  if (url.includes("youtube.com") || url.includes("youtu.be")) return "Watch on YouTube";
+  return "Watch video";
 }
 
 export async function generateStaticParams() {
@@ -96,7 +102,7 @@ export default async function CarPage({
             {car.videos.map((video, idx) => {
               const embedUrl = video.videoUrl ? getEmbedUrl(video.videoUrl) : null;
               return (
-                <div key={idx} className="bg-black overflow-hidden">
+                <div key={`${video.title ?? "video"}-${idx}`} className="bg-black overflow-hidden">
                   <div className="aspect-video">
                     {video.videoFile ? (
                       <video
@@ -114,7 +120,22 @@ export default async function CarPage({
                         className="w-full h-full"
                         sandbox="allow-same-origin allow-scripts allow-presentation"
                       />
-                    ) : null}
+                    ) : video.videoUrl ? (
+                      <div className="flex h-full min-h-48 items-center justify-center bg-stone-900 p-6">
+                        <a
+                          href={video.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm tracking-wider uppercase text-brand-light transition-colors hover:text-brand"
+                        >
+                          {getExternalVideoLabel(video.videoUrl)} <ExternalLink size={14} />
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="flex h-full min-h-48 items-center justify-center bg-bg-elevated p-6 text-center text-sm text-text-muted">
+                        Video unavailable — add a file or supported link in Sanity.
+                      </div>
+                    )}
                   </div>
                   {video.title && (
                     <div className="p-4 bg-bg-elevated border-t border-border">

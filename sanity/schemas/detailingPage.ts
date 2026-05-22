@@ -61,26 +61,31 @@ export const detailingPage = defineType({
               description: "Upload an MP4 to use a video for the After side instead of a still image.",
             }),
           ],
-          validation: (r) => [
-            r.custom((obj) => {
-              if (!obj?.afterImage && !obj?.afterVideo) {
+          validation: (rule) =>
+            rule.custom((obj) => {
+              const item = obj as {
+                beforeImage?: unknown;
+                beforeVideo?: unknown;
+                afterImage?: unknown;
+                afterVideo?: unknown;
+              } | undefined;
+              if (!item?.afterImage && !item?.afterVideo) {
                 return "Upload either an After image or After video";
               }
-              if (obj?.beforeImage && obj?.beforeVideo) {
+              if (item.beforeImage && item.beforeVideo) {
                 return "Choose either a Before image or video, not both";
               }
-              if (obj?.afterImage && obj?.afterVideo) {
+              if (item.afterImage && item.afterVideo) {
                 return "Choose either an After image or video, not both";
               }
-              if (!obj?.beforeImage && !obj?.beforeVideo) {
-                const hasAfter = obj?.afterImage || obj?.afterVideo;
+              if (!item.beforeImage && !item.beforeVideo) {
+                const hasAfter = item.afterImage || item.afterVideo;
                 if (!hasAfter) {
                   return "Upload at least a Before or After image/video";
                 }
               }
               return true;
             }),
-          ],
           preview: {
             select: { title: "label", media: "afterImage" },
           },
@@ -136,14 +141,14 @@ export const detailingPage = defineType({
               description: "YouTube or Vimeo URL. Used when no file is uploaded.",
             }),
           ],
-          validation: (r) => [
-            r.custom((obj) => {
-              if (!obj?.videoFile && !obj?.videoUrl) {
+          validation: (rule) =>
+            rule.custom((obj) => {
+              const item = obj as { videoFile?: unknown; videoUrl?: string } | undefined;
+              if (!item?.videoFile && !item?.videoUrl) {
                 return "Upload a video file or paste an external URL";
               }
               return true;
             }),
-          ],
           preview: { select: { title: "title" } },
         }),
       ],

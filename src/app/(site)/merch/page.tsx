@@ -37,7 +37,7 @@ function ProductImage({ product }: { product: MerchProduct }) {
   }
 
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center bg-linear-to-br from-stone-700 to-stone-900">
+    <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-stone-700 to-stone-900">
       <ShoppingBag size={40} className="text-stone-300 mb-3" strokeWidth={1.5} />
       <div className="text-xs tracking-[0.3em] uppercase text-stone-300">Merch</div>
     </div>

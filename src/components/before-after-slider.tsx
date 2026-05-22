@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 
@@ -71,6 +71,11 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
     if (beforeVideoRef.current) beforeVideoRef.current.muted = next;
     if (afterVideoRef.current) afterVideoRef.current.muted = next;
   }, [isMuted, onMutedChange]);
+
+  useEffect(() => {
+    if (beforeVideoRef.current) beforeVideoRef.current.muted = isMuted;
+    if (afterVideoRef.current) afterVideoRef.current.muted = isMuted;
+  }, [isMuted]);
 
   return (
     <div className="bg-bg-elevated border border-border overflow-hidden">
