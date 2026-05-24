@@ -142,16 +142,17 @@ export default async function DetailingPage() {
         <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Service</div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Detailing</h1>
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
-          From ceramic coating protection to full paintwork correction, our professional detailing team at{" "}
+          From ceramic coating protection to full paintwork correction, our professional detailing team —{" "}
+          <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
           <a
             href="https://www.ttautodetailing.co.uk/detailing-and-protection"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand hover:text-brand-light transition-colors font-medium"
           >
-            TT Auto Detailing
+            TT Auto detailers
           </a>{" "}
-          delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.
+          — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.
         </p>
       </section>
 
@@ -298,13 +299,14 @@ export default async function DetailingPage() {
         <div className="container-page">
           <p className="text-text-muted text-center">
             Our detailing work is carried out by{" "}
+            <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
             <a
               href="https://www.ttautodetailing.co.uk/detailing-and-protection"
               target="_blank"
               rel="noopener noreferrer"
               className="text-brand hover:text-brand-light transition-colors font-medium inline-flex items-center gap-1"
             >
-              TT Auto Detailing <ExternalLink size={12} />
+              TT Auto detailers <ExternalLink size={12} />
             </a>
           </p>
         </div>

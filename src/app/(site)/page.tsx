@@ -69,39 +69,48 @@ export default async function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[88vh] min-h-[620px] overflow-hidden bg-stone-900">
+      <section className="relative h-screen min-h-[640px] overflow-hidden bg-stone-900">
         <Image
-          src="/tdh-warehouse.jpg"
-          alt="TDH Motors warehouse"
+          src="/new-hero-image.png"
+          alt="The Dog House Automotive Solutions"
           fill
           sizes="100vw"
           loading="eager"
           fetchPriority="high"
-          className="object-cover object-[20%_center] md:object-center"
+          className="object-cover object-[65%_center] md:object-center"
         />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-bg to-transparent" />
+        {/* Even darkening so centered text stays legible across the frame — lighter in light mode */}
+        <div className="absolute inset-0 bg-black/30 dark:bg-black/55" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-black/20 dark:from-black/70 dark:to-black/40" />
+        {/* Soft fade into the page background below */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-bg to-transparent" />
 
-        <div className="relative h-full container-page flex items-end justify-end pb-12 md:pb-16">
-          <div className="max-w-md w-full bg-bg/85 backdrop-blur-sm p-8 md:p-10 border-l-4 border-brand">
-            <div className="inline-flex items-center gap-2 mb-4 text-[10px] tracking-[0.3em] uppercase text-brand">
-              <span className="w-8 h-px bg-brand" />
+        <div className="relative h-full container-page flex items-center justify-center text-center">
+          <div className="max-w-3xl flex flex-col items-center">
+            <div className="inline-flex items-center gap-3 mb-6 text-[10px] tracking-[0.3em] uppercase text-brand-light animate-fade-up [animation-delay:100ms] group">
+              <span className="h-px bg-brand-light transition-all duration-500 w-8 group-hover:w-14" />
               Established in the Chilterns
+              <span className="h-px bg-brand-light transition-all duration-500 w-8 group-hover:w-14" />
             </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4 tracking-tight">
-              {heroLine1}<br />
-              <span className="text-brand">{heroLine2}</span>
+            <h1 className="group font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] mb-6 tracking-tight text-white animate-fade-up [animation-delay:250ms]">
+              <span className="inline-block transition-transform duration-500 ease-out group-hover:-translate-y-1">{heroLine1}</span>
+              <br />
+              <span className="inline-block text-brand-light transition-all duration-500 ease-out group-hover:text-white group-hover:[text-shadow:0_0_36px_rgba(64,145,108,0.7)] group-hover:translate-y-1">
+                {heroLine2}
+              </span>
             </h1>
-            <p className="text-text-muted mb-8 leading-relaxed">{heroSubheading}</p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <p className="text-white/85 text-lg max-w-xl mb-10 leading-relaxed animate-fade-up [animation-delay:450ms]">{heroSubheading}</p>
+            <div className="flex flex-col gap-3 w-full max-w-56 animate-fade-up [animation-delay:650ms]">
               <Link
                 href="/inventory"
-                className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-6 py-3 font-medium tracking-wider uppercase text-xs transition-colors"
+                className="group inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-7 py-4 font-medium tracking-wider uppercase text-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand/30"
               >
-                Browse Inventory <ArrowRight size={14} />
+                Browse Inventory
+                <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 border border-text/30 hover:border-text text-text px-6 py-3 font-medium tracking-wider uppercase text-xs transition-colors"
+                className="group inline-flex items-center justify-center gap-2 border border-white/40 hover:border-white text-white px-7 py-4 font-medium tracking-wider uppercase text-xs transition-all duration-300 bg-white/5 hover:bg-white/15 backdrop-blur-sm hover:-translate-y-0.5"
               >
                 Book a Viewing
               </Link>

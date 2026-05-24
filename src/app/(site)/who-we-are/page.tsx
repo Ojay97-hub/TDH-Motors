@@ -35,7 +35,7 @@ export default async function WhoWeArePage() {
   );
 
   const heroHeading = cms?.heroHeading ?? "Built on a passion for performance.";
-  const introParagraph = cms?.introParagraph ?? "TDH Motors is a small, family-run dealership based in the Chilterns — with one principle that drives everything we do.";
+  const introParagraph = cms?.introParagraph ?? "TDH Motors is a small, family-run dealership based in the Chilterns — guided by three principles that drive everything we do.";
   const para1 = cms?.para1 ?? "Buying a performance car should feel as good as driving one. Too often, it doesn't. Pushy sales tactics, opaque pricing, and tired stock have made the experience something to endure rather than enjoy.";
   const para2 = cms?.para2 ?? "We started TDH Motors to do things differently. Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. We sell cars we'd be proud to own — and we'd rather have fewer of the right ones than a full forecourt of the wrong ones.";
   const para3 = cms?.para3 ?? "We're a long way from a corporate showroom. There's no high-pressure sales floor, no commission targets, and no need to rush. We invite our customers to come and see us by appointment, take their time, ask questions, and only move forward when it feels right.";

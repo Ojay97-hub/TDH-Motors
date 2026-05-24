@@ -29,7 +29,13 @@ const inventoryNav = {
   children: [{ href: "/merch", label: "Merch" }],
 };
 
-const mobileNav = [...leftNav, ...rightNav];
+const mobileNav = [
+  ...leftNav,
+  ...rightNav,
+  { href: "/who-we-are", label: "Who We Are" },
+  { href: "/contact", label: "Contact" },
+  { href: "/merch", label: "Merch" },
+];
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -183,7 +189,7 @@ function MobileNavGroup({
           key={child.href}
           href={child.href}
           onClick={onNavigate}
-          className={`${navClass(pathname, child.href, true)} pl-4 text-sm`}
+          className={`${navClass(pathname, child.href, true)} pl-4`}
         >
           {child.label}
         </Link>
@@ -214,13 +220,13 @@ export function SiteHeader() {
 
         <Link href="/" className="flex items-center lg:justify-self-center group">
           <Image
-            src="/tdh-logo.jpg"
+            src="/logo-light-mode.png"
             alt="The Dog House"
-            width={96}
-            height={96}
+            width={192}
+            height={192}
             loading="eager"
             fetchPriority="high"
-            className="w-20 h-20 lg:w-24 lg:h-24 rounded-sm object-cover"
+            className="w-20 h-20 lg:w-24 lg:h-24 object-contain dark:invert"
           />
         </Link>
 
@@ -268,21 +274,13 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <MobileNavGroup
-              href={whoWeAreNav.href}
-              label={whoWeAreNav.label}
-              items={whoWeAreNav.children}
-              pathname={pathname}
-              onNavigate={closeMenu}
-            />
-            <MobileNavGroup
+            <Link
               href={inventoryNav.href}
-              label={inventoryNav.label}
-              items={inventoryNav.children}
-              pathname={pathname}
-              onNavigate={closeMenu}
-              variant="button"
-            />
+              onClick={closeMenu}
+              className="inline-flex items-center justify-center w-full px-5 py-3 bg-brand hover:bg-brand-light text-on-brand font-medium tracking-wider uppercase transition-colors mt-2"
+            >
+              {inventoryNav.label}
+            </Link>
           </nav>
         </div>
       )}

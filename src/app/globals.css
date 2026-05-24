@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Wire the `dark:` variant to our data-theme attribute (used by [src/components/theme-toggle.tsx]). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --color-bg: #f0efe9;
   --color-bg-elevated: #e8e7e1;
@@ -16,6 +19,33 @@
 
   --font-display: var(--font-barlow);
   --font-sans: var(--font-barlow);
+
+  --animate-fade-up: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 1s ease-out both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Dark mode overrides — toggled via data-theme="dark" on <html> */

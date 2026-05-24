@@ -73,11 +73,11 @@ export async function SiteFooter() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <Image
-                src="/tdh-logo.jpg"
+                src="/logo-light-mode.png"
                 alt="The Dog House"
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-sm object-cover"
+                width={96}
+                height={96}
+                className="w-12 h-12 object-contain dark:invert"
               />
               <div>
                 <div className="font-display font-bold tracking-wide leading-none">

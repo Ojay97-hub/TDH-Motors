@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Lock } from "lucide-react";
+import { StorageGallery } from "./_components/storage-gallery";
 
 export const metadata: Metadata = {
   title: "Storage | TDH Motors",
@@ -16,6 +17,10 @@ export default function StoragePage() {
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
           Whether you're a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer.
         </p>
+      </section>
+
+      <section className="container-page pb-24">
+        <StorageGallery />
       </section>
 
       <section className="container-page pb-24">
