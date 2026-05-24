@@ -81,9 +81,8 @@ export default async function Home() {
         />
         {/* Even darkening so centered text stays legible across the frame — lighter in light mode */}
         <div className="absolute inset-0 bg-black/30 dark:bg-black/55" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-black/20 dark:from-black/70 dark:to-black/40" />
-        {/* Soft fade into the page background below */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-bg to-transparent" />
+        {/* Bottom fade — anchored to fully-solid bg in the bottom 20% so it matches the next section exactly, then curves up via a translucent mid-stop to fully transparent at the top */}
+        <div className="absolute inset-x-0 bottom-0 h-72 bg-linear-to-t from-bg from-20% via-bg/35 via-60% to-transparent" />
 
         <div className="relative h-full container-page flex items-center justify-center text-center">
           <div className="max-w-3xl flex flex-col items-center">
