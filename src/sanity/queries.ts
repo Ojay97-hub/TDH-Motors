@@ -68,6 +68,11 @@ export const detailingPageQuery = defineQuery(`*[_type == "detailingPage"][0] {
     "afterImage": afterImage.asset->url,
     "afterVideo": afterVideo.asset->url,
   },
+  "gallery": gallery[] {
+    caption,
+    serviceTag,
+    "image": image.asset->url,
+  },
   "videos": videos[] {
     title,
     caption,

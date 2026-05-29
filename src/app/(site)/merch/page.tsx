@@ -1,169 +1,83 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { ArrowRight, ExternalLink, Package, ShoppingBag } from "lucide-react";
-import { sanityClient } from "@/sanity/client";
-import { merchProductsQuery } from "@/sanity/queries";
+import { ArrowRight, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { MerchGrid } from "@/components/merch-grid";
+import { MERCH_ITEMS, TIKTOK_SHOP_URL } from "@/lib/merch";
 
 export const metadata: Metadata = {
-  title: "Merch | TDH Motors",
-  description: "Shop The Dog House Motors official merchandise through TikTok Shop.",
+  title: "Shop | TDH Motors",
+  description: "Shop The Dog House official apparel and garage essentials — checkout securely through TikTok Shop.",
 };
 
-export const revalidate = 60;
+const STORE_PERKS = [
+  {
+    icon: ShieldCheck,
+    title: "Secure TikTok checkout",
+    detail: "Every order is completed and protected through TikTok Shop.",
+  },
+  {
+    icon: Truck,
+    title: "Tracked delivery",
+    detail: "Shipping and tracking handled end-to-end by TikTok Shop.",
+  },
+  {
+    icon: Sparkles,
+    title: "New drop incoming",
+    detail: "The first Dog House collection lands soon — follow for the date.",
+  },
+];
 
-type MerchProduct = {
-  _id: string;
-  title: string;
-  description?: string | null;
-  priceLabel?: string | null;
-  tiktokShopUrl?: string | null;
-  status: "available" | "coming-soon" | "hidden";
-  image?: string | null;
-};
-
-const TIKTOK_PROFILE_URL = "https://www.tiktok.com/@thedoghouseas";
-
-function ProductImage({ product }: { product: MerchProduct }) {
-  if (product.image) {
-    return (
-      <Image
-        src={product.image}
-        alt={product.title}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover group-hover:scale-105 transition-transform duration-700"
-      />
-    );
-  }
-
-  return (
-    <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-stone-700 to-stone-900">
-      <ShoppingBag size={40} className="text-stone-300 mb-3" strokeWidth={1.5} />
-      <div className="text-xs tracking-[0.3em] uppercase text-stone-300">Merch</div>
-    </div>
-  );
-}
-
-export default async function MerchPage() {
-  const products = await sanityClient.fetch<MerchProduct[]>(
-    merchProductsQuery,
-    {},
-    { next: { revalidate: 60, tags: ["merchProduct"] } },
-  );
-
-  const hasProducts = products.length > 0;
-
+export default function MerchPage() {
   return (
     <>
-      <section className="container-page pt-32 md:pt-40 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 lg:gap-20 items-end">
-          <div className="max-w-3xl">
-            <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Merch</div>
-            <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">
-              The Dog House Shop
-            </h1>
-            <p className="text-text-muted text-lg leading-relaxed">
-              Official TDH apparel and accessories, managed in Sanity and checked out securely through TikTok Shop.
-            </p>
-          </div>
+      {/* Storefront header */}
+      <section className="container-page pt-32 md:pt-40 pb-12">
+        <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Shop</div>
+        <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">The Dog House Shop</h1>
+        <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
+          Official TDH apparel and garage essentials, built around the new Dog House artwork.
+          Browse the collection below and check out securely through TikTok Shop.
+        </p>
+      </section>
 
-          <div className="border border-border bg-bg-elevated p-8">
-            <Package size={30} className="text-brand-light mb-5" strokeWidth={1.5} />
-            <h2 className="font-display text-2xl tracking-wide mb-3">TikTok handles checkout</h2>
-            <p className="text-text-muted leading-relaxed">
-              Add each product in Sanity with its TikTok Shop URL. Customers browse here, then buy through TikTok.
-            </p>
-          </div>
+      {/* Trust / info bar */}
+      <section className="container-page pb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-3 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border bg-bg-elevated">
+          {STORE_PERKS.map((perk) => {
+            const Icon = perk.icon;
+            return (
+              <div key={perk.title} className="flex items-start gap-4 p-6">
+                <Icon size={22} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
+                <div>
+                  <div className="font-medium text-text mb-1">{perk.title}</div>
+                  <p className="text-text-muted text-sm leading-relaxed">{perk.detail}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
+      {/* Product grid */}
       <section className="container-page pb-24">
-        {hasProducts ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => {
-              const isComingSoon = product.status === "coming-soon";
-              const canBuy = !isComingSoon && Boolean(product.tiktokShopUrl);
-
-              return (
-                <article
-                  key={product._id}
-                  className="group bg-bg-elevated border border-border hover:border-brand transition-all overflow-hidden"
-                >
-                  <div className="relative aspect-4/3 overflow-hidden bg-stone-800">
-                    <ProductImage product={product} />
-                    {isComingSoon && (
-                      <div className="absolute top-4 left-4 bg-amber-500 text-stone-900 px-3 py-1 text-xs uppercase tracking-widest font-medium">
-                        Coming Soon
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-6">
-                    <div className="text-xs text-text-subtle tracking-widest uppercase mb-2">
-                      Official TDH Merch
-                    </div>
-                    <h2 className="font-display text-xl tracking-wide mb-3">{product.title}</h2>
-                    {product.description && (
-                      <p className="text-text-muted text-sm leading-relaxed mb-5">
-                        {product.description}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between gap-4 pt-5 border-t border-border">
-                      <div>
-                        <div className="text-xs text-text-subtle uppercase tracking-wider">Price</div>
-                        <div className="font-display text-lg text-text">
-                          {product.priceLabel || "See TikTok"}
-                        </div>
-                      </div>
-                      {canBuy ? (
-                        <a
-                          href={product.tiktokShopUrl ?? "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-4 py-3 font-medium tracking-wider uppercase text-xs transition-colors"
-                        >
-                          Buy <ExternalLink size={13} />
-                        </a>
-                      ) : (
-                        <span className="inline-flex items-center justify-center gap-2 bg-border text-text-muted px-4 py-3 font-medium tracking-wider uppercase text-xs">
-                          Soon
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+        <div className="flex items-center justify-between border-b border-border pb-5 mb-10">
+          <div className="text-sm text-text-muted">
+            {MERCH_ITEMS.length} {MERCH_ITEMS.length === 1 ? "product" : "products"}
           </div>
-        ) : (
-          <div className="border border-border bg-bg-elevated p-10 md:p-14 text-center">
-            <ShoppingBag size={42} className="text-brand-light mx-auto mb-5" strokeWidth={1.5} />
-            <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-4">
-              Merch drops are coming soon
-            </h2>
-            <p className="text-text-muted max-w-xl mx-auto leading-relaxed mb-8">
-              Once products are added in Sanity, they will appear here with direct links to complete the purchase on TikTok Shop.
-            </p>
-            <a
-              href={TIKTOK_PROFILE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
-            >
-              Follow on TikTok <ArrowRight size={16} />
-            </a>
-          </div>
-        )}
+          <div className="text-xs uppercase tracking-[0.2em] text-text-subtle">The Dog House Drop</div>
+        </div>
+
+        <MerchGrid items={MERCH_ITEMS} />
       </section>
 
+      {/* Bottom CTA */}
       <section className="border-t border-border bg-bg-elevated">
         <div className="container-page py-24 text-center">
-          <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">Stay Updated</h2>
+          <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">Don&apos;t Miss the Drop</h2>
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-            Follow TDH on TikTok for new drops, restocks, and behind-the-scenes previews.
+            Follow TDH on TikTok for the launch date, new drops, restocks, and behind-the-scenes previews.
           </p>
           <a
-            href={TIKTOK_PROFILE_URL}
+            href={TIKTOK_SHOP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"

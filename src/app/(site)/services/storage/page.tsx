@@ -15,7 +15,7 @@ export default function StoragePage() {
         <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Service</div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Storage</h1>
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
-          Whether you're a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer.
+          Whether you're a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer. Discretion and security are our highest priority — your car is kept confidential and protected around the clock.
         </p>
       </section>
 
@@ -38,9 +38,15 @@ export default function StoragePage() {
                 </p>
               </div>
               <div>
-                <h3 className="font-display text-xl tracking-wide mb-2">Secure Facility</h3>
+                <h3 className="font-display text-xl tracking-wide mb-2">Security First</h3>
                 <p className="text-text-muted leading-relaxed">
-                  CCTV monitoring, secure gates, and secure indoor storage. Your car is as safe as it can be during its time with us.
+                  Security is our number one priority. 24/7 CCTV monitoring, secure gates, alarmed access, and locked indoor storage mean your car is as safe as it can possibly be during its time with us.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-display text-xl tracking-wide mb-2">Discreet &amp; Confidential</h3>
+                <p className="text-text-muted leading-relaxed">
+                  We keep a low profile. Your vehicle's presence, registration, and ownership details stay strictly confidential — nothing is shared, and the facility address is given only to clients.
                 </p>
               </div>
               <div>
@@ -62,6 +68,10 @@ export default function StoragePage() {
               <li className="flex gap-3">
                 <span className="text-brand-light font-bold text-lg shrink-0">✓</span>
                 <span className="text-text-muted leading-relaxed">24/7 CCTV security monitoring</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-brand-light font-bold text-lg shrink-0">✓</span>
+                <span className="text-text-muted leading-relaxed">Discreet, fully confidential handling</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-brand-light font-bold text-lg shrink-0">✓</span>

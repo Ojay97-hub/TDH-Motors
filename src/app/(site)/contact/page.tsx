@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
-import { sanityClient } from "@/sanity/client";
+import { safeSanityFetch } from "@/sanity/client";
 import { siteSettingsQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default async function ContactPage({
 }) {
   const [{ car }, settings] = await Promise.all([
     searchParams,
-    sanityClient.fetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
+    safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
   ]);
 
   const phone = settings?.phone ?? "+44 (0) 1000 000 000";

@@ -6,6 +6,7 @@ export const detailingPage = defineType({
   type: "document",
   groups: [
     { name: "beforeAfter", title: "Before & After", default: true },
+    { name: "gallery", title: "Photo Gallery" },
     { name: "videos", title: "Videos" },
   ],
   fields: [
@@ -88,6 +89,47 @@ export const detailingPage = defineType({
             }),
           preview: {
             select: { title: "label", media: "afterImage" },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "gallery",
+      title: "Photo Gallery",
+      description: "Single completed-job photos — no before/after slider. Just upload a finished detail and (optionally) add a caption.",
+      type: "array",
+      group: "gallery",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "image",
+              title: "Photo",
+              type: "image",
+              options: { hotspot: true },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+              description: 'Optional, e.g. "Porsche 911 — Ceramic Coating"',
+            }),
+            defineField({
+              name: "serviceTag",
+              title: "Service tag",
+              type: "string",
+              description: 'Optional, e.g. "Protection Detailing"',
+            }),
+          ],
+          preview: {
+            select: { title: "caption", subtitle: "serviceTag", media: "image" },
+            prepare: ({ title, subtitle, media }) => ({
+              title: title || "Untitled photo",
+              subtitle,
+              media,
+            }),
           },
         }),
       ],

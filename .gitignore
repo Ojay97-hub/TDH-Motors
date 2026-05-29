@@ -45,6 +45,9 @@ next-env.d.ts
 .claude/
 .cursor/
 
+# un-blurred source images kept locally for re-editing (never deploy/serve)
+/.image-originals/
+
 # sanity build output
 /dist/
 /.sanity/

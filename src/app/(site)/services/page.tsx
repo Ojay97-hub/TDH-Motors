@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Car, Search, Wrench, Banknote, Shield, Sparkles } from "lucide-react";
-import { sanityClient } from "@/sanity/client";
+import { safeSanityFetch } from "@/sanity/client";
 import { servicesPageQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ const SERVICES_DEFAULTS = [
 ];
 
 export default async function ServicesPage() {
-  const cms = await sanityClient.fetch(
+  const cms = await safeSanityFetch(
     servicesPageQuery,
     {},
     { next: { revalidate: 60, tags: ["servicesPage"] } },

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Shield, Wrench, Droplets, CheckCircle, ExternalLink } from "lucide-react";
-import { BeforeAfterSlider } from "@/components/before-after-slider";
-import { sanityClient } from "@/sanity/client";
+import { BeforeAfterGallery } from "@/components/before-after-gallery";
+import { safeSanityFetch } from "@/sanity/client";
 import { detailingPageQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
@@ -125,16 +126,23 @@ function getExternalLabel(url: string): string {
 }
 
 export default async function DetailingPage() {
-  const cms = await sanityClient.fetch(
+  type BeforeAfterItem = { label: string; serviceTag?: string; beforeImage?: string; beforeVideo?: string; afterImage?: string; afterVideo?: string };
+  type GalleryItem = { image: string; caption?: string; serviceTag?: string };
+  type VideoItem = { title: string; caption?: string; orientation?: string; videoFile?: string; videoUrl?: string };
+
+  const cms = await safeSanityFetch<{
+    beforeAfterGallery?: BeforeAfterItem[];
+    gallery?: GalleryItem[];
+    videos?: VideoItem[];
+  }>(
     detailingPageQuery,
     {},
     { next: { revalidate: 60, tags: ["detailingPage"] } },
   );
 
-  const beforeAfterGallery: { label: string; serviceTag?: string; beforeImage?: string; beforeVideo?: string; afterImage?: string; afterVideo?: string }[] =
-    cms?.beforeAfterGallery ?? [];
-  const videos: { title: string; caption?: string; orientation?: string; videoFile?: string; videoUrl?: string }[] =
-    cms?.videos ?? [];
+  const beforeAfterGallery: BeforeAfterItem[] = cms?.beforeAfterGallery ?? [];
+  const gallery: GalleryItem[] = cms?.gallery ?? [];
+  const videos: VideoItem[] = cms?.videos ?? [];
 
   return (
     <>
@@ -189,7 +197,7 @@ export default async function DetailingPage() {
               </div>
 
               <div className={`p-8 md:p-12 bg-bg border-t lg:border-t-0 border-border ${!isEven ? "lg:order-1 lg:border-r border-border" : "lg:border-l border-border"}`}>
-                <h3 className="font-display text-xl tracking-wide mb-6 text-text">What's Included</h3>
+                <h3 className="font-display text-xl tracking-wide mb-6 text-text">What&apos;s Included</h3>
                 <ul className="space-y-3">
                   {svc.includes.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-text-muted">
@@ -215,17 +223,47 @@ export default async function DetailingPage() {
                 Drag the handle left and right to compare.
               </p>
             </div>
+            <BeforeAfterGallery items={beforeAfterGallery} />
+          </div>
+        </section>
+      )}
+
+      {/* Photo Gallery — single completed-job photos */}
+      {gallery.length > 0 && (
+        <section className="border-t border-border py-24 md:py-28">
+          <div className="container-page">
+            <div className="mb-12">
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Recent Work</div>
+              <h2 className="font-display text-4xl md:text-5xl tracking-tight">The Gallery</h2>
+              <p className="text-text-muted mt-4 max-w-lg leading-relaxed">
+                A selection of recently completed details.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {beforeAfterGallery.map((item) => (
-                <BeforeAfterSlider
-                  key={item.label}
-                  beforeUrl={item.beforeImage}
-                  beforeVideoUrl={item.beforeVideo}
-                  afterUrl={item.afterImage}
-                  afterVideoUrl={item.afterVideo}
-                  label={item.label}
-                  serviceTag={item.serviceTag}
-                />
+              {gallery.map((item, i) => (
+                <figure key={i} className="group overflow-hidden border border-border bg-bg-elevated">
+                  <div className="relative aspect-4/3 overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.caption || "Completed detailing job"}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  {(item.caption || item.serviceTag) && (
+                    <figcaption className="p-5">
+                      {item.serviceTag && (
+                        <div className="text-[10px] tracking-[0.25em] uppercase text-brand-light mb-1">
+                          {item.serviceTag}
+                        </div>
+                      )}
+                      {item.caption && (
+                        <div className="font-display text-lg tracking-wide">{item.caption}</div>
+                      )}
+                    </figcaption>
+                  )}
+                </figure>
               ))}
             </div>
           </div>
@@ -316,7 +354,7 @@ export default async function DetailingPage() {
         <div className="container-page py-24 text-center">
           <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">Book Your Detail</h2>
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-            Every job is assessed individually. Get in touch to discuss your car's needs and we'll recommend the right service for you.
+            Every job is assessed individually. Get in touch to discuss your car&apos;s needs and we&apos;ll recommend the right service for you.
           </p>
           <Link
             href="/contact"

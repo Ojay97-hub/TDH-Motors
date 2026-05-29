@@ -1,4 +1,4 @@
-import { sanityClient } from "@/sanity/client";
+import { safeSanityFetch } from "@/sanity/client";
 import {
   allCarSlugsQuery,
   allCarsQuery,
@@ -60,25 +60,27 @@ function normalizeCarVideos(car: CarRaw): Car {
 }
 
 export async function getAllCars(): Promise<Car[]> {
-  const cars = await sanityClient.fetch<CarRaw[]>(
+  const cars = await safeSanityFetch<CarRaw[]>(
     allCarsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
+    [],
   );
-  return cars.map(normalizeCarVideos);
+  return (cars ?? []).map(normalizeCarVideos);
 }
 
 export async function getFeaturedCars(): Promise<Car[]> {
-  const cars = await sanityClient.fetch<CarRaw[]>(
+  const cars = await safeSanityFetch<CarRaw[]>(
     featuredCarsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
+    [],
   );
-  return cars.map(normalizeCarVideos);
+  return (cars ?? []).map(normalizeCarVideos);
 }
 
 export async function getCarBySlug(slug: string): Promise<Car | null> {
-  const car = await sanityClient.fetch<CarRaw | null>(
+  const car = await safeSanityFetch<CarRaw | null>(
     carBySlugQuery,
     { slug },
     { next: { revalidate: 60, tags: ["car", `car:${slug}`] } },
@@ -87,11 +89,13 @@ export async function getCarBySlug(slug: string): Promise<Car | null> {
 }
 
 export async function getAllCarSlugs(): Promise<string[]> {
-  return await sanityClient.fetch<string[]>(
+  const slugs = await safeSanityFetch<string[]>(
     allCarSlugsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
+    [],
   );
+  return slugs ?? [];
 }
 
 export function formatPrice(price: number): string {

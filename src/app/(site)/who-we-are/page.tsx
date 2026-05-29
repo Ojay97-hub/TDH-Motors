@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Eye, Handshake } from "lucide-react";
-import { sanityClient } from "@/sanity/client";
+import { safeSanityFetch } from "@/sanity/client";
 import { whoWeArePageQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ const PRINCIPLES_DEFAULTS = [
 ];
 
 export default async function WhoWeArePage() {
-  const cms = await sanityClient.fetch(
+  const cms = await safeSanityFetch(
     whoWeArePageQuery,
     {},
     { next: { revalidate: 60, tags: ["whoWeArePage"] } },

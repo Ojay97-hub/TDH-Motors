@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Clock, ExternalLink } from "lucide-react";
+import { ArrowRight, MapPin, ExternalLink, ShoppingBag } from "lucide-react";
 
 function InstagramIcon({ size = 24 }: { size?: number }) {
   return (
@@ -30,7 +30,8 @@ function FacebookIcon({ size = 24 }: { size?: number }) {
 import { CarCard } from "@/components/car-card";
 import { ShowroomVideo } from "@/components/showroom-video";
 import { getFeaturedCars } from "@/lib/cars";
-import { sanityClient } from "@/sanity/client";
+import { MERCH_ITEMS, TIKTOK_SHOP_URL } from "@/lib/merch";
+import { safeSanityFetch } from "@/sanity/client";
 import { homePageQuery, siteSettingsQuery } from "@/sanity/queries";
 
 const SERVICES_STRIP_DEFAULTS = [
@@ -40,12 +41,11 @@ const SERVICES_STRIP_DEFAULTS = [
   { title: "Detailing", text: "Full machine polish, paint protection, and ceramic coating from experienced detailers." },
 ];
 
-
 export default async function Home() {
   const [featured, cms, settings] = await Promise.all([
     getFeaturedCars(),
-    sanityClient.fetch(homePageQuery, {}, { next: { revalidate: 60, tags: ["homePage"] } }),
-    sanityClient.fetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
+    safeSanityFetch(homePageQuery, {}, { next: { revalidate: 60, tags: ["homePage"] } }),
+    safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
   ]);
 
   const heroLine1 = cms?.heroLine1 ?? "Performance Cars,";
@@ -189,9 +189,14 @@ export default async function Home() {
             <CarCard key={car.slug} car={car} />
           ))}
           <div className="group block bg-bg-elevated border border-border border-dashed overflow-hidden cursor-default">
-            <div className="relative aspect-4/3 flex flex-col items-center justify-center bg-linear-to-br from-stone-700 to-stone-900">
-              <Clock size={36} className="text-stone-400 mb-3" strokeWidth={1.5} />
-              <div className="text-xs tracking-[0.3em] uppercase text-amber-400 font-medium">Coming Soon</div>
+            <div className="relative aspect-4/3 overflow-hidden bg-black p-6 md:p-8">
+              <Image
+                src="/coming-soon-tdh.png"
+                alt="The Dog House Automotive Solutions coming soon"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-contain transition-transform duration-700 group-hover:scale-105"
+              />
             </div>
             <div className="p-6">
               <div className="text-xs text-text-subtle tracking-widest uppercase mb-2">New Arrival</div>
@@ -208,6 +213,80 @@ export default async function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Upcoming Merch */}
+      <section className="border-y border-border bg-bg-elevated">
+        <div className="container-page py-24 md:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-end mb-12">
+            <div>
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Upcoming Merch</div>
+              <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-5">
+                The Dog House Drop
+              </h2>
+              <p className="text-text-muted text-lg leading-relaxed">
+                The new TDH artwork is being turned into a small merch line across hoodies, tees, caps, and garage essentials. Coming soon.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row lg:justify-end gap-3">
+              <Link
+                href="/merch"
+                className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
+              >
+                Preview Merch <ShoppingBag size={15} />
+              </Link>
+              <a
+                href="https://www.tiktok.com/@thedoghouseas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 border border-border hover:border-brand text-text px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
+              >
+                Drop Updates <ExternalLink size={13} />
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            {MERCH_ITEMS.map((item) => (
+              <article
+                key={item.title}
+                className="group relative overflow-hidden border border-border bg-bg transition-all duration-300 hover:-translate-y-1 hover:border-brand hover:shadow-xl hover:shadow-black/10"
+              >
+                <Link
+                  href="/merch"
+                  aria-label={`View ${item.title} on the merch page`}
+                  className="absolute inset-0 z-10"
+                />
+                <div className="relative aspect-4/3 overflow-hidden bg-bg">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-6 md:p-7">
+                  <div className="text-xs text-text-subtle tracking-widest uppercase mb-2">
+                    {item.category}
+                  </div>
+                  <h3 className="font-display text-xl tracking-wide mb-3">{item.title}</h3>
+                  <p className="text-text-muted text-sm leading-relaxed">
+                    {item.detail} Coming soon.
+                  </p>
+                  <a
+                    href={TIKTOK_SHOP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative z-20 mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-brand-light transition-colors hover:text-text"
+                  >
+                    Purchase on TikTok <ExternalLink size={12} />
+                  </a>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>

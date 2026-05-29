@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { sanityClient } from "@/sanity/client";
+import { safeSanityFetch } from "@/sanity/client";
 import { siteSettingsQuery } from "@/sanity/queries";
 
 function InstagramIcon({ size = 16 }: { size?: number }) {
@@ -53,7 +53,7 @@ function TikTokIcon({ size = 16 }: { size?: number }) {
 }
 
 export async function SiteFooter() {
-  const settings = await sanityClient.fetch(
+  const settings = await safeSanityFetch(
     siteSettingsQuery,
     {},
     { next: { revalidate: 60, tags: ["siteSettings"] } },
