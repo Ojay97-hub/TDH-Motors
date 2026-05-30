@@ -30,16 +30,11 @@ export const siteSettings = defineType({
       description: 'e.g. "Exact address shared on booking"',
     }),
     defineField({
-      name: "mapPlusCode",
-      title: "Map plus code / short address",
-      type: "string",
-      description: 'Shown in the homepage map pin, e.g. "P5WG+RV Aylesbury"',
-    }),
-    defineField({
       name: "mapRegion",
-      title: "Map region line",
+      title: "General area",
       type: "string",
-      description: 'Second line under plus code, e.g. "Buckinghamshire, UK"',
+      description:
+        'General location shown on the homepage map (the exact address is never published — it is shared on enquiry). e.g. "The Chilterns, Buckinghamshire"',
     }),
     defineField({
       name: "hoursLabel",
@@ -52,18 +47,6 @@ export const siteSettings = defineType({
       title: "Opening hours detail",
       type: "string",
       description: 'e.g. "09:00 – 17:00 (by appointment)"',
-    }),
-    defineField({
-      name: "mapEmbedUrl",
-      title: "Google Maps embed URL",
-      type: "url",
-      description: "Full embed URL from Google Maps → Share → Embed a map",
-    }),
-    defineField({
-      name: "mapDirectionsUrl",
-      title: "Google Maps directions URL",
-      type: "url",
-      description: "URL opened when visitor clicks Get Directions",
     }),
   ],
   preview: {

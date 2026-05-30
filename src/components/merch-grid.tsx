@@ -90,7 +90,7 @@ export function MerchGrid({ items }: { items: MerchItem[] }) {
           aria-modal="true"
           aria-label={`${active.title} — enlarged image`}
           onClick={close}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 sm:p-10"
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 sm:p-10 cursor-zoom-out"
         >
           <button
             type="button"
@@ -115,10 +115,7 @@ export function MerchGrid({ items }: { items: MerchItem[] }) {
             </button>
           )}
 
-          <div
-            className="relative h-[78vh] w-[92vw] sm:w-[85vw]"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative h-[78vh] w-[92vw] sm:w-[85vw] pointer-events-none">
             <Image
               src={active.image}
               alt={active.title}

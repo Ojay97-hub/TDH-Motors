@@ -82,14 +82,9 @@ const SITE_SETTINGS = {
   email: "hello@tdhmotors.co.uk",
   addressLine1: "Aylesbury, Buckinghamshire",
   addressLine2: "Exact address shared on booking",
-  mapPlusCode: "P5WG+RV Aylesbury",
-  mapRegion: "Buckinghamshire, UK",
+  mapRegion: "The Chilterns, Buckinghamshire",
   hoursLabel: "Monday – Saturday",
   hoursDetail: "09:00 – 17:00 (by appointment)",
-  mapEmbedUrl:
-    "https://maps.google.com/maps?q=P5WG%2BRV+Aylesbury%2C+UK&t=&z=15&ie=UTF8&iwloc=&output=embed",
-  mapDirectionsUrl:
-    "https://www.google.com/maps/dir/?api=1&destination=P5WG%2BRV+Aylesbury%2C+UK",
 };
 
 const SERVICES_PAGE = {

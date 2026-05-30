@@ -107,7 +107,7 @@ export default async function WhoWeArePage() {
               <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Collaboration</div>
               <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">Business Partners</h2>
               <p className="text-text-muted text-lg leading-relaxed mb-8">
-                We're always interested in exploring partnerships that align with our values. Whether you're a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we'd like to hear from you.
+                We&apos;re always interested in exploring partnerships that align with our values. Whether you&apos;re a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we&apos;d like to hear from you.
               </p>
               <ul className="space-y-4 mb-10">
                 <li className="flex gap-3">
@@ -140,7 +140,7 @@ export default async function WhoWeArePage() {
                 We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.
               </p>
               <p className="text-text-muted text-sm leading-relaxed">
-                Have an opportunity you think we should know about? Drop us a message and let's have a conversation. We're always open to the right opportunity.
+                Have an opportunity you think we should know about? Drop us a message and let&apos;s have a conversation. We&apos;re always open to the right opportunity.
               </p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Car, Banknote } from "lucide-react";
+import { ArrowRight, Car } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Curated Sales | TDH Motors",
@@ -14,7 +14,7 @@ export default function CuratedSalesPage() {
         <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Service</div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Curated Sales</h1>
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
-          Every car in our inventory is hand-picked by our team and personally inspected before listing. We only sell cars we'd happily own ourselves. And we make trading in your current car straightforward.
+          Every car in our inventory is hand-picked by our team and personally inspected before listing. We only sell cars we&apos;d happily own ourselves. And we make trading in your current car straightforward.
         </p>
       </section>
 
@@ -50,7 +50,7 @@ export default function CuratedSalesPage() {
           <div className="bg-bg-elevated p-8 md:p-12">
             <h3 className="font-display text-2xl tracking-wide mb-6">Part-Exchange Made Simple</h3>
             <p className="text-text-muted leading-relaxed mb-6">
-              Trading in your current car? We offer fair, transparent valuations with no surprises. Here's how it works:
+              Trading in your current car? We offer fair, transparent valuations with no surprises. Here&apos;s how it works:
             </p>
             <div className="flex items-start gap-3 mb-4">
               <span className="inline-flex items-center justify-center w-8 h-8 bg-brand text-on-brand font-bold text-sm rounded-full shrink-0">1</span>
@@ -81,7 +81,7 @@ export default function CuratedSalesPage() {
         <div className="container-page py-24 text-center">
           <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">Find Your Next Car</h2>
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-            Browse our current inventory or tell us what you're looking for. We're here to help.
+            Browse our current inventory or tell us what you&apos;re looking for. We&apos;re here to help.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

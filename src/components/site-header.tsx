@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 
 const leftNav = [
@@ -48,12 +48,56 @@ function navClass(pathname: string, href: string, mobile = false) {
     : "text-sm tracking-wider uppercase transition-colors pb-0.5 font-medium";
   const state = active
     ? "text-text border-b-2 border-brand"
-    : "text-text-muted hover:text-text border-b-2 border-transparent";
+    : "text-text/85 hover:text-text border-b-2 border-transparent";
   return `${base} ${state}`;
 }
 
-function dropdownPanelClass() {
-  return "absolute top-full pt-2 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 transition-all duration-150 z-50";
+function dropdownPanelClass(open: boolean) {
+  return `absolute top-full pt-2 transition-all duration-150 z-50 ${
+    open
+      ? "opacity-100 visible translate-y-0"
+      : "opacity-0 invisible translate-y-1 pointer-events-none"
+  }`;
+}
+
+// Drives a nav dropdown that opens on hover (mouse) or tap (touch).
+// `open = hovered || pinned`; the chevron toggles `pinned`, hover drives the
+// rest, and an outside tap or route change collapses it again. The owning
+// component passes its own `ref` so the outside-tap check can read it.
+function useNavDropdown(
+  ref: RefObject<HTMLDivElement | null>,
+  pathname: string,
+) {
+  const [pinned, setPinned] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // Collapse the dropdown when the route changes — React's recommended
+  // "adjust state during render" pattern, no extra effect pass needed.
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setPinned(false);
+    setHovered(false);
+  }
+
+  useEffect(() => {
+    if (!pinned) return;
+    const handlePointer = (event: PointerEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setPinned(false);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointer);
+    return () => document.removeEventListener("pointerdown", handlePointer);
+  }, [pinned, ref]);
+
+  return {
+    open: hovered || pinned,
+    pinned,
+    togglePinned: () => setPinned((value) => !value),
+    onMouseEnter: () => setHovered(true),
+    onMouseLeave: () => setHovered(false),
+  };
 }
 
 function dropdownItemClass(pathname: string, href: string) {
@@ -79,9 +123,16 @@ function NavDropdown({
   const parentActive =
     isActive(pathname, href) ||
     items.some((child) => isActive(pathname, child.href));
+  const ref = useRef<HTMLDivElement>(null);
+  const dropdown = useNavDropdown(ref, pathname);
 
   return (
-    <div className="relative group">
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={dropdown.onMouseEnter}
+      onMouseLeave={dropdown.onMouseLeave}
+    >
       <div
         className={`flex items-center gap-0.5 pb-0.5 border-b-2 transition-colors ${
           parentActive ? "border-brand" : "border-transparent"
@@ -90,20 +141,28 @@ function NavDropdown({
         <Link
           href={href}
           className={`text-sm tracking-wider uppercase font-medium transition-colors ${
-            parentActive ? "text-text" : "text-text-muted hover:text-text"
+            parentActive ? "text-text" : "text-text/85 hover:text-text"
           }`}
         >
           {label}
         </Link>
-        <ChevronDown
-          size={14}
-          className={`shrink-0 transition-colors ${
-            parentActive ? "text-text" : "text-text-muted group-hover:text-text"
-          }`}
-          aria-hidden
-        />
+        <button
+          type="button"
+          onClick={dropdown.togglePinned}
+          aria-expanded={dropdown.open}
+          aria-label={`Toggle ${label} menu`}
+          className="flex items-center -m-1 p-1"
+        >
+          <ChevronDown
+            size={14}
+            className={`shrink-0 transition-transform ${
+              dropdown.open ? "rotate-180" : ""
+            } ${parentActive ? "text-text" : "text-text/85"}`}
+            aria-hidden
+          />
+        </button>
       </div>
-      <div className={`right-0 ${dropdownPanelClass()}`}>
+      <div className={`right-0 ${dropdownPanelClass(dropdown.open)}`}>
         <div className="min-w-40 border border-border/60 bg-bg shadow-lg py-1">
           {items.map((child) => (
             <Link
@@ -125,21 +184,41 @@ function InventoryDropdown({ pathname }: { pathname: string }) {
   const parentActive =
     isActive(pathname, href) ||
     items.some((child) => isActive(pathname, child.href));
+  const ref = useRef<HTMLDivElement>(null);
+  const dropdown = useNavDropdown(ref, pathname);
 
   return (
-    <div className="relative group hidden lg:block">
-      <Link
-        href={href}
-        className={`inline-flex items-center gap-1 px-5 py-2.5 font-medium text-sm tracking-wider uppercase transition-colors ${
-          parentActive
-            ? "bg-brand-light text-on-brand"
-            : "bg-brand hover:bg-brand-light text-on-brand"
+    <div
+      ref={ref}
+      className="relative hidden lg:block"
+      onMouseEnter={dropdown.onMouseEnter}
+      onMouseLeave={dropdown.onMouseLeave}
+    >
+      <div
+        className={`inline-flex items-center font-medium text-sm tracking-wider uppercase transition-colors text-on-brand ${
+          parentActive ? "bg-brand-light" : "bg-brand hover:bg-brand-light"
         }`}
       >
-        {label}
-        <ChevronDown size={14} aria-hidden />
-      </Link>
-      <div className={`right-0 ${dropdownPanelClass()}`}>
+        <Link href={href} className="py-2.5 pl-5 pr-1">
+          {label}
+        </Link>
+        <button
+          type="button"
+          onClick={dropdown.togglePinned}
+          aria-expanded={dropdown.open}
+          aria-label={`Toggle ${label} menu`}
+          className="flex items-center py-2.5 pr-4 pl-1"
+        >
+          <ChevronDown
+            size={14}
+            className={`transition-transform ${
+              dropdown.open ? "rotate-180" : ""
+            }`}
+            aria-hidden
+          />
+        </button>
+      </div>
+      <div className={`right-0 ${dropdownPanelClass(dropdown.open)}`}>
         <div className="min-w-40 border border-border/60 bg-bg shadow-lg py-1">
           {items.map((child) => (
             <Link
@@ -156,55 +235,13 @@ function InventoryDropdown({ pathname }: { pathname: string }) {
   );
 }
 
-function MobileNavGroup({
-  href,
-  label,
-  items,
-  pathname,
-  onNavigate,
-  variant = "link",
-}: {
-  href: string;
-  label: string;
-  items: { href: string; label: string }[];
-  pathname: string;
-  onNavigate: () => void;
-  variant?: "link" | "button";
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <Link
-        href={href}
-        onClick={onNavigate}
-        className={
-          variant === "button"
-            ? "inline-flex items-center justify-center px-5 py-3 bg-brand hover:bg-brand-light text-on-brand font-medium tracking-wider uppercase transition-colors"
-            : navClass(pathname, href, true)
-        }
-      >
-        {label}
-      </Link>
-      {items.map((child) => (
-        <Link
-          key={child.href}
-          href={child.href}
-          onClick={onNavigate}
-          className={`${navClass(pathname, child.href, true)} pl-4`}
-        >
-          {child.label}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const closeMenu = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 inset-x-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border/60">
+    <header className="sticky top-0 inset-x-0 z-50 bg-bg/65 backdrop-blur-md border-b border-border/60">
       <div className="container-page flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between h-24 lg:h-28 gap-4">
         <nav className="hidden lg:flex items-center gap-7 justify-self-start">
           {leftNav.map((item) => (

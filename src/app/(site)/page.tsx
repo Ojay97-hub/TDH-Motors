@@ -61,15 +61,19 @@ export default async function Home() {
   const findUsHeading = cms?.findUsHeading ?? "Better yet, see us in person.";
   const findUsBody = cms?.findUsBody ?? "Viewing is by appointment only — give us a call or drop us a line and we'll get the kettle on.";
 
-  const mapEmbedUrl = settings?.mapEmbedUrl ?? "https://maps.google.com/maps?q=P5WG%2BRV+Aylesbury%2C+UK&t=&z=15&ie=UTF8&iwloc=&output=embed";
-  const mapDirectionsUrl = settings?.mapDirectionsUrl ?? "https://www.google.com/maps/dir/?api=1&destination=P5WG%2BRV+Aylesbury%2C+UK";
-  const mapPlusCode = settings?.mapPlusCode ?? "P5WG+RV Aylesbury";
-  const mapRegion = settings?.mapRegion ?? "Buckinghamshire, UK";
+  // For privacy/security the home page only ever shows a general area — the exact
+  // yard is shared once a visitor enquires. We deliberately ignore any precise
+  // mapEmbedUrl / plus code from the CMS here and build a wide, region-level map
+  // centred on the general region, so the address can never be re-exposed publicly.
+  const mapRegion = settings?.mapRegion ?? "The Chilterns, Buckinghamshire";
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapRegion)}&z=11&output=embed`;
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative h-screen min-h-[640px] overflow-hidden bg-stone-900">
+      {/* Hero — pulled up behind the sticky header (matching its h-24/h-28) so the
+          image fills the full viewport and the translucent header shows the image
+          through it even at the top of the page, not the bare page background. */}
+      <section className="relative h-screen min-h-[640px] -mt-24 lg:-mt-28 overflow-hidden bg-stone-900">
         <Image
           src="/new-hero-image.png"
           alt="The Dog House Automotive Solutions"
@@ -81,10 +85,10 @@ export default async function Home() {
         />
         {/* Even darkening so centered text stays legible across the frame — lighter in light mode */}
         <div className="absolute inset-0 bg-black/30 dark:bg-black/55" />
-        {/* Bottom fade — anchored to fully-solid bg in the bottom 20% so it matches the next section exactly, then curves up via a translucent mid-stop to fully transparent at the top */}
-        <div className="absolute inset-x-0 bottom-0 h-72 bg-linear-to-t from-bg from-20% via-bg/35 via-60% to-transparent" />
+        {/* Bottom fade — anchored to fully-solid bg at the very bottom so it matches the next section exactly, then curves up to transparent. Kept short and light in light mode so it doesn't wash out the hero; dark mode restores the taller/denser fade that blends with the dark image. */}
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-bg from-12% via-bg/12 via-50% to-transparent dark:h-72 dark:from-20% dark:via-bg/35 dark:via-60%" />
 
-        <div className="relative h-full container-page flex items-center justify-center text-center">
+        <div className="relative h-full container-page flex items-center justify-center text-center pt-24 lg:pt-28">
           <div className="max-w-3xl flex flex-col items-center">
             <div className="inline-flex items-center gap-3 mb-6 text-[10px] tracking-[0.3em] uppercase text-brand-light animate-fade-up [animation-delay:100ms] group">
               <span className="h-px bg-brand-light transition-all duration-500 w-8 group-hover:w-14" />
@@ -375,7 +379,7 @@ export default async function Home() {
         <div className="relative h-[480px] md:h-[680px] bg-bg overflow-hidden">
           <iframe
             src={mapEmbedUrl}
-            title="The Dog House — showroom location"
+            title="The Dog House — general area"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
@@ -396,20 +400,18 @@ export default async function Home() {
             <div className="flex gap-3">
               <MapPin className="text-brand-light shrink-0 mt-1" size={22} strokeWidth={1.5} />
               <div>
-                <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Showroom</div>
-                <div className="text-text font-medium">{mapPlusCode}</div>
-                <div className="text-text-muted text-sm">{mapRegion}</div>
+                <div className="text-xs uppercase tracking-wider text-text-subtle mb-1">Based in</div>
+                <div className="text-text font-medium">{mapRegion}</div>
+                <div className="text-text-muted text-sm">Exact address shared once you enquire.</div>
               </div>
             </div>
 
-            <a
-              href={mapDirectionsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/contact"
               className="sm:ml-auto inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
             >
-              Get Directions <ArrowRight size={16} />
-            </a>
+              Book a Viewing <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>

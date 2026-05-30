@@ -15,7 +15,15 @@ export default function StoragePage() {
         <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Service</div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Storage</h1>
         <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
-          Whether you're a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer. Discretion and security are our highest priority — your car is kept confidential and protected around the clock.
+          Whether you&apos;re a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer. Discretion and security are our highest priority — your car is kept confidential and protected around the clock.
+        </p>
+        <p className="text-text-muted max-w-2xl leading-relaxed mt-4">
+          Storage starts from <span className="text-text font-medium">£200</span>. Rates depend on the vehicle and
+          length of stay, so final costing is assessed case by case —{" "}
+          <Link href="/contact" className="text-brand hover:text-brand-light transition-colors font-medium">
+            get in touch
+          </Link>{" "}
+          for a tailored quote.
         </p>
       </section>
 
@@ -46,20 +54,20 @@ export default function StoragePage() {
               <div>
                 <h3 className="font-display text-xl tracking-wide mb-2">Discreet &amp; Confidential</h3>
                 <p className="text-text-muted leading-relaxed">
-                  We keep a low profile. Your vehicle's presence, registration, and ownership details stay strictly confidential — nothing is shared, and the facility address is given only to clients.
+                  We keep a low profile. Your vehicle&apos;s presence, registration, and ownership details stay strictly confidential — nothing is shared, and the facility address is given only to clients.
                 </p>
               </div>
               <div>
                 <h3 className="font-display text-xl tracking-wide mb-2">Flexible Terms</h3>
                 <p className="text-text-muted leading-relaxed">
-                  Short or long-term storage to suit your needs. Whether it's seasonal or extended, we offer competitive rates with no long-term lock-in.
+                  Short or long-term storage to suit your needs. Whether it&apos;s seasonal or extended, we offer competitive rates with no long-term lock-in.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="bg-bg-elevated p-8 md:p-12">
-            <h3 className="font-display text-2xl tracking-wide mb-6">What's Included</h3>
+            <h3 className="font-display text-2xl tracking-wide mb-6">What&apos;s Included</h3>
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <span className="text-brand-light font-bold text-lg shrink-0">✓</span>
@@ -93,7 +101,7 @@ export default function StoragePage() {
 
             <div className="mt-8 pt-8 border-t border-border">
               <p className="text-text-muted text-sm">
-                Perfect for collectors, investment vehicles, classic cars, or simply parking your pride and joy somewhere it'll be looked after.
+                Perfect for collectors, investment vehicles, classic cars, or simply parking your pride and joy somewhere it&apos;ll be looked after.
               </p>
             </div>
           </div>

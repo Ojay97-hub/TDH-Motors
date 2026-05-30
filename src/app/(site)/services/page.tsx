@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Car, Search, Wrench, Banknote, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, Car, Search, Banknote, Sparkles } from "lucide-react";
 import { safeSanityFetch } from "@/sanity/client";
 import { servicesPageQuery } from "@/sanity/queries";
 

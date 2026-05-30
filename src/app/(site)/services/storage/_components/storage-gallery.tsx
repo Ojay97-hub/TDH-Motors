@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 
@@ -21,6 +21,22 @@ const GALLERY_IMAGES = [
 
 export function StorageGallery() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const isOpen = expandedIndex !== null;
+
+  // While the lightbox is open, close on Escape and lock background scroll.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpandedIndex(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -49,20 +65,21 @@ export function StorageGallery() {
 
       {expandedIndex !== null && (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={GALLERY_IMAGES[expandedIndex].alt}
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 sm:p-10 cursor-zoom-out"
           onClick={() => setExpandedIndex(null)}
         >
           <button
+            type="button"
             onClick={() => setExpandedIndex(null)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2"
             aria-label="Close"
+            className="absolute top-4 right-4 z-10 inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
-            <X size={32} />
+            <X size={22} />
           </button>
-          <div
-            className="relative w-full h-full max-w-5xl max-h-[90vh] click-prevent"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative h-[78vh] w-[92vw] sm:w-[85vw] pointer-events-none">
             <Image
               src={GALLERY_IMAGES[expandedIndex].src}
               alt={GALLERY_IMAGES[expandedIndex].alt}

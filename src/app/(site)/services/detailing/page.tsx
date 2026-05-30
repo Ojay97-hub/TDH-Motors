@@ -27,6 +27,7 @@ const SERVICES = [
       "Anti-micro scratch properties",
       "Temperature resistant: -40°F to 250°F",
     ],
+    price: "From £200",
     includes: [
       "Multi-stage decontamination wash",
       "Snow foam, clay bar, Iron X and Tardis treatment",
@@ -98,6 +99,7 @@ const SERVICES = [
       "Maintains the integrity and appearance of ceramic coatings",
       "Scheduled to suit your routine",
     ],
+    price: "From £200",
     includes: [
       "Exterior rinse and snow foam pre-wash",
       "Two-bucket wash with lamb's wool mitt",
@@ -161,6 +163,14 @@ export default async function DetailingPage() {
             TT Auto detailers
           </a>{" "}
           — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.
+        </p>
+        <p className="text-text-muted max-w-2xl leading-relaxed mt-4">
+          Prices start from <span className="text-text font-medium">£200</span>. Every car is different, so final
+          costing is assessed case by case —{" "}
+          <Link href="/contact" className="text-brand hover:text-brand-light transition-colors font-medium">
+            get in touch
+          </Link>{" "}
+          for a tailored quote.
         </p>
       </section>
 
