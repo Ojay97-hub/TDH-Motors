@@ -32,6 +32,11 @@ const previewOrigin =
   process.env.SANITY_STUDIO_PREVIEW_URL ||
   process.env.NEXT_PUBLIC_SITE_URL ||
   "http://localhost:3000";
+const draftMode = {
+  enable: `${previewOrigin}/api/draft-mode/enable`,
+  disable: `${previewOrigin}/api/draft-mode/disable`,
+  shareAccess: true,
+};
 
 const pageLocations = {
   homePage: { title: "Home", href: "/" },
@@ -56,11 +61,9 @@ export default defineConfig({
     presentationTool({
       previewUrl: {
         initial: previewOrigin,
-        previewMode: {
-          enable: "/api/draft-mode/enable",
-          disable: "/api/draft-mode/disable",
-          shareAccess: true,
-        },
+        origin: previewOrigin,
+        preview: "/",
+        previewMode: draftMode,
       },
       allowOrigins: [previewOrigin],
       resolve: {
