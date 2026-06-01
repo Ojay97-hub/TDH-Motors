@@ -58,6 +58,8 @@ const SERVICES_STRIP_DEFAULTS = [
   { title: "Detailing", text: "Full machine polish, paint protection, and ceramic coating from experienced detailers." },
 ];
 
+export const revalidate = 60;
+
 export default async function Home() {
   const [fallbackFeatured, cms, settings, fallbackMerch] = await Promise.all([
     getFeaturedCars(),
