@@ -147,7 +147,7 @@ export default async function Home() {
             <h1 className="group font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] mb-6 tracking-tight text-white animate-fade-up [animation-delay:250ms]">
               <span className="inline-block transition-transform duration-500 ease-out group-hover:-translate-y-1">{heroLine1}</span>
               <br />
-              <span className="inline-block text-brand-light transition-all duration-500 ease-out group-hover:text-white group-hover:[text-shadow:0_0_36px_rgba(64,145,108,0.7)] group-hover:translate-y-1">
+              <span className="inline-block text-brand-light transition-all duration-500 ease-out group-hover:text-white group-hover:[text-shadow:0_0_36px_rgba(64,145,108,0.7)] group-hover:translate-y-1 cursor-[url(/car-911-cursor.svg)_20_10,auto]">
                 {heroLine2}
               </span>
             </h1>
