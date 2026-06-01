@@ -402,7 +402,11 @@ const MERCH_PAGE = {
 
 const MERCH_PRODUCTS = [
   {
-    _id: "merchProduct.tdh-signature-hoodie",
+    // IDs must NOT contain a dot: on a public dataset Sanity's anonymous read
+    // grant only covers `_id in path("*")` (no-dot IDs), so dotted IDs are
+    // omitted (reason: "permission") from token-less published fetches and
+    // never reach the live site. See scripts/fix-merch-ids.mjs.
+    _id: "merch-tdh-signature-hoodie",
     _type: "merchProduct",
     title: "TDH Signature Hoodie",
     category: "Heavyweight Fleece",
@@ -413,7 +417,7 @@ const MERCH_PRODUCTS = [
     sortOrder: 10,
   },
   {
-    _id: "merchProduct.dog-house-tee",
+    _id: "merch-dog-house-tee",
     _type: "merchProduct",
     title: "Dog House Tee",
     category: "Premium Cotton",
@@ -424,7 +428,7 @@ const MERCH_PRODUCTS = [
     sortOrder: 20,
   },
   {
-    _id: "merchProduct.workshop-cap",
+    _id: "merch-workshop-cap",
     _type: "merchProduct",
     title: "Workshop Cap",
     category: "Embroidered Peak",
@@ -435,7 +439,7 @@ const MERCH_PRODUCTS = [
     sortOrder: 30,
   },
   {
-    _id: "merchProduct.garage-mug",
+    _id: "merch-garage-mug",
     _type: "merchProduct",
     title: "Garage Mug",
     category: "Ceramic Mug",
