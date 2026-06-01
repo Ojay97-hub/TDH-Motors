@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Shield, Wrench, Droplets, CheckCircle, ExternalLi
 import { BeforeAfterGallery } from "@/components/before-after-gallery";
 import { safeSanityFetch } from "@/sanity/client";
 import { detailingPageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Detailing | TDH Motors",
@@ -154,6 +155,7 @@ export default async function DetailingPage() {
     ctaHeading?: string;
     ctaBody?: string;
     ctaLabel?: string;
+    ctaLink?: string;
     beforeAfterGallery?: BeforeAfterItem[];
     gallery?: GalleryItem[];
     videos?: VideoItem[];
@@ -172,6 +174,7 @@ export default async function DetailingPage() {
   const ctaHeading = cms?.ctaHeading ?? "Book Your Detail";
   const ctaBody = cms?.ctaBody ?? "Every job is assessed individually. Get in touch to discuss your car's needs and we'll recommend the right service for you.";
   const ctaLabel = cms?.ctaLabel ?? "Get In Touch";
+  const ctaLink = cms?.ctaLink ?? "/contact";
   const beforeAfterGallery: BeforeAfterItem[] = cms?.beforeAfterGallery ?? [];
   const gallery: GalleryItem[] = cms?.gallery ?? [];
   const videos: VideoItem[] = cms?.videos ?? [];
@@ -408,12 +411,12 @@ export default async function DetailingPage() {
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
             {ctaBody}
           </p>
-          <Link
-            href="/contact"
+          <CtaLink
+            href={ctaLink}
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             {ctaLabel} <ArrowRight size={16} />
-          </Link>
+          </CtaLink>
         </div>
       </section>
     </>

@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { ctaLinkField } from "./_ctaLink";
 
 export const merchPage = defineType({
   name: "merchPage",
@@ -33,9 +34,20 @@ export const merchPage = defineType({
     }),
     defineField({ name: "productsLabel", title: "Products label", type: "string", group: "products" }),
     defineField({ name: "collectionLabel", title: "Collection label", type: "string", group: "products" }),
+    defineField({
+      name: "products",
+      title: "Products shown on this page",
+      description:
+        "Choose which products appear in the shop grid, in this order. Remove one here to drop it from the page without deleting the product itself. Leave empty to show every visible product (by their sort order). Hidden products never appear, even if added here.",
+      type: "array",
+      group: "products",
+      of: [defineArrayMember({ type: "reference", to: [{ type: "merchProduct" }] })],
+      validation: (r) => r.unique(),
+    }),
     defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "cta" }),
     defineField({ name: "ctaBody", title: "CTA body", type: "text", rows: 2, group: "cta" }),
     defineField({ name: "ctaLabel", title: "CTA label", type: "string", group: "cta" }),
+    ctaLinkField({ name: "ctaLink", title: "CTA link", group: "cta", description: "Where the CTA button goes. Defaults to the TikTok shop." }),
   ],
   preview: {
     prepare: () => ({ title: "Merch Page" }),

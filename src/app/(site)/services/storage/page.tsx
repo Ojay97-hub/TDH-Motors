@@ -4,6 +4,7 @@ import { ArrowRight, Lock } from "lucide-react";
 import { StorageGallery } from "./_components/storage-gallery";
 import { safeSanityFetch } from "@/sanity/client";
 import { storagePageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Storage | TDH Motors",
@@ -58,6 +59,7 @@ export default async function StoragePage() {
   const ctaHeading = cms?.ctaHeading ?? "Ready to Store With Confidence?";
   const ctaBody = cms?.ctaBody ?? "Get in touch to discuss your storage needs and receive a competitive quote.";
   const ctaLabel = cms?.ctaLabel ?? "Get In Touch";
+  const ctaLink = cms?.ctaLink ?? "/contact";
 
   return (
     <>
@@ -130,12 +132,12 @@ export default async function StoragePage() {
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
             {ctaBody}
           </p>
-          <Link
-            href="/contact"
+          <CtaLink
+            href={ctaLink}
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             {ctaLabel} <ArrowRight size={16} />
-          </Link>
+          </CtaLink>
         </div>
       </section>
     </>

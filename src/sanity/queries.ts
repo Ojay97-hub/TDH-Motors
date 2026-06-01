@@ -103,7 +103,15 @@ export const bespokeSourcingPageQuery = defineQuery(`*[_id == "bespokeSourcingPa
 
 export const storagePageQuery = defineQuery(`*[_id == "storagePage"][0]`);
 
-export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]`);
+// The merch page can curate its own product grid via a reference list. Resolve
+// those references inline so the page gets full product objects (an empty list
+// falls back to every visible product at render time).
+export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]{
+  ...,
+  "products": products[]->{
+    ${merchProductProjection}
+  }
+}`);
 
 export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
   ...,

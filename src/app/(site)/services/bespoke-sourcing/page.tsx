@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowRight, Search } from "lucide-react";
 import { safeSanityFetch } from "@/sanity/client";
 import { bespokeSourcingPageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Bespoke Sourcing | TDH Motors",
@@ -51,6 +51,7 @@ export default async function BespokeSourcingPage() {
   const ctaHeading = cms?.ctaHeading ?? "Let's Find Your Perfect Car";
   const ctaBody = cms?.ctaBody ?? "Tell us what you're looking for and we'll start the search. No obligation, no pressure — just an honest conversation.";
   const ctaLabel = cms?.ctaLabel ?? "Start the Search";
+  const ctaLink = cms?.ctaLink ?? "/contact";
 
   return (
     <>
@@ -108,12 +109,12 @@ export default async function BespokeSourcingPage() {
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
             {ctaBody}
           </p>
-          <Link
-            href="/contact"
+          <CtaLink
+            href={ctaLink}
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             {ctaLabel} <ArrowRight size={16} />
-          </Link>
+          </CtaLink>
         </div>
       </section>
     </>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowRight, Car } from "lucide-react";
 import { safeSanityFetch } from "@/sanity/client";
 import { curatedSalesPageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Curated Sales | TDH Motors",
@@ -48,7 +48,9 @@ export default async function CuratedSalesPage() {
   const ctaHeading = cms?.ctaHeading ?? "Find Your Next Car";
   const ctaBody = cms?.ctaBody ?? "Browse our current inventory or tell us what you're looking for. We're here to help.";
   const primaryCtaLabel = cms?.primaryCtaLabel ?? "View Inventory";
+  const primaryCtaLink = cms?.primaryCtaLink ?? "/inventory";
   const secondaryCtaLabel = cms?.secondaryCtaLabel ?? "Get a Valuation";
+  const secondaryCtaLink = cms?.secondaryCtaLink ?? "/contact";
 
   return (
     <>
@@ -104,18 +106,18 @@ export default async function CuratedSalesPage() {
             {ctaBody}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/inventory"
+            <CtaLink
+              href={primaryCtaLink}
               className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
             >
               {primaryCtaLabel} <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/contact"
+            </CtaLink>
+            <CtaLink
+              href={secondaryCtaLink}
               className="inline-flex items-center justify-center gap-2 border border-text/30 hover:border-text text-text px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
             >
               {secondaryCtaLabel}
-            </Link>
+            </CtaLink>
           </div>
         </div>
       </section>

@@ -31,8 +31,8 @@ function formatDate(iso: string) {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  new: "bg-brand/10 text-brand",
-  contacted: "bg-accent/10 text-accent",
+  new: "bg-brand/15 text-brand dark:text-brand-light",
+  contacted: "bg-accent/15 text-amber-700 dark:text-accent",
   done: "bg-bg-elevated text-text-muted",
 };
 
@@ -74,7 +74,7 @@ export default async function EnquiryDetailPage({
             >
               TDH Motors
             </Link>
-            <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="text-sm font-medium bg-brand/10 text-brand dark:text-brand-light px-2 py-0.5 uppercase tracking-wider">
               Admin
             </span>
           </div>
@@ -111,7 +111,7 @@ export default async function EnquiryDetailPage({
             </p>
           </div>
           <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${STATUS_BADGE[enquiry.status] ?? STATUS_BADGE.completed}`}
+            className={`text-sm font-medium px-2.5 py-1 capitalize ${STATUS_BADGE[enquiry.status] ?? STATUS_BADGE.completed}`}
           >
             {enquiry.status}
           </span>
@@ -121,40 +121,40 @@ export default async function EnquiryDetailPage({
           {/* Left: enquiry details */}
           <div className="md:col-span-2 flex flex-col gap-6">
             {/* Contact */}
-            <div className="bg-surface border border-border rounded-xl p-5">
-              <h2 className="text-xs uppercase tracking-wider text-text-subtle font-medium mb-4">
+            <div className="bg-surface border border-border p-5">
+              <h2 className="text-xs uppercase tracking-wider text-text-muted font-medium mb-4">
                 Contact
               </h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-xs text-text-subtle mb-0.5">Name</dt>
+                  <dt className="text-sm text-text-muted mb-0.5">Name</dt>
                   <dd className="text-sm font-medium text-text">{enquiry.name}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-text-subtle mb-0.5">Email</dt>
+                  <dt className="text-sm text-text-muted mb-0.5">Email</dt>
                   <dd className="text-sm">
-                    <a href={`mailto:${enquiry.email}`} className="text-brand hover:underline">
+                    <a href={`mailto:${enquiry.email}`} className="text-brand dark:text-brand-light hover:underline">
                       {enquiry.email}
                     </a>
                   </dd>
                 </div>
                 {enquiry.phone && (
                   <div>
-                    <dt className="text-xs text-text-subtle mb-0.5">Phone</dt>
+                    <dt className="text-sm text-text-muted mb-0.5">Phone</dt>
                     <dd className="text-sm">
-                      <a href={`tel:${enquiry.phone}`} className="text-brand hover:underline">
+                      <a href={`tel:${enquiry.phone}`} className="text-brand dark:text-brand-light hover:underline">
                         {enquiry.phone}
                       </a>
                     </dd>
                   </div>
                 )}
                 <div>
-                  <dt className="text-xs text-text-subtle mb-0.5">Type</dt>
+                  <dt className="text-sm text-text-muted mb-0.5">Type</dt>
                   <dd className="text-sm text-text">{enquiry.type}</dd>
                 </div>
                 {enquiry.car && (
                   <div className="sm:col-span-2">
-                    <dt className="text-xs text-text-subtle mb-0.5">Car interest</dt>
+                    <dt className="text-sm text-text-muted mb-0.5">Car interest</dt>
                     <dd className="text-sm text-text">{enquiry.car}</dd>
                   </div>
                 )}
@@ -162,8 +162,8 @@ export default async function EnquiryDetailPage({
             </div>
 
             {/* Message */}
-            <div className="bg-surface border border-border rounded-xl p-5">
-              <h2 className="text-xs uppercase tracking-wider text-text-subtle font-medium mb-3">
+            <div className="bg-surface border border-border p-5">
+              <h2 className="text-xs uppercase tracking-wider text-text-muted font-medium mb-3">
                 Message
               </h2>
               <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">
@@ -172,8 +172,8 @@ export default async function EnquiryDetailPage({
             </div>
 
             {/* Notes */}
-            <div className="bg-surface border border-border rounded-xl p-5">
-              <h2 className="text-xs uppercase tracking-wider text-text-subtle font-medium mb-3">
+            <div className="bg-surface border border-border p-5">
+              <h2 className="text-xs uppercase tracking-wider text-text-muted font-medium mb-3">
                 Notes
               </h2>
               <NotesForm id={enquiry.id} initial={enquiry.notes} />
@@ -182,8 +182,8 @@ export default async function EnquiryDetailPage({
 
           {/* Right: status */}
           <div className="flex flex-col gap-4">
-            <div className="bg-surface border border-border rounded-xl p-5">
-              <h2 className="text-xs uppercase tracking-wider text-text-subtle font-medium mb-3">
+            <div className="bg-surface border border-border p-5">
+              <h2 className="text-xs uppercase tracking-wider text-text-muted font-medium mb-3">
                 Status
               </h2>
               <StatusSelect id={enquiry.id} current={enquiry.status} />
@@ -191,7 +191,7 @@ export default async function EnquiryDetailPage({
 
             <a
               href={`mailto:${enquiry.email}?subject=Your enquiry — TDH Motors`}
-              className="flex items-center justify-center gap-2 bg-brand text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-brand/90 transition-colors"
+              className="flex items-center justify-center gap-2 bg-brand text-white text-sm font-medium px-4 py-2.5 hover:bg-brand/90 transition-colors"
             >
               Reply by email
             </a>
@@ -199,7 +199,7 @@ export default async function EnquiryDetailPage({
             {enquiry.phone && (
               <a
                 href={`tel:${enquiry.phone}`}
-                className="flex items-center justify-center gap-2 bg-surface border border-border text-text text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-bg-elevated transition-colors"
+                className="flex items-center justify-center gap-2 bg-surface border border-border text-text text-sm font-medium px-4 py-2.5 hover:bg-bg-elevated transition-colors"
               >
                 Call {enquiry.phone}
               </a>

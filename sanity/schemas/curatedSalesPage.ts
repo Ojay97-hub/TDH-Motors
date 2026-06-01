@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { ctaLinkField } from "./_ctaLink";
 
 export const curatedSalesPage = defineType({
   name: "curatedSalesPage",
@@ -52,7 +53,9 @@ export const curatedSalesPage = defineType({
     defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "cta" }),
     defineField({ name: "ctaBody", title: "CTA body", type: "text", rows: 2, group: "cta" }),
     defineField({ name: "primaryCtaLabel", title: "Primary CTA label", type: "string", group: "cta" }),
+    ctaLinkField({ name: "primaryCtaLink", title: "Primary CTA link", group: "cta", description: "Where the primary button goes. Defaults to /inventory." }),
     defineField({ name: "secondaryCtaLabel", title: "Secondary CTA label", type: "string", group: "cta" }),
+    ctaLinkField({ name: "secondaryCtaLink", title: "Secondary CTA link", group: "cta", description: "Where the secondary button goes. Defaults to /contact." }),
   ],
   preview: {
     prepare: () => ({ title: "Curated Sales Page" }),

@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { ctaLinkField } from "./_ctaLink";
 
 export const storagePage = defineType({
   name: "storagePage",
@@ -44,6 +45,7 @@ export const storagePage = defineType({
     defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "cta" }),
     defineField({ name: "ctaBody", title: "CTA body", type: "text", rows: 2, group: "cta" }),
     defineField({ name: "ctaLabel", title: "CTA label", type: "string", group: "cta" }),
+    ctaLinkField({ name: "ctaLink", title: "CTA link", group: "cta", description: "Where the CTA button goes. Defaults to /contact." }),
   ],
   preview: {
     prepare: () => ({ title: "Storage Page" }),

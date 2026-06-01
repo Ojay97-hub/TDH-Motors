@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { ctaLinkField } from "./_ctaLink";
 
 export const homePage = defineType({
   name: "homePage",
@@ -38,6 +39,10 @@ export const homePage = defineType({
       rows: 2,
       group: "hero",
     }),
+    defineField({ name: "heroPrimaryCtaLabel", title: "Hero primary button — label", type: "string", group: "hero", description: 'e.g. "Browse Inventory". Defaults to "Browse Inventory".' }),
+    ctaLinkField({ name: "heroPrimaryCtaLink", title: "Hero primary button — link", group: "hero", description: 'Where the primary hero button goes. Defaults to /inventory.' }),
+    defineField({ name: "heroSecondaryCtaLabel", title: "Hero secondary button — label", type: "string", group: "hero", description: 'e.g. "Book a Viewing". Defaults to "Book a Viewing".' }),
+    ctaLinkField({ name: "heroSecondaryCtaLink", title: "Hero secondary button — link", group: "hero", description: 'Where the secondary hero button goes. Defaults to /contact.' }),
 
     // About / Step Inside section
     defineField({
@@ -138,8 +143,10 @@ export const homePage = defineType({
     defineField({ name: "merchEyebrow", title: "Merch eyebrow", type: "string", group: "merch" }),
     defineField({ name: "merchHeading", title: "Merch heading", type: "string", group: "merch" }),
     defineField({ name: "merchBody", title: "Merch body", type: "text", rows: 3, group: "merch" }),
-    defineField({ name: "merchPrimaryCta", title: "Merch primary CTA", type: "string", group: "merch" }),
-    defineField({ name: "merchSecondaryCta", title: "Merch secondary CTA", type: "string", group: "merch" }),
+    defineField({ name: "merchPrimaryCta", title: "Merch primary CTA — label", type: "string", group: "merch" }),
+    ctaLinkField({ name: "merchPrimaryCtaLink", title: "Merch primary CTA — link", group: "merch", description: 'Where the primary button goes. Defaults to /merch.' }),
+    defineField({ name: "merchSecondaryCta", title: "Merch secondary CTA — label", type: "string", group: "merch" }),
+    ctaLinkField({ name: "merchSecondaryCtaLink", title: "Merch secondary CTA — link", group: "merch", description: 'Where the secondary button goes. Defaults to the TikTok page.' }),
 
     // Merch items (curated for the homepage)
     defineField({
@@ -190,6 +197,8 @@ export const homePage = defineType({
       rows: 3,
       group: "cta",
     }),
+    defineField({ name: "ctaButtonLabel", title: "CTA button — label", type: "string", group: "cta", description: 'e.g. "Book a Viewing". Also used by the "Find Us" button. Defaults to "Book a Viewing".' }),
+    ctaLinkField({ name: "ctaButtonLink", title: "CTA button — link", group: "cta", description: 'Where the CTA / Find Us button goes. Defaults to /contact.' }),
 
     // Find Us section
     defineField({

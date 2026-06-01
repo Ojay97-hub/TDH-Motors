@@ -10,8 +10,8 @@ const STATUSES = [
 ] as const;
 
 const statusStyles: Record<string, string> = {
-  new: "text-brand bg-brand/10 border-brand/30",
-  contacted: "text-accent bg-accent/10 border-accent/30",
+  new: "text-brand dark:text-brand-light bg-brand/15 border-brand/40",
+  contacted: "text-amber-700 dark:text-accent bg-accent/15 border-accent/40",
   done: "text-text-muted bg-bg-elevated border-border",
 };
 
@@ -28,7 +28,7 @@ export function StatusSelect({ id, current }: Props) {
         onChange={(e) => {
           startTransition(() => updateEnquiryStatus(id, e.target.value));
         }}
-        className={`appearance-none text-xs font-medium pl-3 pr-8 py-1.5 rounded-md border cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-brand ${statusStyles[current] ?? statusStyles.new}`}
+        className={`appearance-none text-sm font-medium pl-3 pr-8 py-2 border cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-brand ${statusStyles[current] ?? statusStyles.new}`}
       >
         {STATUSES.map((s) => (
           <option key={s.value} value={s.value}>

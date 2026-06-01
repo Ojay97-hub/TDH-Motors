@@ -18,9 +18,9 @@ type Enquiry = {
 };
 
 const TYPE_BADGE: Record<string, string> = {
-  Viewing: "bg-brand/10 text-brand border border-brand/20",
-  "Part-Exchange": "bg-accent/10 text-accent border border-accent/20",
-  "Bespoke Sourcing": "bg-purple-100 text-purple-700 border border-purple-200",
+  Viewing: "bg-brand/15 text-brand dark:text-brand-light border border-brand/30",
+  "Part-Exchange": "bg-accent/15 text-amber-700 dark:text-accent border border-accent/30",
+  "Bespoke Sourcing": "bg-purple-100 text-purple-700 border border-purple-300 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-400/30",
   General: "bg-bg-elevated text-text-muted border border-border",
 };
 
@@ -31,6 +31,19 @@ function formatDate(iso: string) {
     year: "numeric",
   });
 }
+
+const MailIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+);
+const PhoneIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+);
+const CarIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+);
+const EyeIcon = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+);
 
 export default async function EnquiriesPage({
   searchParams,
@@ -79,31 +92,31 @@ export default async function EnquiriesPage({
           : rows;
 
   const stats = [
-    { label: "Total", value: counts.total, style: "text-text", filter: "all" },
-    { label: "New", value: counts.new, style: "text-brand", filter: "new" },
-    { label: "Contacted", value: counts.contacted, style: "text-accent", filter: "contacted" },
-    { label: "Done", value: counts.done, style: "text-text-muted", filter: "done" },
+    { label: "Total", value: counts.total, dot: "bg-text-muted", value_style: "text-text", filter: "all" },
+    { label: "New", value: counts.new, dot: "bg-brand-light", value_style: "text-brand dark:text-brand-light", filter: "new" },
+    { label: "Contacted", value: counts.contacted, dot: "bg-accent", value_style: "text-amber-700 dark:text-accent", filter: "contacted" },
+    { label: "Done", value: counts.done, dot: "bg-text-muted", value_style: "text-text-muted", filter: "done" },
   ];
 
   return (
     <div className="min-h-screen bg-bg">
       {/* Header */}
-      <header className="bg-surface border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-20 bg-surface/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Link
               href="/"
-              className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors"
+              className="font-bold tracking-wider uppercase text-text hover:text-brand transition-colors truncate"
             >
               TDH Motors
             </Link>
-            <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="shrink-0 text-sm font-semibold bg-brand/10 text-brand px-2 py-0.5 uppercase tracking-wider">
               Admin
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <ThemeToggle />
-            <span className="text-sm text-text-muted hidden sm:block">
+            <span className="text-sm text-text-muted hidden md:block max-w-[180px] truncate">
               {user?.email}
             </span>
             <Link
@@ -117,11 +130,25 @@ export default async function EnquiriesPage({
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold text-text mb-6">Enquiries</h1>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Title + mobile dashboard link */}
+        <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-text">Enquiries</h1>
+            <p className="text-sm text-text-muted mt-1">
+              {counts.total} total · {counts.new} awaiting response
+            </p>
+          </div>
+          <Link
+            href="/admin"
+            className="sm:hidden text-sm text-text-muted hover:text-text transition-colors whitespace-nowrap"
+          >
+            ← Dashboard
+          </Link>
+        </div>
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        {/* Stat / filter cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
           {stats.map((stat) => {
             const isActive = activeFilter === stat.filter;
             const href =
@@ -132,16 +159,21 @@ export default async function EnquiriesPage({
               <Link
                 key={stat.label}
                 href={href}
-                className={`bg-surface border rounded-xl p-4 transition-all hover:bg-bg-elevated ${
+                className={`group relative border p-4 sm:p-5 transition-all duration-200 ${
                   isActive
-                    ? "border-brand ring-1 ring-brand/30"
-                    : "border-border"
+                    ? "border-brand bg-surface"
+                    : "border-border bg-surface hover:border-brand hover:bg-bg-elevated"
                 }`}
               >
-                <p className="text-xs uppercase tracking-wider text-text-subtle mb-1">
-                  {stat.label}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`h-1.5 w-1.5 rounded-full ${stat.dot}`} />
+                  <p className="text-sm uppercase tracking-wider text-text-muted font-medium">
+                    {stat.label}
+                  </p>
+                </div>
+                <p className={`text-3xl sm:text-4xl font-bold tabular-nums ${stat.value_style}`}>
+                  {stat.value}
                 </p>
-                <p className={`text-3xl font-bold ${stat.style}`}>{stat.value}</p>
               </Link>
             );
           })}
@@ -151,80 +183,149 @@ export default async function EnquiriesPage({
         {activeFilter !== "all" && (
           <div className="flex items-center gap-2 mb-4">
             <span className="text-sm text-text-muted">
-              Showing:{" "}
+              Showing{" "}
               <span className="font-medium text-text capitalize">{activeFilter}</span>
+              {" "}· {filteredRows.length}
             </span>
             <Link
               href="/admin/enquiries"
-              className="text-xs text-text-muted hover:text-text underline underline-offset-2"
+              className="text-sm text-brand dark:text-brand-light hover:underline underline-offset-2"
             >
               Clear filter
             </Link>
           </div>
         )}
 
-        {/* Table */}
         {filteredRows.length === 0 ? (
-          <div className="bg-surface border border-border rounded-xl p-12 text-center text-text-subtle">
-            No {activeFilter !== "all" ? `"${activeFilter}" ` : ""}enquiries yet.
+          <div className="bg-surface border border-dashed border-border p-12 sm:p-16 text-center">
+            <p className="text-text-subtle">
+              No {activeFilter !== "all" ? `"${activeFilter}" ` : ""}enquiries yet.
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-separate border-spacing-y-2">
+          <>
+            {/* Mobile / tablet: card list */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+              {filteredRows.map((e) => (
+                <div
+                  key={e.id}
+                  className="border border-border bg-surface p-4 flex flex-col gap-3 transition-colors hover:border-brand"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-text truncate">{e.name}</p>
+                      <p className="text-sm text-text-muted dark:text-neutral-300 mt-0.5">
+                        {formatDate(e.created_at)}
+                      </p>
+                    </div>
+                    <span className={`shrink-0 inline-block text-sm font-medium px-2.5 py-1 ${TYPE_BADGE[e.type] ?? TYPE_BADGE.General}`}>
+                      {e.type}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 text-sm">
+                    <a href={`mailto:${e.email}`} className="flex items-center gap-2 text-brand dark:text-brand-light hover:underline">
+                      <span className="text-text-muted">{MailIcon}</span>
+                      <span className="truncate">{e.email}</span>
+                    </a>
+                    {e.phone && (
+                      <a href={`tel:${e.phone}`} className="flex items-center gap-2 text-text-muted dark:text-neutral-200 hover:underline">
+                        <span className="text-text-muted">{PhoneIcon}</span>
+                        {e.phone}
+                      </a>
+                    )}
+                    {e.car && (
+                      <p className="flex items-center gap-2 text-text-muted dark:text-neutral-200">
+                        <span className="text-text-muted">{CarIcon}</span>
+                        <span className="truncate">{e.car}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {e.message && (
+                    <p className="text-sm text-text-muted dark:text-neutral-200 line-clamp-2 leading-snug border-l-2 border-border pl-3">
+                      {e.message}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between gap-3 pt-1">
+                    <StatusSelect id={e.id} current={e.status} />
+                    <Link
+                      href={`/admin/enquiries/${e.id}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border border-border text-text-muted hover:text-brand hover:border-brand transition-colors"
+                    >
+                      {EyeIcon}
+                      View details
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: separated rows */}
+            <table className="hidden lg:table w-full text-sm border-separate border-spacing-y-3">
               <thead>
                 <tr>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Date</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Name</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Contact</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Type</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Car interest</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Message</th>
-                  <th className="text-left px-5 py-2 text-text-subtle font-medium uppercase tracking-wider text-xs">Status</th>
-                  <th className="px-5 py-2" />
+                  {["Customer", "Contact", "Enquiry", "Message", "Status", ""].map((h, i) => (
+                    <th
+                      key={i}
+                      className="text-left px-5 pb-1 text-text-muted font-medium uppercase tracking-wider text-sm"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredRows.map((e) => {
-                  const cell = "border-t border-b border-border bg-surface px-5 py-4 align-middle";
+                  const cell =
+                    "bg-surface border-y border-border align-middle px-5 py-5 transition-colors group-hover:bg-bg-elevated group-hover:border-brand";
                   return (
-                    <tr key={e.id} className="hover:brightness-[0.97] transition-all">
-                      <td className={`${cell} rounded-l-xl border-l whitespace-nowrap text-text-muted`}>
-                        {formatDate(e.created_at)}
+                    <tr key={e.id} className="group">
+                      {/* Customer = name + date stacked */}
+                      <td className={`${cell} border-l`}>
+                        <p className="font-semibold text-text whitespace-nowrap">{e.name}</p>
+                        <p className="text-sm text-text-muted dark:text-neutral-300 mt-0.5 whitespace-nowrap">
+                          {formatDate(e.created_at)}
+                        </p>
                       </td>
-                      <td className={`${cell} font-semibold text-text whitespace-nowrap`}>
-                        {e.name}
-                      </td>
+                      {/* Contact = email + phone stacked */}
                       <td className={cell}>
-                        <a href={`mailto:${e.email}`} className="text-brand hover:underline block">
+                        <a href={`mailto:${e.email}`} className="text-brand dark:text-brand-light hover:underline block">
                           {e.email}
                         </a>
                         {e.phone && (
-                          <a href={`tel:${e.phone}`} className="text-text-muted hover:underline block text-xs mt-0.5">
+                          <a href={`tel:${e.phone}`} className="text-text-muted dark:text-neutral-200 hover:underline block text-sm mt-0.5">
                             {e.phone}
                           </a>
                         )}
                       </td>
-                      <td className={cell}>
-                        <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${TYPE_BADGE[e.type] ?? TYPE_BADGE.General}`}>
+                      {/* Enquiry = type badge + car interest stacked */}
+                      <td className={`${cell} max-w-[180px]`}>
+                        <span className={`inline-block text-sm font-medium px-2.5 py-1 ${TYPE_BADGE[e.type] ?? TYPE_BADGE.General}`}>
                           {e.type}
                         </span>
+                        <p className="text-text-muted dark:text-neutral-200 text-sm mt-1.5 truncate">
+                          {e.car ?? <span className="text-text-subtle">—</span>}
+                        </p>
                       </td>
-                      <td className={`${cell} text-text-muted max-w-[140px] truncate`}>
-                        {e.car ?? <span className="text-text-subtle">—</span>}
+                      {/* Message */}
+                      <td className={`${cell} max-w-[280px]`}>
+                        <p className="line-clamp-2 leading-snug text-text-muted dark:text-neutral-200">{e.message}</p>
                       </td>
-                      <td className={`${cell} text-text-muted max-w-[220px]`}>
-                        <p className="line-clamp-2 leading-snug">{e.message}</p>
-                      </td>
-                      <td className={`${cell} pr-8`}>
+                      {/* Status */}
+                      <td className={cell}>
                         <StatusSelect id={e.id} current={e.status} />
                       </td>
-                      <td className={`${cell} rounded-r-xl border-r whitespace-nowrap`}>
+                      {/* View details icon */}
+                      <td className={`${cell} border-r text-right whitespace-nowrap`}>
                         <Link
                           href={`/admin/enquiries/${e.id}`}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-text-muted hover:text-text hover:border-text-muted transition-colors"
+                          aria-label="View details"
+                          title="View details"
+                          className="inline-flex h-9 w-9 items-center justify-center border border-border text-text-muted hover:text-brand hover:border-brand hover:bg-brand/5 transition-colors"
                         >
-                          View details
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                          {EyeIcon}
                         </Link>
                       </td>
                     </tr>
@@ -232,7 +333,7 @@ export default async function EnquiriesPage({
                 })}
               </tbody>
             </table>
-          </div>
+          </>
         )}
       </main>
     </div>

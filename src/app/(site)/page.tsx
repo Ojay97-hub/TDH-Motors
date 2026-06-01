@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin, ExternalLink, ShoppingBag } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 
 function InstagramIcon({ size = 24 }: { size?: number }) {
   return (
@@ -79,6 +80,12 @@ export default async function Home() {
   const heroLine1 = cms?.heroLine1 ?? "Performance Cars,";
   const heroLine2 = cms?.heroLine2 ?? "Hand-Picked.";
   const heroSubheading = cms?.heroSubheading ?? "Sourced for enthusiasts, by enthusiasts — every car on our forecourt selected on its own merit.";
+  const heroPrimaryCtaLabel = cms?.heroPrimaryCtaLabel ?? "Browse Inventory";
+  const heroPrimaryCtaLink = cms?.heroPrimaryCtaLink ?? "/inventory";
+  const heroSecondaryCtaLabel = cms?.heroSecondaryCtaLabel ?? "Book a Viewing";
+  const heroSecondaryCtaLink = cms?.heroSecondaryCtaLink ?? "/contact";
+  const ctaButtonLabel = cms?.ctaButtonLabel ?? "Book a Viewing";
+  const ctaButtonLink = cms?.ctaButtonLink ?? "/contact";
   const aboutHeading = cms?.aboutHeading ?? "A proper passion for cars.";
   const aboutPara1 = cms?.aboutPara1 ?? "The Dog House is a small, family-run dealership tucked away in the Chilterns. We started it because buying a performance car should feel as good as driving one.";
   const aboutPara2 = cms?.aboutPara2 ?? "Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. No high-pressure sales floor, no commission targets — just an honest conversation and cars we're genuinely proud of.";
@@ -88,7 +95,9 @@ export default async function Home() {
   const merchHeading = cms?.merchHeading ?? "The Dog House Drop";
   const merchBody = cms?.merchBody ?? "The new TDH artwork is being turned into a small merch line across hoodies, tees, caps, and garage essentials. Coming soon.";
   const merchPrimaryCta = cms?.merchPrimaryCta ?? "Preview Merch";
+  const merchPrimaryCtaLink = cms?.merchPrimaryCtaLink ?? "/merch";
   const merchSecondaryCta = cms?.merchSecondaryCta ?? "Drop Updates";
+  const merchSecondaryCtaLink = cms?.merchSecondaryCtaLink ?? "https://www.tiktok.com/@thedoghouseas";
   const socialEyebrow = cms?.socialEyebrow ?? "Stay Connected";
   const socialHeading = cms?.socialHeading ?? "Check Us Out on Our Socials";
   const socialBody = cms?.socialBody ?? "Follow along for new arrivals, behind-the-scenes content, and everything cars.";
@@ -153,19 +162,19 @@ export default async function Home() {
             </h1>
             <p className="text-white/85 text-lg max-w-xl mb-10 leading-relaxed animate-fade-up [animation-delay:450ms]">{heroSubheading}</p>
             <div className="flex flex-col gap-3 w-full max-w-56 animate-fade-up [animation-delay:650ms]">
-              <Link
-                href="/inventory"
+              <CtaLink
+                href={heroPrimaryCtaLink}
                 className="group inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-7 py-4 font-medium tracking-wider uppercase text-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand/30"
               >
-                Browse Inventory
+                {heroPrimaryCtaLabel}
                 <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/contact"
+              </CtaLink>
+              <CtaLink
+                href={heroSecondaryCtaLink}
                 className="group inline-flex items-center justify-center gap-2 border border-white/40 hover:border-white text-white px-7 py-4 font-medium tracking-wider uppercase text-xs transition-all duration-300 bg-white/5 hover:bg-white/15 backdrop-blur-sm hover:-translate-y-0.5"
               >
-                Book a Viewing
-              </Link>
+                {heroSecondaryCtaLabel}
+              </CtaLink>
             </div>
           </div>
         </div>
@@ -286,20 +295,18 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:justify-end gap-3">
-              <Link
-                href="/merch"
+              <CtaLink
+                href={merchPrimaryCtaLink}
                 className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
               >
                 {merchPrimaryCta} <ShoppingBag size={15} />
-              </Link>
-              <a
-                href="https://www.tiktok.com/@thedoghouseas"
-                target="_blank"
-                rel="noopener noreferrer"
+              </CtaLink>
+              <CtaLink
+                href={merchSecondaryCtaLink}
                 className="inline-flex items-center justify-center gap-2 border border-border hover:border-brand text-text px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
               >
                 {merchSecondaryCta} <ExternalLink size={13} />
-              </a>
+              </CtaLink>
             </div>
           </div>
 
@@ -385,12 +392,12 @@ export default async function Home() {
           <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Visit Us</div>
           <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">{ctaHeading}</h2>
           <p className="text-text-muted text-lg leading-relaxed mb-10">{ctaBody}</p>
-          <Link
-            href="/contact"
+          <CtaLink
+            href={ctaButtonLink}
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
-            Book a Viewing <ArrowRight size={16} />
-          </Link>
+            {ctaButtonLabel} <ArrowRight size={16} />
+          </CtaLink>
         </div>
       </section>
 
@@ -426,12 +433,12 @@ export default async function Home() {
               </div>
             </div>
 
-            <Link
-              href="/contact"
+            <CtaLink
+              href={ctaButtonLink}
               className="sm:ml-auto inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
             >
-              Book a Viewing <ArrowRight size={16} />
-            </Link>
+              {ctaButtonLabel} <ArrowRight size={16} />
+            </CtaLink>
           </div>
         </div>
       </section>

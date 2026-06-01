@@ -28,18 +28,18 @@ export function NotesForm({ id, initial }: { id: string; initial: string | null 
         }}
         rows={6}
         placeholder="Log call notes, follow-up actions, or anything relevant…"
-        className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-text text-sm placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none leading-relaxed"
+        className="w-full px-3 py-2 bg-bg border border-border text-text text-sm placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none leading-relaxed"
       />
       <div className="flex items-center gap-3">
         <button
           onClick={handleSave}
           disabled={isPending}
-          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-lg hover:bg-brand/90 transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-brand text-white text-sm font-medium hover:bg-brand/90 transition-colors disabled:opacity-50"
         >
           {isPending ? "Saving…" : "Save notes"}
         </button>
         {saved && (
-          <span className="text-sm text-brand">Saved</span>
+          <span className="text-sm text-brand dark:text-brand-light">Saved</span>
         )}
       </div>
     </div>

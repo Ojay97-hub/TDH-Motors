@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
             >
               TDH Motors
             </Link>
-            <span className="text-xs font-medium bg-brand/10 text-brand px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="text-sm font-medium bg-brand/10 text-brand dark:text-brand-light px-2 py-0.5 uppercase tracking-wider">
               Admin
             </span>
           </div>
@@ -47,11 +47,11 @@ export default async function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* User Management */}
-          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
-            <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
+          <div className="group bg-surface border border-border p-6 flex flex-col gap-4 transition-all duration-200 hover:border-brand">
+            <div className="w-10 h-10 bg-brand/15 flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-brand"
+                className="w-5 h-5 text-brand dark:text-brand-light"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -73,18 +73,18 @@ export default async function AdminDashboardPage() {
             </div>
             <Link
               href="/admin/users"
-              className="inline-flex items-center justify-center rounded-lg bg-brand text-white text-sm font-medium px-4 py-2 hover:bg-brand/90 transition-colors"
+              className="inline-flex items-center justify-center bg-brand text-white text-sm font-medium px-4 py-2 hover:bg-brand/90 transition-colors"
             >
               Manage Users
             </Link>
           </div>
 
           {/* Sanity Studio */}
-          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+          <div className="group bg-surface border border-border p-6 flex flex-col gap-4 transition-all duration-200 hover:border-brand">
+            <div className="w-10 h-10 bg-accent/15 flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-accent"
+                className="w-5 h-5 text-amber-700 dark:text-accent"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -107,18 +107,18 @@ export default async function AdminDashboardPage() {
               href="https://www.sanity.io/@oIYAL9sDV/studio/bwp3bixqbg6nz5vosnu0osa6/tdh-motors/structure"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-accent text-white text-sm font-medium px-4 py-2 hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center justify-center bg-amber-700 text-white text-sm font-medium px-4 py-2 hover:bg-amber-700/90 transition-colors"
             >
               Open Studio
             </a>
           </div>
 
           {/* View Enquiries */}
-          <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+          <div className="group bg-surface border border-border p-6 flex flex-col gap-4 transition-all duration-200 hover:border-brand">
+            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/15 flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-purple-600"
+                className="w-5 h-5 text-purple-600 dark:text-purple-300"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
             </div>
             <Link
               href="/admin/enquiries"
-              className="inline-flex items-center justify-center rounded-lg border border-border text-text text-sm font-medium px-4 py-2 hover:bg-bg-elevated transition-colors"
+              className="inline-flex items-center justify-center bg-purple-600 text-white text-sm font-medium px-4 py-2 hover:bg-purple-600/90 transition-colors"
             >
               View Enquiries
             </Link>

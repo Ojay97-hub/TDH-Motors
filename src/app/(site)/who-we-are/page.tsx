@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, Heart, Eye, Handshake } from "lucide-react";
 import { safeSanityFetch } from "@/sanity/client";
 import { whoWeArePageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Who We Are",
@@ -54,8 +54,11 @@ export default async function WhoWeArePage() {
   const partnersCardBody = cms?.partnersCardBody ?? "We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.";
   const partnersCardFootnote = cms?.partnersCardFootnote ?? "Have an opportunity you think we should know about? Drop us a message and let's have a conversation. We're always open to the right opportunity.";
   const partnersCtaLabel = cms?.partnersCtaLabel ?? "Get In Touch";
+  const partnersCtaLink = cms?.partnersCtaLink ?? "/contact?subject=business-partnership";
   const ctaHeading = cms?.ctaHeading ?? "Come and Visit Us.";
   const ctaBody = cms?.ctaBody ?? "The best way to understand how we work is to come and meet us. Book an appointment and we'll put the kettle on.";
+  const ctaButtonLabel = cms?.ctaButtonLabel ?? "Book a Visit";
+  const ctaButtonLink = cms?.ctaButtonLink ?? "/contact";
 
   return (
     <>
@@ -131,12 +134,12 @@ export default async function WhoWeArePage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/contact?subject=business-partnership"
+              <CtaLink
+                href={partnersCtaLink}
                 className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
               >
                 {partnersCtaLabel} <ArrowRight size={16} />
-              </Link>
+              </CtaLink>
             </div>
 
             <div className="bg-bg-elevated border border-border p-8 md:p-12">
@@ -154,12 +157,12 @@ export default async function WhoWeArePage() {
       <section className="container-page py-24 text-center">
         <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">{ctaHeading}</h2>
         <p className="text-text-muted text-lg max-w-xl mx-auto mb-10 leading-relaxed">{ctaBody}</p>
-        <Link
-          href="/contact"
+        <CtaLink
+          href={ctaButtonLink}
           className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
         >
-          Book a Visit <ArrowRight size={16} />
-        </Link>
+          {ctaButtonLabel} <ArrowRight size={16} />
+        </CtaLink>
       </section>
     </>
   );

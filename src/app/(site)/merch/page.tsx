@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { ArrowRight, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { MerchGrid } from "@/components/merch-grid";
 import { TIKTOK_SHOP_URL } from "@/lib/merch";
-import { getMerchItems } from "@/lib/merch-products";
+import { getMerchItems, toMerchItems } from "@/lib/merch-products";
 import { safeSanityFetch } from "@/sanity/client";
 import { merchPageQuery } from "@/sanity/queries";
+import { CtaLink } from "@/components/cta-link";
 
 export const metadata: Metadata = {
   title: "Shop | TDH Motors",
@@ -29,14 +30,18 @@ const STORE_PERKS_DEFAULTS = [
 ];
 
 export default async function MerchPage() {
-  const [cms, products] = await Promise.all([
+  const [cms, fallbackProducts] = await Promise.all([
+    // Tag with "merchProduct" too, so editing a curated product revalidates here.
     safeSanityFetch(
       merchPageQuery,
       {},
-      { next: { revalidate: 60, tags: ["merchPage"] } },
+      { next: { revalidate: 60, tags: ["merchPage", "merchProduct"] } },
     ),
     getMerchItems(),
   ]);
+
+  // Curated list takes priority; an empty list falls back to every visible product.
+  const products = cms?.products?.length ? toMerchItems(cms.products) : fallbackProducts;
 
   const eyebrow = cms?.eyebrow ?? "Shop";
   const heading = cms?.heading ?? "The Dog House Shop";
@@ -47,6 +52,7 @@ export default async function MerchPage() {
   const ctaHeading = cms?.ctaHeading ?? "Don't Miss the Drop";
   const ctaBody = cms?.ctaBody ?? "Follow TDH on TikTok for the launch date, new drops, restocks, and behind-the-scenes previews.";
   const ctaLabel = cms?.ctaLabel ?? "Follow on TikTok";
+  const ctaLink = cms?.ctaLink ?? TIKTOK_SHOP_URL;
 
   return (
     <>
@@ -96,14 +102,12 @@ export default async function MerchPage() {
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
             {ctaBody}
           </p>
-          <a
-            href={TIKTOK_SHOP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <CtaLink
+            href={ctaLink}
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
             {ctaLabel} <ArrowRight size={16} />
-          </a>
+          </CtaLink>
         </div>
       </section>
     </>
