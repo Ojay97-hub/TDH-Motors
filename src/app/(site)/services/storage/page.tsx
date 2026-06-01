@@ -93,8 +93,8 @@ export default async function StoragePage() {
               <h2 className="font-display text-3xl tracking-wide">{benefitsHeading}</h2>
             </div>
             <div className="space-y-6">
-              {benefits.map((item: { title: string; body: string }) => (
-                <div key={item.title}>
+              {benefits.map((item: { title: string; body: string }, i: number) => (
+                <div key={`${item.title ?? "benefit"}-${i}`}>
                   <h3 className="font-display text-xl tracking-wide mb-2">{item.title}</h3>
                   <p className="text-text-muted leading-relaxed">
                     {item.body}
@@ -107,8 +107,8 @@ export default async function StoragePage() {
           <div className="bg-bg-elevated p-8 md:p-12">
             <h3 className="font-display text-2xl tracking-wide mb-6">{includedHeading}</h3>
             <ul className="space-y-4">
-              {includedItems.map((item: string) => (
-                <li key={item} className="flex gap-3">
+              {includedItems.map((item: string, i: number) => (
+                <li key={`${item}-${i}`} className="flex gap-3">
                   <span className="text-brand-light font-bold text-lg shrink-0">✓</span>
                   <span className="text-text-muted leading-relaxed">{item}</span>
                 </li>

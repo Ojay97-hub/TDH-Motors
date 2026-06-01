@@ -26,14 +26,19 @@ export async function getMerchItems(): Promise<MerchItem[]> {
     [],
   );
 
-  // Need an image to render a card; ignore CMS products without one.
-  const withImages = (products ?? []).filter((p) => p.image);
+  // Defensively drop hidden products even if the query filter ever changes,
+  // so an unpublished/hidden item can never leak into the storefront.
+  const visible = (products ?? []).filter((p) => p.status !== "hidden");
 
-  if (withImages.length === 0) {
+  // No CMS catalogue yet -> use the bundled defaults so the store isn't empty.
+  if (visible.length === 0) {
     return MERCH_ITEMS;
   }
 
-  return withImages.map((p) => ({
+  // A card needs an image to render; skip any visible product without one.
+  return visible
+    .filter((p) => p.image)
+    .map((p) => ({
     title: p.title,
     category: p.category ?? "",
     detail: p.description ?? "",

@@ -68,8 +68,8 @@ export default async function CuratedSalesPage() {
               <h2 className="font-display text-3xl tracking-wide">{approachHeading}</h2>
             </div>
             <div className="space-y-6">
-              {approachItems.map((item: { title: string; body: string }) => (
-                <div key={item.title}>
+              {approachItems.map((item: { title: string; body: string }, i: number) => (
+                <div key={`${item.title ?? "approach"}-${i}`}>
                   <h3 className="font-display text-xl tracking-wide mb-2">{item.title}</h3>
                   <p className="text-text-muted leading-relaxed">
                     {item.body}
@@ -85,7 +85,7 @@ export default async function CuratedSalesPage() {
               {partExchangeIntro}
             </p>
             {partExchangeSteps.map((step: { title: string; body: string }, i: number) => (
-              <div key={step.title} className={`flex items-start gap-3 ${i < partExchangeSteps.length - 1 ? "mb-4" : ""}`}>
+              <div key={`${step.title ?? "step"}-${i}`} className={`flex items-start gap-3 ${i < partExchangeSteps.length - 1 ? "mb-4" : ""}`}>
                 <span className="inline-flex items-center justify-center w-8 h-8 bg-brand text-on-brand font-bold text-sm rounded-full shrink-0">{i + 1}</span>
                 <div>
                   <h4 className="font-medium mb-1">{step.title}</h4>

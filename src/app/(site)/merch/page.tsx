@@ -65,7 +65,7 @@ export default async function MerchPage() {
           {perks.map((perk: { title: string; detail: string }, i: number) => {
             const Icon = PERK_ICONS[i] ?? ShieldCheck;
             return (
-              <div key={perk.title} className="flex items-start gap-4 p-6">
+              <div key={`${perk.title ?? "perk"}-${i}`} className="flex items-start gap-4 p-6">
                 <Icon size={22} className="text-brand-light shrink-0 mt-0.5" strokeWidth={1.5} />
                 <div>
                   <div className="font-medium text-text mb-1">{perk.title}</div>

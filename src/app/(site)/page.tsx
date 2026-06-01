@@ -35,7 +35,7 @@ import { getMerchItems } from "@/lib/merch-products";
 import { safeSanityFetch } from "@/sanity/client";
 import { homePageQuery, siteSettingsQuery } from "@/sanity/queries";
 
-type SocialLink = { platform: string; label: string; url: string; ctaLabel?: string };
+type SocialLink = { platform?: string; label?: string; url?: string; ctaLabel?: string };
 
 const SOCIAL_LINKS_DEFAULTS: SocialLink[] = [
   { platform: "Instagram", label: "@thedoghouse_as", url: "https://www.instagram.com/thedoghouse_as", ctaLabel: "Follow" },
@@ -43,8 +43,8 @@ const SOCIAL_LINKS_DEFAULTS: SocialLink[] = [
   { platform: "Facebook", label: "The Dog House AS", url: "https://www.facebook.com/profile.php?id=61584858144187", ctaLabel: "Follow" },
 ];
 
-function SocialPlatformIcon({ platform, size = 36 }: { platform: string; size?: number }) {
-  const key = platform.toLowerCase();
+function SocialPlatformIcon({ platform, size = 36 }: { platform?: string; size?: number }) {
+  const key = (platform ?? "").toLowerCase();
   if (key.includes("instagram")) return <InstagramIcon size={size} />;
   if (key.includes("tiktok")) return <TikTokIcon size={size} />;
   if (key.includes("facebook")) return <FacebookIcon size={size} />;
@@ -182,8 +182,8 @@ export default async function Home() {
               <h2 className="font-display text-4xl md:text-5xl tracking-tight">Services</h2>
             </div>
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {servicesStrip.map((svc: { title: string; text: string }) => (
-                <div key={svc.title} className="border-l border-brand pl-6">
+              {servicesStrip.map((svc: { title: string; text: string }, i: number) => (
+                <div key={`${svc.title ?? "service"}-${i}`} className="border-l border-brand pl-6">
                   <h3 className="font-display text-xl tracking-wide mb-2">{svc.title}</h3>
                   <p className="text-text-muted text-sm leading-relaxed">{svc.text}</p>
                 </div>
@@ -280,9 +280,9 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {merchItems.map((item) => (
+            {merchItems.map((item, i) => (
               <article
-                key={item.title}
+                key={`${item.title ?? "merch"}-${i}`}
                 className="group relative overflow-hidden border border-border bg-bg transition-all duration-300 hover:-translate-y-1 hover:border-brand hover:shadow-xl hover:shadow-black/10"
               >
                 <Link
@@ -331,9 +331,9 @@ export default async function Home() {
             <p className="text-text-muted mt-4 max-w-md mx-auto leading-relaxed">{socialBody}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {socialLinks.map((link) => (
+            {socialLinks.map((link, i) => (
               <a
-                key={link.platform}
+                key={`${link.platform ?? "social"}-${i}`}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"

@@ -103,7 +103,7 @@ export default async function WhoWeArePage() {
             {principles.map((p: { title: string; body: string }, i: number) => {
               const Icon = PRINCIPLE_ICONS[i] ?? Heart;
               return (
-                <div key={p.title} className="text-center">
+                <div key={`${p.title ?? "principle"}-${i}`} className="text-center">
                   <Icon size={36} className="text-brand-light mx-auto mb-6" strokeWidth={1.5} />
                   <h3 className="font-display text-2xl tracking-wide mb-4">{p.title}</h3>
                   <p className="text-text-muted leading-relaxed">{p.body}</p>
@@ -124,8 +124,8 @@ export default async function WhoWeArePage() {
                 {partnersBody}
               </p>
               <ul className="space-y-4 mb-10">
-                {partnerOpportunities.map((item: string) => (
-                  <li key={item} className="flex gap-3">
+                {partnerOpportunities.map((item: string, i: number) => (
+                  <li key={`${item}-${i}`} className="flex gap-3">
                     <span className="text-brand-light font-bold text-lg shrink-0">•</span>
                     <span className="text-text-muted">{item}</span>
                   </li>

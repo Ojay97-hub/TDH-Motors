@@ -218,7 +218,7 @@ export default async function DetailingPage() {
           const isEven = i % 2 === 0;
           return (
             <div
-              key={svc.title}
+              key={`${svc.title ?? "service"}-${i}`}
               className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-border"
             >
               <div className={`p-8 md:p-12 bg-bg-elevated ${!isEven ? "lg:order-2" : ""}`}>
@@ -235,8 +235,8 @@ export default async function DetailingPage() {
                 {svc.tagline && <p className="text-text-muted leading-relaxed mb-6 italic text-sm">{svc.tagline}</p>}
                 {svc.description && <p className="text-text-muted leading-relaxed mb-8">{svc.description}</p>}
                 <ul className="space-y-2">
-                  {(svc.bullets ?? []).map((b) => (
-                    <li key={b} className="flex items-start gap-2.5 text-sm text-text-muted">
+                  {(svc.bullets ?? []).map((b, bi) => (
+                    <li key={`${b}-${bi}`} className="flex items-start gap-2.5 text-sm text-text-muted">
                       <CheckCircle size={15} className="text-brand-light shrink-0 mt-0.5" />
                       <span>{b}</span>
                     </li>
@@ -247,8 +247,8 @@ export default async function DetailingPage() {
               <div className={`p-8 md:p-12 bg-bg border-t lg:border-t-0 border-border ${!isEven ? "lg:order-1 lg:border-r border-border" : "lg:border-l border-border"}`}>
                 <h3 className="font-display text-xl tracking-wide mb-6 text-text">What&apos;s Included</h3>
                 <ul className="space-y-3">
-                  {(svc.includes ?? []).map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-text-muted">
+                  {(svc.includes ?? []).map((item, ii) => (
+                    <li key={`${item}-${ii}`} className="flex items-start gap-3 text-sm text-text-muted">
                       <span className="text-brand-light shrink-0 font-bold">✓</span>
                       <span>{item}</span>
                     </li>
@@ -335,11 +335,11 @@ export default async function DetailingPage() {
               </a>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {videos.map((v) => {
+              {videos.map((v, vi) => {
                 const embedUrl = v.videoUrl ? getEmbedUrl(v.videoUrl) : null;
                 const isPortrait = v.orientation === "portrait";
                 return (
-                  <div key={v.title} className={`bg-bg border border-border overflow-hidden ${isPortrait ? "md:col-span-1 max-w-md" : ""}`}>
+                  <div key={`${v.title ?? "video"}-${vi}`} className={`bg-bg border border-border overflow-hidden ${isPortrait ? "md:col-span-1 max-w-md" : ""}`}>
                     {v.videoFile ? (
                       <video
                         src={v.videoFile}

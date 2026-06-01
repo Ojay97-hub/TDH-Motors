@@ -70,8 +70,8 @@ export default async function BespokeSourcingPage() {
               <h2 className="font-display text-3xl tracking-wide">{processHeading}</h2>
             </div>
             <div className="space-y-6">
-              {processItems.map((item: { title: string; body: string }) => (
-                <div key={item.title}>
+              {processItems.map((item: { title: string; body: string }, i: number) => (
+                <div key={`${item.title ?? "step"}-${i}`}>
                   <h3 className="font-display text-xl tracking-wide mb-2">{item.title}</h3>
                   <p className="text-text-muted leading-relaxed">
                     {item.body}
@@ -84,8 +84,8 @@ export default async function BespokeSourcingPage() {
           <div className="bg-bg-elevated p-8 md:p-12">
             <h3 className="font-display text-2xl tracking-wide mb-6">{perfectForHeading}</h3>
             <ul className="space-y-4 mb-8">
-              {perfectForItems.map((item: string) => (
-                <li key={item} className="flex gap-3">
+              {perfectForItems.map((item: string, i: number) => (
+                <li key={`${item}-${i}`} className="flex gap-3">
                   <span className="text-brand-light font-bold text-lg shrink-0">→</span>
                   <span className="text-text-muted leading-relaxed">{item}</span>
                 </li>
