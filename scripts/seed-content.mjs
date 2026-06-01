@@ -53,12 +53,6 @@ const HOME_PAGE = {
   aboutPara2:
     "Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. No high-pressure sales floor, no commission targets — just an honest conversation and cars we're genuinely proud of.",
   aboutPara3: "Come and see us by appointment. We'll put the kettle on.",
-  valueProps: [
-    { _key: "vp1", title: "Curated Selection", text: "Every car personally inspected and approved." },
-    { _key: "vp2", title: "Bespoke Sourcing", text: "Can't find what you want? We'll find it for you." },
-    { _key: "vp3", title: "Full Servicing", text: "In-house preparation and ongoing care." },
-    { _key: "vp4", title: "Trusted Trade-Ins", text: "Fair, transparent valuations on your current car." },
-  ],
   servicesStrip: [
     { _key: "sales", title: "Curated Sales", text: "Every car hand-picked and personally inspected. We only sell cars we'd happily own ourselves." },
     { _key: "sourcing", title: "Bespoke Sourcing", text: "Looking for something specific? We'll use our network to find it — any spec, any variant." },

@@ -60,6 +60,20 @@ function normalizeCarVideos(car: CarRaw): Car {
   };
 }
 
+/**
+ * Normalizes a list of raw cars (e.g. the homepage's curated `featuredCars`
+ * references resolved by `homePageQuery`) into the public `Car` shape, applying
+ * the same legacy-video handling as every other car loader.
+ */
+export function normalizeCars(
+  cars: Array<CarRaw | null | undefined> | null | undefined,
+): Car[] {
+  // Resolved references can be null (target missing/unpublished); drop them.
+  return (cars ?? [])
+    .filter((c): c is CarRaw => Boolean(c))
+    .map(normalizeCarVideos);
+}
+
 export async function getAllCars(): Promise<Car[]> {
   const cars = await safeSanityFetch<CarRaw[]>(
     allCarsQuery,
