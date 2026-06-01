@@ -68,14 +68,16 @@ export default defineConfig({
       allowOrigins: [previewOrigin],
       resolve: {
         mainDocuments: [
-          { route: "/", type: "homePage" },
-          { route: "/services", type: "servicesPage" },
-          { route: "/who-we-are", type: "whoWeArePage" },
-          { route: "/services/detailing", type: "detailingPage" },
-          { route: "/services/curated-sales", type: "curatedSalesPage" },
-          { route: "/services/bespoke-sourcing", type: "bespokeSourcingPage" },
-          { route: "/services/storage", type: "storagePage" },
-          { route: "/merch", type: "merchPage" },
+          // Pin each singleton route to its fixed document id so Presentation
+          // always resolves the one canonical singleton, never a stray copy.
+          { route: "/", filter: `_id == "homePage"` },
+          { route: "/services", filter: `_id == "servicesPage"` },
+          { route: "/who-we-are", filter: `_id == "whoWeArePage"` },
+          { route: "/services/detailing", filter: `_id == "detailingPage"` },
+          { route: "/services/curated-sales", filter: `_id == "curatedSalesPage"` },
+          { route: "/services/bespoke-sourcing", filter: `_id == "bespokeSourcingPage"` },
+          { route: "/services/storage", filter: `_id == "storagePage"` },
+          { route: "/merch", filter: `_id == "merchPage"` },
           {
             route: "/inventory/:slug",
             filter: `_type == "car" && slug.current == $slug`,
@@ -140,4 +142,21 @@ export default defineConfig({
     }),
     visionTool({ defaultApiVersion: "2025-05-20" }),
   ],
+  document: {
+    // Singletons must never be duplicated: a second copy of a singleton type
+    // breaks resolution (the site/Presentation can pick the wrong/empty one).
+    // Hide singleton types from the global "Create" menu...
+    newDocumentOptions: (prev, { creationContext }) =>
+      creationContext.type === "global"
+        ? prev.filter((template) => !singletonTypeNames.has(template.templateId))
+        : prev,
+    // ...and drop the duplicate/delete/unpublish actions on singleton docs.
+    actions: (prev, { schemaType }) =>
+      singletonTypeNames.has(schemaType)
+        ? prev.filter(
+            ({ action }) =>
+              action !== "duplicate" && action !== "delete" && action !== "unpublish",
+          )
+        : prev,
+  },
 });

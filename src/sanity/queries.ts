@@ -51,23 +51,29 @@ export const allCarSlugsQuery = defineQuery(`
   *[_type == "car" && defined(slug.current)].slug.current
 `);
 
-export const siteSettingsQuery = defineQuery(`*[_type == "siteSettings"][0]`);
+// Singletons are fetched by their fixed document id rather than `_type[0]`.
+// `[_type == "x"][0]` is non-deterministic if a stray duplicate of the type
+// ever exists (e.g. an accidental second draft), which can make Presentation
+// or the site resolve to the wrong/empty document. The id-based query always
+// targets the one canonical singleton (the drafts perspective overlays the
+// draft onto this same id).
+export const siteSettingsQuery = defineQuery(`*[_id == "siteSettings"][0]`);
 
-export const homePageQuery = defineQuery(`*[_type == "homePage"][0]`);
+export const homePageQuery = defineQuery(`*[_id == "homePage"][0]`);
 
-export const servicesPageQuery = defineQuery(`*[_type == "servicesPage"][0]`);
+export const servicesPageQuery = defineQuery(`*[_id == "servicesPage"][0]`);
 
-export const whoWeArePageQuery = defineQuery(`*[_type == "whoWeArePage"][0]`);
+export const whoWeArePageQuery = defineQuery(`*[_id == "whoWeArePage"][0]`);
 
-export const curatedSalesPageQuery = defineQuery(`*[_type == "curatedSalesPage"][0]`);
+export const curatedSalesPageQuery = defineQuery(`*[_id == "curatedSalesPage"][0]`);
 
-export const bespokeSourcingPageQuery = defineQuery(`*[_type == "bespokeSourcingPage"][0]`);
+export const bespokeSourcingPageQuery = defineQuery(`*[_id == "bespokeSourcingPage"][0]`);
 
-export const storagePageQuery = defineQuery(`*[_type == "storagePage"][0]`);
+export const storagePageQuery = defineQuery(`*[_id == "storagePage"][0]`);
 
-export const merchPageQuery = defineQuery(`*[_type == "merchPage"][0]`);
+export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]`);
 
-export const detailingPageQuery = defineQuery(`*[_type == "detailingPage"][0] {
+export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
   ...,
   "beforeAfterGallery": beforeAfterGallery[] {
     label,
