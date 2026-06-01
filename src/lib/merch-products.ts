@@ -2,7 +2,7 @@ import { safeSanityFetch } from "@/sanity/client";
 import { merchProductsQuery } from "@/sanity/queries";
 import { MERCH_ITEMS, TIKTOK_SHOP_URL, type MerchItem } from "@/lib/merch";
 
-type MerchProductRaw = {
+export type MerchProductRaw = {
   _id: string;
   title: string;
   category?: string;
@@ -12,6 +12,30 @@ type MerchProductRaw = {
   status?: "available" | "coming-soon" | "hidden";
   image?: string;
 };
+
+/**
+ * Maps raw CMS merch products into the `MerchItem` shape the cards render.
+ * Drops hidden products and any without an image. Shared by the `/merch`
+ * storefront loader and the homepage's curated `homepageMerch` list so both
+ * apply identical filtering.
+ */
+export function toMerchItems(
+  products: Array<MerchProductRaw | null | undefined> | null | undefined,
+): MerchItem[] {
+  return (products ?? [])
+    // Resolved references can be null (target missing/unpublished); drop them.
+    .filter((p): p is MerchProductRaw => Boolean(p))
+    .filter((p) => p.status !== "hidden")
+    .filter((p) => p.image)
+    .map((p) => ({
+      title: p.title,
+      category: p.category ?? "",
+      detail: p.description ?? "",
+      image: p.image as string,
+      comingSoon: p.status === "coming-soon",
+      tiktokShopUrl: p.tiktokShopUrl || TIKTOK_SHOP_URL,
+    }));
+}
 
 /**
  * Loads the merch catalogue from Sanity (used by both the /merch storefront and
@@ -26,24 +50,8 @@ export async function getMerchItems(): Promise<MerchItem[]> {
     [],
   );
 
-  // Defensively drop hidden products even if the query filter ever changes,
-  // so an unpublished/hidden item can never leak into the storefront.
-  const visible = (products ?? []).filter((p) => p.status !== "hidden");
+  const items = toMerchItems(products);
 
-  // No CMS catalogue yet -> use the bundled defaults so the store isn't empty.
-  if (visible.length === 0) {
-    return MERCH_ITEMS;
-  }
-
-  // A card needs an image to render; skip any visible product without one.
-  return visible
-    .filter((p) => p.image)
-    .map((p) => ({
-    title: p.title,
-    category: p.category ?? "",
-    detail: p.description ?? "",
-    image: p.image as string,
-    comingSoon: p.status === "coming-soon",
-    tiktokShopUrl: p.tiktokShopUrl || TIKTOK_SHOP_URL,
-  }));
+  // No usable CMS catalogue yet -> use the bundled defaults so the store isn't empty.
+  return items.length > 0 ? items : MERCH_ITEMS;
 }

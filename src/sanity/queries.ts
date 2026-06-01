@@ -29,6 +29,16 @@ const carProjection = /* groq */ `
   status
 `;
 
+const merchProductProjection = /* groq */ `
+  _id,
+  title,
+  description,
+  priceLabel,
+  tiktokShopUrl,
+  status,
+  "image": image.asset->url
+`;
+
 export const allCarsQuery = defineQuery(`
   *[_type == "car"] | order(year desc, _createdAt desc) {
     ${carProjection}
@@ -59,7 +69,29 @@ export const allCarSlugsQuery = defineQuery(`
 // draft onto this same id).
 export const siteSettingsQuery = defineQuery(`*[_id == "siteSettings"][0]`);
 
-export const homePageQuery = defineQuery(`*[_id == "homePage"][0]`);
+// The homepage curates its own Featured Cars and Merch via reference lists.
+// Resolve those references inline so the page gets full car/product objects
+// (in the editor-chosen order). Both fall back at render time: an empty
+// `featuredCars` uses the per-car `featured` flag, and an empty `homepageMerch`
+// shows all visible products.
+export const homePageQuery = defineQuery(`*[_id == "homePage"][0]{
+  ...,
+  "featuredCars": featuredCars[]->{
+    ${carProjection}
+  },
+  "homepageMerch": homepageMerch[]->{
+    ${merchProductProjection}
+  },
+  comingSoonCard {
+    show,
+    eyebrow,
+    heading,
+    subtext,
+    priceLabel,
+    mileageLabel,
+    "image": image.asset->url
+  }
+}`);
 
 export const servicesPageQuery = defineQuery(`*[_id == "servicesPage"][0]`);
 
@@ -99,12 +131,6 @@ export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
 
 export const merchProductsQuery = defineQuery(`
   *[_type == "merchProduct" && status != "hidden"] | order(coalesce(sortOrder, 100) asc, _createdAt desc) {
-    _id,
-    title,
-    description,
-    priceLabel,
-    tiktokShopUrl,
-    status,
-    "image": image.asset->url
+    ${merchProductProjection}
   }
 `);

@@ -8,7 +8,9 @@ export const homePage = defineType({
     { name: "hero", title: "Hero", default: true },
     { name: "about", title: "About Section" },
     { name: "servicesStrip", title: "Services Strip" },
+    { name: "featuredCars", title: "Featured Cars" },
     { name: "merch", title: "Merch Section" },
+    { name: "merchItems", title: "Merch Items" },
     { name: "social", title: "Social Section" },
     { name: "cta", title: "Call to Action" },
     { name: "findUs", title: "Find Us" },
@@ -87,11 +89,69 @@ export const homePage = defineType({
       validation: (r) => r.max(4),
     }),
 
+    // Featured Cars (curated for the homepage)
+    defineField({
+      name: "featuredCars",
+      title: "Featured cars",
+      description:
+        "Cars shown in the “Featured Cars” section on the homepage, in this order. Remove one here to drop it from the homepage without deleting the car. Leave empty to fall back to every car with the “Featured” checkbox ticked.",
+      type: "array",
+      group: "featuredCars",
+      of: [defineArrayMember({ type: "reference", to: [{ type: "car" }] })],
+      validation: (r) => r.max(6).unique(),
+    }),
+
+    // The dark "Coming Soon" teaser shown at the end of the Featured Cars row.
+    // It isn't a real car, so it's edited here on the Home Page.
+    defineField({
+      name: "comingSoonCard",
+      title: "“Coming Soon” card",
+      description:
+        "The dark teaser card shown after the featured cars. Turn it off once you have enough real cars to fill the row.",
+      type: "object",
+      group: "featuredCars",
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({ name: "show", title: "Show this card", type: "boolean", initialValue: true }),
+        defineField({ name: "eyebrow", title: "Eyebrow", type: "string", description: 'e.g. "New Arrival"' }),
+        defineField({ name: "heading", title: "Heading", type: "string", description: 'e.g. "Details Coming Soon"' }),
+        defineField({ name: "subtext", title: "Subtext", type: "string", description: 'e.g. "Stay tuned for our next listing"' }),
+        defineField({ name: "priceLabel", title: "Price label", type: "string", description: 'e.g. "TBC"' }),
+        defineField({ name: "mileageLabel", title: "Mileage label", type: "string", description: 'e.g. "TBC"' }),
+        defineField({
+          name: "image",
+          title: "Image",
+          type: "image",
+          options: { hotspot: true },
+          description: "Optional. Defaults to the TDH “Coming Soon” graphic.",
+        }),
+      ],
+      preview: {
+        select: { title: "heading", subtitle: "show" },
+        prepare: ({ title, subtitle }) => ({
+          title: title || "Details Coming Soon",
+          subtitle: subtitle === false ? "Hidden" : "Visible",
+        }),
+      },
+    }),
+
     defineField({ name: "merchEyebrow", title: "Merch eyebrow", type: "string", group: "merch" }),
     defineField({ name: "merchHeading", title: "Merch heading", type: "string", group: "merch" }),
     defineField({ name: "merchBody", title: "Merch body", type: "text", rows: 3, group: "merch" }),
     defineField({ name: "merchPrimaryCta", title: "Merch primary CTA", type: "string", group: "merch" }),
     defineField({ name: "merchSecondaryCta", title: "Merch secondary CTA", type: "string", group: "merch" }),
+
+    // Merch items (curated for the homepage)
+    defineField({
+      name: "homepageMerch",
+      title: "Merch items",
+      description:
+        "Products shown in the “Upcoming Merch” section on the homepage, in this order. Remove one here to drop it from the homepage without deleting the product. Leave empty to show all visible products.",
+      type: "array",
+      group: "merchItems",
+      of: [defineArrayMember({ type: "reference", to: [{ type: "merchProduct" }] })],
+      validation: (r) => r.max(8).unique(),
+    }),
 
     defineField({ name: "socialEyebrow", title: "Social eyebrow", type: "string", group: "social" }),
     defineField({ name: "socialHeading", title: "Social heading", type: "string", group: "social" }),

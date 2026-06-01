@@ -29,9 +29,9 @@ function FacebookIcon({ size = 24 }: { size?: number }) {
 }
 import { CarCard } from "@/components/car-card";
 import { ShowroomVideo } from "@/components/showroom-video";
-import { getFeaturedCars } from "@/lib/cars";
+import { getFeaturedCars, normalizeCars } from "@/lib/cars";
 import { TIKTOK_SHOP_URL } from "@/lib/merch";
-import { getMerchItems } from "@/lib/merch-products";
+import { getMerchItems, toMerchItems } from "@/lib/merch-products";
 import { safeSanityFetch } from "@/sanity/client";
 import { homePageQuery, siteSettingsQuery } from "@/sanity/queries";
 
@@ -59,12 +59,20 @@ const SERVICES_STRIP_DEFAULTS = [
 ];
 
 export default async function Home() {
-  const [featured, cms, settings, merchItems] = await Promise.all([
+  const [fallbackFeatured, cms, settings, fallbackMerch] = await Promise.all([
     getFeaturedCars(),
-    safeSanityFetch(homePageQuery, {}, { next: { revalidate: 60, tags: ["homePage"] } }),
+    // The homepage query resolves the curated `featuredCars`/`homepageMerch`
+    // references, so tag it with "car"/"merchProduct" too — editing a
+    // referenced car or product then revalidates the homepage as well.
+    safeSanityFetch(homePageQuery, {}, { next: { revalidate: 60, tags: ["homePage", "car", "merchProduct"] } }),
     safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
     getMerchItems(),
   ]);
+
+  // Curated homepage lists take priority; fall back to the per-car `featured`
+  // flag and the full product catalogue when an editor hasn't curated a list.
+  const featured = cms?.featuredCars?.length ? normalizeCars(cms.featuredCars) : fallbackFeatured;
+  const merchItems = cms?.homepageMerch?.length ? toMerchItems(cms.homepageMerch) : fallbackMerch;
 
   const heroLine1 = cms?.heroLine1 ?? "Performance Cars,";
   const heroLine2 = cms?.heroLine2 ?? "Hand-Picked.";
@@ -87,6 +95,18 @@ export default async function Home() {
   const ctaBody = cms?.ctaBody ?? "Our showroom is open by appointment, allowing us to give every visitor the time and attention they deserve. Get in touch to arrange a viewing.";
   const findUsHeading = cms?.findUsHeading ?? "Better yet, see us in person.";
   const findUsBody = cms?.findUsBody ?? "Viewing is by appointment only — give us a call or drop us a line and we'll get the kettle on.";
+
+  // "Coming Soon" teaser card at the end of the Featured Cars row. Editable on
+  // the Home Page doc; falls back to the original copy/graphic. `show` defaults
+  // to true (undefined on docs created before this field existed).
+  const comingSoon = cms?.comingSoonCard ?? {};
+  const showComingSoon = comingSoon.show !== false;
+  const comingSoonImage = comingSoon.image || "/coming-soon-tdh.png";
+  const comingSoonEyebrow = comingSoon.eyebrow || "New Arrival";
+  const comingSoonHeading = comingSoon.heading || "Details Coming Soon";
+  const comingSoonSubtext = comingSoon.subtext || "Stay tuned for our next listing";
+  const comingSoonPrice = comingSoon.priceLabel || "TBC";
+  const comingSoonMileage = comingSoon.mileageLabel || "TBC";
 
   // For privacy/security the home page only ever shows a general area — the exact
   // yard is shared once a visitor enquires. We deliberately ignore any precise
@@ -219,32 +239,34 @@ export default async function Home() {
           {featured.map((car) => (
             <CarCard key={car.slug} car={car} />
           ))}
-          <div className="group block bg-bg-elevated border border-border border-dashed overflow-hidden cursor-default">
-            <div className="relative aspect-4/3 overflow-hidden bg-black p-6 md:p-8">
-              <Image
-                src="/coming-soon-tdh.png"
-                alt="The Dog House Automotive Solutions coming soon"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-contain transition-transform duration-700 group-hover:scale-105"
-              />
-            </div>
-            <div className="p-6">
-              <div className="text-xs text-text-subtle tracking-widest uppercase mb-2">New Arrival</div>
-              <h3 className="font-display text-xl tracking-wide mb-1 text-text-muted">Details Coming Soon</h3>
-              <div className="text-sm text-text-subtle mb-4">Stay tuned for our next listing</div>
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div>
-                  <div className="text-xs text-text-subtle uppercase tracking-wider">Price</div>
-                  <div className="font-display text-lg text-text-muted">TBC</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs text-text-subtle uppercase tracking-wider">Mileage</div>
-                  <div className="font-display text-lg text-text-muted">TBC</div>
+          {showComingSoon && (
+            <div className="group block bg-bg-elevated border border-border border-dashed overflow-hidden cursor-default">
+              <div className={`relative aspect-4/3 overflow-hidden bg-black ${comingSoon.image ? "" : "p-6 md:p-8"}`}>
+                <Image
+                  src={comingSoonImage}
+                  alt={comingSoonHeading}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className={`transition-transform duration-700 group-hover:scale-105 ${comingSoon.image ? "object-cover" : "object-contain"}`}
+                />
+              </div>
+              <div className="p-6">
+                <div className="text-xs text-text-subtle tracking-widest uppercase mb-2">{comingSoonEyebrow}</div>
+                <h3 className="font-display text-xl tracking-wide mb-1 text-text-muted">{comingSoonHeading}</h3>
+                <div className="text-sm text-text-subtle mb-4">{comingSoonSubtext}</div>
+                <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <div>
+                    <div className="text-xs text-text-subtle uppercase tracking-wider">Price</div>
+                    <div className="font-display text-lg text-text-muted">{comingSoonPrice}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-text-subtle uppercase tracking-wider">Mileage</div>
+                    <div className="font-display text-lg text-text-muted">{comingSoonMileage}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
