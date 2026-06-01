@@ -33,7 +33,7 @@ export async function safeSanityFetch<T = any>(
     try {
       const tags = options?.next?.tags?.filter(
         (tag): tag is string => typeof tag === "string",
-      );
+      ) ?? [];
       const { data } = await sanityFetch({ query, params, tags });
       return data as T;
     } catch (err) {
