@@ -227,7 +227,7 @@ export default async function DetailingPage() {
                   <div className="text-xs tracking-[0.3em] uppercase text-brand-light">{svc.tag}</div>
                 </div>
                 <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-2">{svc.title}</h2>
-                {"price" in svc && svc.price && (
+                {svc.price && (
                   <div className="inline-block bg-brand text-on-brand text-sm font-medium tracking-wider uppercase px-3 py-1 mb-4">
                     {svc.price}
                   </div>
