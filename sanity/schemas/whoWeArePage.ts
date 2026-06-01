@@ -8,6 +8,7 @@ export const whoWeArePage = defineType({
     { name: "hero", title: "Hero", default: true },
     { name: "story", title: "Our Story" },
     { name: "principles", title: "Principles" },
+    { name: "partners", title: "Business Partners" },
     { name: "cta", title: "Call to Action" },
   ],
   fields: [
@@ -66,6 +67,53 @@ export const whoWeArePage = defineType({
         }),
       ],
       validation: (r) => r.max(3),
+    }),
+
+    defineField({
+      name: "partnersEyebrow",
+      title: "Partners eyebrow",
+      type: "string",
+      group: "partners",
+    }),
+    defineField({
+      name: "partnersHeading",
+      title: "Partners heading",
+      type: "string",
+      group: "partners",
+    }),
+    defineField({
+      name: "partnersBody",
+      title: "Partners body",
+      type: "text",
+      rows: 3,
+      group: "partners",
+    }),
+    defineField({
+      name: "partnerOpportunities",
+      title: "Partner opportunities",
+      type: "array",
+      group: "partners",
+      of: [defineArrayMember({ type: "string" })],
+    }),
+    defineField({
+      name: "partnersCardBody",
+      title: "Partners card body",
+      type: "text",
+      rows: 3,
+      group: "partners",
+    }),
+    defineField({
+      name: "partnersCardFootnote",
+      title: "Partners card footnote",
+      type: "text",
+      rows: 3,
+      group: "partners",
+    }),
+    defineField({
+      name: "partnersCtaLabel",
+      title: "Partners CTA label",
+      type: "string",
+      group: "partners",
     }),
 
     defineField({

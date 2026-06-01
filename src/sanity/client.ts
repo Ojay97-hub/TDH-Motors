@@ -1,15 +1,8 @@
-import { createClient, type FilteredResponseQueryOptions } from "next-sanity";
-import { apiVersion, dataset, projectId } from "./env";
+import type { FilteredResponseQueryOptions } from "next-sanity";
+import { sanityClient } from "./base-client";
+import { sanityFetch } from "./live";
 
-export const sanityClient = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  // Next.js' Data Cache + `revalidate`/`tags` already control freshness, so the
-  // extra Sanity CDN layer only adds staleness (published edits can lag behind).
-  // Turning it off means revalidation always pulls the live published content.
-  useCdn: false,
-});
+export { sanityClient };
 
 const MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 150;
@@ -38,7 +31,11 @@ export async function safeSanityFetch<T = any>(
   let lastErr: unknown;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      return await sanityClient.fetch<T>(query, params, options);
+      const tags = options?.next?.tags?.filter(
+        (tag): tag is string => typeof tag === "string",
+      );
+      const { data } = await sanityFetch({ query, params, tags });
+      return data as T;
     } catch (err) {
       lastErr = err;
       if (attempt < MAX_ATTEMPTS) {

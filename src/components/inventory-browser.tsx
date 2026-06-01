@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { ArrowUpRight, ChevronDown, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
-import { Car, formatPrice, formatMileage } from "@/lib/cars";
+import type { Car } from "@/lib/cars";
 
 type ViewMode = "grid" | "list";
 type SortKey = "year-desc" | "year-asc" | "price-desc" | "price-asc";
@@ -16,6 +16,18 @@ const categoryLabel: Record<string, string> = {
   performance: "Performance",
   sports: "Sports",
 };
+
+function formatPrice(price: number): string {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function formatMileage(miles: number): string {
+  return new Intl.NumberFormat("en-GB").format(miles) + " mi";
+}
 
 export function InventoryBrowser({ cars }: { cars: Car[] }) {
   const [view, setView] = useState<ViewMode>("grid");

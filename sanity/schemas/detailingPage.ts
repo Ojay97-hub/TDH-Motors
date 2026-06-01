@@ -5,11 +5,39 @@ export const detailingPage = defineType({
   title: "Detailing Page",
   type: "document",
   groups: [
-    { name: "beforeAfter", title: "Before & After", default: true },
+    { name: "hero", title: "Hero", default: true },
+    { name: "services", title: "Services" },
+    { name: "beforeAfter", title: "Before & After" },
     { name: "gallery", title: "Photo Gallery" },
     { name: "videos", title: "Videos" },
+    { name: "footer", title: "Footer CTA" },
   ],
   fields: [
+    defineField({ name: "eyebrow", title: "Eyebrow", type: "string", group: "hero" }),
+    defineField({ name: "heading", title: "Heading", type: "string", group: "hero" }),
+    defineField({ name: "intro", title: "Intro", type: "text", rows: 4, group: "hero" }),
+    defineField({ name: "pricingBody", title: "Pricing body", type: "text", rows: 3, group: "hero" }),
+    defineField({
+      name: "services",
+      title: "Detailing services",
+      type: "array",
+      group: "services",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({ name: "title", title: "Title", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "tag", title: "Tag", type: "string" }),
+            defineField({ name: "tagline", title: "Tagline", type: "string" }),
+            defineField({ name: "description", title: "Description", type: "text", rows: 4 }),
+            defineField({ name: "price", title: "Price", type: "string" }),
+            defineField({ name: "bullets", title: "Bullets", type: "array", of: [defineArrayMember({ type: "string" })] }),
+            defineField({ name: "includes", title: "What's included", type: "array", of: [defineArrayMember({ type: "string" })] }),
+          ],
+          preview: { select: { title: "title", subtitle: "price" } },
+        }),
+      ],
+    }),
     defineField({
       name: "beforeAfterGallery",
       title: "Before & After Gallery",
@@ -195,6 +223,10 @@ export const detailingPage = defineType({
         }),
       ],
     }),
+    defineField({ name: "partnerNote", title: "Partner note", type: "text", rows: 2, group: "footer" }),
+    defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "footer" }),
+    defineField({ name: "ctaBody", title: "CTA body", type: "text", rows: 2, group: "footer" }),
+    defineField({ name: "ctaLabel", title: "CTA label", type: "string", group: "footer" }),
   ],
   preview: {
     prepare: () => ({ title: "Detailing Page" }),

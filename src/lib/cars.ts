@@ -1,4 +1,5 @@
 import { safeSanityFetch } from "@/sanity/client";
+import { sanityClient } from "@/sanity/base-client";
 import {
   allCarSlugsQuery,
   allCarsQuery,
@@ -89,13 +90,15 @@ export async function getCarBySlug(slug: string): Promise<Car | null> {
 }
 
 export async function getAllCarSlugs(): Promise<string[]> {
-  const slugs = await safeSanityFetch<string[]>(
-    allCarSlugsQuery,
-    {},
-    { next: { revalidate: 60, tags: ["car"] } },
-    [],
-  );
-  return slugs ?? [];
+  try {
+    return await sanityClient.fetch<string[]>(allCarSlugsQuery);
+  } catch (err) {
+    console.error(
+      "[sanity] slug fetch failed during static param generation:",
+      err instanceof Error ? err.message : err,
+    );
+    return [];
+  }
 }
 
 export function formatPrice(price: number): string {

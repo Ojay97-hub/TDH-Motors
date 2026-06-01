@@ -1,12 +1,10 @@
 /**
- * Populates all singleton CMS documents with the default content that is
- * currently hardcoded as fallbacks in the Next.js pages.
- *
- * Safe to re-run — uses createOrReplace so it is fully idempotent.
- * Also removes any stale drafts so the Studio shows clean published content.
+ * Populates singleton CMS documents with the content currently shown on the
+ * frontend. Safe to re-run: it patches existing published docs or creates the
+ * expected singleton IDs, then removes stale drafts for those docs.
  *
  * Usage:
- *   node scripts/seed-content.mjs
+ *   node --env-file=.env scripts/seed-content.mjs
  *   (SANITY_API_WRITE_TOKEN must be set in env or .env)
  */
 
@@ -15,16 +13,18 @@ import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
-// Load .env manually (no dotenv dependency required)
 const __dir = dirname(fileURLToPath(import.meta.url));
 const envPath = resolve(__dir, "../.env");
+
 try {
   const lines = readFileSync(envPath, "utf8").split("\n");
   for (const line of lines) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
     if (m) process.env[m[1]] ??= m[2].trim();
   }
-} catch { /* .env optional */ }
+} catch {
+  // .env optional
+}
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
 if (!token) {
@@ -39,8 +39,6 @@ const client = createClient({
   token,
   useCdn: false,
 });
-
-// ─── Document payloads ───────────────────────────────────────────────────────
 
 const HOME_PAGE = {
   _id: "homePage",
@@ -62,10 +60,24 @@ const HOME_PAGE = {
     { _key: "vp4", title: "Trusted Trade-Ins", text: "Fair, transparent valuations on your current car." },
   ],
   servicesStrip: [
-    { _key: "sales",    title: "Sales",        text: "Curated stock plus dedicated bespoke sourcing for cars we don't yet have." },
-    { _key: "px",       title: "Part-Exchange", text: "Honest, market-aware valuations on whatever you're driving today." },
-    { _key: "finance",  title: "Finance",       text: "Flexible HP and PCP through our trusted finance partners." },
-    { _key: "workshop", title: "Workshop",      text: "Servicing, MOT preparation, and detailing — in-house." },
+    { _key: "sales", title: "Curated Sales", text: "Every car hand-picked and personally inspected. We only sell cars we'd happily own ourselves." },
+    { _key: "sourcing", title: "Bespoke Sourcing", text: "Looking for something specific? We'll use our network to find it — any spec, any variant." },
+    { _key: "px", title: "Part-Exchange", text: "Honest, market-aware valuations on whatever you're driving today." },
+    { _key: "detailing", title: "Detailing", text: "Full machine polish, paint protection, and ceramic coating from experienced detailers." },
+  ],
+  merchEyebrow: "Upcoming Merch",
+  merchHeading: "The Dog House Drop",
+  merchBody:
+    "The new TDH artwork is being turned into a small merch line across hoodies, tees, caps, and garage essentials. Coming soon.",
+  merchPrimaryCta: "Preview Merch",
+  merchSecondaryCta: "Drop Updates",
+  socialEyebrow: "Stay Connected",
+  socialHeading: "Check Us Out on Our Socials",
+  socialBody: "Follow along for new arrivals, behind-the-scenes content, and everything cars.",
+  socialLinks: [
+    { _key: "instagram", platform: "Instagram", label: "@thedoghouse_as", url: "https://www.instagram.com/thedoghouse_as", ctaLabel: "Follow" },
+    { _key: "tiktok", platform: "TikTok", label: "@thedoghouseas", url: "https://www.tiktok.com/@thedoghouseas", ctaLabel: "Follow" },
+    { _key: "facebook", platform: "Facebook", label: "The Dog House AS", url: "https://www.facebook.com/profile.php?id=61584858144187", ctaLabel: "Follow" },
   ],
   ctaHeading: "By Appointment, In the Chilterns.",
   ctaBody:
@@ -110,16 +122,6 @@ const SERVICES_PAGE = {
     },
     {
       _key: "s4",
-      title: "Finance",
-      body: "Flexible HP and PCP arrangements through our trusted partners. We'll help you structure a deal that works for you, with no obligation.",
-    },
-    {
-      _key: "s5",
-      title: "Servicing & MOT",
-      body: "Our in-house workshop handles preparation, servicing, and MOT for every car we sell — and for our customers, long after they drive away.",
-    },
-    {
-      _key: "s6",
       title: "Detailing",
       body: "Full machine polish, paint protection, and ceramic coating from experienced detailers. Every car we sell is presented at its absolute best.",
     },
@@ -134,7 +136,7 @@ const WHO_WE_ARE_PAGE = {
   _type: "whoWeArePage",
   heroHeading: "Built on a passion for performance.",
   introParagraph:
-    "TDH Motors is a small, family-run dealership based in the Chilterns — with one principle that drives everything we do.",
+    "TDH Motors is a small, family-run dealership based in the Chilterns — guided by three principles that drive everything we do.",
   para1:
     "Buying a performance car should feel as good as driving one. Too often, it doesn't. Pushy sales tactics, opaque pricing, and tired stock have made the experience something to endure rather than enjoy.",
   para2:
@@ -158,29 +160,312 @@ const WHO_WE_ARE_PAGE = {
       body: "Our best customers are repeat customers. We're not interested in a one-off sale — we want to be the dealer you call for your next car, and the one after that.",
     },
   ],
+  partnersEyebrow: "Collaboration",
+  partnersHeading: "Business Partners",
+  partnersBody:
+    "We're always interested in exploring partnerships that align with our values. Whether you're a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we'd like to hear from you.",
+  partnerOpportunities: [
+    "Exclusive service partnerships",
+    "Product and supplier collaborations",
+    "Event and sponsorship opportunities",
+    "Media and content partnerships",
+  ],
+  partnersCardBody:
+    "We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.",
+  partnersCardFootnote:
+    "Have an opportunity you think we should know about? Drop us a message and let's have a conversation. We're always open to the right opportunity.",
+  partnersCtaLabel: "Get In Touch",
   ctaHeading: "Come and Visit Us.",
   ctaBody:
     "The best way to understand how we work is to come and meet us. Book an appointment and we'll put the kettle on.",
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+const DETAILING_PAGE = {
+  _id: "detailingPage",
+  _type: "detailingPage",
+  eyebrow: "Service",
+  heading: "Detailing",
+  intro:
+    "From ceramic coating protection to full paintwork correction, our professional detailing team — TDH Detailing in partnership with TT Auto detailers — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.",
+  pricingBody:
+    "Prices start from £200. Every car is different, so final costing is assessed case by case — get in touch for a tailored quote.",
+  services: [
+    {
+      _key: "new-car-protection",
+      title: "New Car Protection",
+      tag: "Protection Detailing",
+      tagline: "Ceramic coating for lasting defence.",
+      description:
+        "Using Gtechniq nano ceramic coatings, we create a durable, slick surface that resists dirt, tar, tree sap, and bird droppings. The coating bonds at a nano level, providing multi-year protection with superior water-beading and an unrivalled finish.",
+      bullets: [
+        "Unrivalled reflection — gloss, depth and clarity",
+        "Hydrophobic/water-dirt repelling properties",
+        "Easy clean and self-cleaning properties",
+        "Weather protection",
+        "Anti-micro scratch properties",
+        "Temperature resistant: -40°F to 250°F",
+      ],
+      price: "From £200",
+      includes: [
+        "Multi-stage decontamination wash",
+        "Snow foam, clay bar, Iron X and Tardis treatment",
+        "Single-stage machine polish",
+        "Gtechniq Crystal Serum Light, Exo and Wheel Armour",
+        "Glass coating and trim restorer",
+        "Interior: Matt Dash, i Leather, i Fabric",
+      ],
+    },
+    {
+      _key: "swirl-correction",
+      title: "Swirl Correction",
+      tag: "Correction Detailing",
+      tagline: "Machine polishing to restore flawless paintwork.",
+      description:
+        "Machine polishing eliminates unsightly swirl marks and fine scratches from your paintwork — the kind that catch in sunlight and dull an otherwise perfect finish. It's not uncommon for cars straight from the dealership to carry swirling already. We correct it.",
+      bullets: [
+        "Removes swirl marks, fine scratches and holograms",
+        "1–5 stage machine polishing depending on condition",
+        "Addresses damage from improper washing, bird mess and tree sap",
+        "Restores true gloss and depth to paintwork",
+        "Optional ceramic coating package available",
+      ],
+      price: "From £250",
+      includes: [
+        "Multi-stage decontamination wash",
+        "Wheel clean with Iron X, Tardis and citrus",
+        "Arch and panel gap decontamination",
+        "Clay bar treatment",
+        "1–5 stage machine polish",
+        "Panel wipe to remove all oils and waxes",
+      ],
+    },
+    {
+      _key: "gloss-enhancement",
+      title: "Gloss Enhancement",
+      tag: "Enhancement Detailing",
+      tagline: "Maximise gloss, depth and reflection.",
+      description:
+        "Focused on elevating your car's visual impact — increasing gloss, depth and reflection while removing light surface marks. Ideal as a standalone treatment or as part of a regular annual maintenance schedule.",
+      bullets: [
+        "Removes light scratches and swirl marks",
+        "Maximises gloss, depth and reflection",
+        "Gtechniq C2 Liquid Crystal finishing spray applied",
+        "Available as standalone or annual maintenance",
+        "Perfect for cars in good condition needing a refresh",
+      ],
+      price: "From £200",
+      includes: [
+        "Multi-stage wash with polymer removal",
+        "Wheel clean with Iron X and Tardis",
+        "Snow foam and two-bucket wash method",
+        "Clay bar treatment",
+        "Single-stage machine polish",
+        "Gtechniq C2 Liquid Crystal Detailing Spray",
+      ],
+    },
+    {
+      _key: "maintenance-valeting",
+      title: "Maintenance Valeting",
+      tag: "Valeting",
+      tagline: "Regular care that protects your investment.",
+      description:
+        "Monthly to six-weekly valet services using pH-neutral shampoos and scratch-avoiding techniques designed to preserve your paintwork and any ceramic coatings. Professional, sympathetic care without the risk of inflicting micro-scratches.",
+      bullets: [
+        "pH-neutral shampoos safe for ceramic coatings",
+        "Scratch-avoiding two-bucket wash method",
+        "Ideal for busy owners who want regular professional upkeep",
+        "Maintains the integrity and appearance of ceramic coatings",
+        "Scheduled to suit your routine",
+      ],
+      price: "From £200",
+      includes: [
+        "Exterior rinse and snow foam pre-wash",
+        "Two-bucket wash with lamb's wool mitt",
+        "Wheel and arch clean",
+        "Contactless dry and detail spray",
+        "Window clean",
+        "Interior wipe-down and vacuum (on request)",
+      ],
+    },
+  ],
+  partnerNote:
+    "Our detailing work is carried out by TDH Detailing in partnership with TT Auto detailers.",
+  ctaHeading: "Book Your Detail",
+  ctaBody:
+    "Every job is assessed individually. Get in touch to discuss your car's needs and we'll recommend the right service for you.",
+  ctaLabel: "Get In Touch",
+};
+
+const CURATED_SALES_PAGE = {
+  _id: "curatedSalesPage",
+  _type: "curatedSalesPage",
+  eyebrow: "Service",
+  heading: "Curated Sales",
+  intro:
+    "Every car in our inventory is hand-picked by our team and personally inspected before listing. We only sell cars we'd happily own ourselves. And we make trading in your current car straightforward.",
+  approachHeading: "Our Approach",
+  approachItems: [
+    { _key: "hand-picked-selection", title: "Hand-Picked Selection", body: "We source performance and specialist cars that meet our exacting standards. Every vehicle is personally inspected before it reaches our inventory." },
+    { _key: "fully-prepared", title: "Fully Prepared", body: "Each car receives a complete check, any necessary servicing, and professional detailing in our own workshop before delivery." },
+    { _key: "transparent-pricing", title: "Transparent Pricing", body: "No games, no haggling. What you see is what you get — we believe in honest conversations and fair value for both sides." },
+  ],
+  partExchangeHeading: "Part-Exchange Made Simple",
+  partExchangeIntro:
+    "Trading in your current car? We offer fair, transparent valuations with no surprises. Here's how it works:",
+  partExchangeSteps: [
+    { _key: "provide-details", title: "Provide Details", body: "Tell us about your car — make, model, year, mileage, condition." },
+    { _key: "we-inspect", title: "We Inspect", body: "Our team inspects your vehicle and provides a competitive valuation." },
+    { _key: "trade-upgrade", title: "Trade & Upgrade", body: "Apply the valuation to your next car and drive away happy." },
+  ],
+  ctaHeading: "Find Your Next Car",
+  ctaBody: "Browse our current inventory or tell us what you're looking for. We're here to help.",
+  primaryCtaLabel: "View Inventory",
+  secondaryCtaLabel: "Get a Valuation",
+};
+
+const BESPOKE_SOURCING_PAGE = {
+  _id: "bespokeSourcingPage",
+  _type: "bespokeSourcingPage",
+  eyebrow: "Service",
+  heading: "Bespoke Sourcing",
+  intro:
+    "Looking for something specific? A rare variant, a particular colour, a unique specification, or an investment-grade example? Let us know your dream spec and we'll use our network to find it.",
+  processHeading: "How It Works",
+  processItems: [
+    { _key: "tell-us", title: "Tell Us What You Want", body: "Whether it's a specific model, year range, colour, specification, or something more unique — the more detail, the better." },
+    { _key: "search-network", title: "We Search Our Network", body: "We tap into our extensive network of dealers, auction houses, and private contacts to find exactly what you're after." },
+    { _key: "inspect-deliver", title: "We Inspect & Deliver", body: "Once we've found your car, we conduct a thorough inspection, handle all the paperwork, and deliver it to you — ready to enjoy." },
+  ],
+  perfectForHeading: "Perfect For",
+  perfectForItems: [
+    "Finding a rare colour or limited edition variant",
+    "Locating investment-grade examples in perfect condition",
+    "Sourcing specific year ranges or generations",
+    "Finding cars with unusual specifications or low mileage",
+    "One-off builds or bespoke configurations",
+  ],
+  noteHeading: "No obligation, no timeline pressure.",
+  noteBody:
+    "We'll search on your behalf with no cost unless we find exactly what you're looking for.",
+  ctaHeading: "Let's Find Your Perfect Car",
+  ctaBody:
+    "Tell us what you're looking for and we'll start the search. No obligation, no pressure — just an honest conversation.",
+  ctaLabel: "Start the Search",
+};
+
+const STORAGE_PAGE = {
+  _id: "storagePage",
+  _type: "storagePage",
+  eyebrow: "Service",
+  heading: "Storage",
+  intro:
+    "Whether you're a collector with a weekend car, between sales, or simply need a secure home for your vehicle, our secure and climate-controlled storage is the answer. Discretion and security are our highest priority — your car is kept confidential and protected around the clock.",
+  pricingBody:
+    "Storage starts from £200. Rates depend on the vehicle and length of stay, so final costing is assessed case by case — get in touch for a tailored quote.",
+  benefitsHeading: "Why Store With Us?",
+  benefits: [
+    { _key: "climate-controlled", title: "Climate Controlled", body: "Your vehicle is protected from the elements. Stable temperature and humidity keep paint, interior, and mechanical condition optimal." },
+    { _key: "security-first", title: "Security First", body: "Security is our number one priority. 24/7 CCTV monitoring, secure gates, alarmed access, and locked indoor storage mean your car is as safe as it can possibly be during its time with us." },
+    { _key: "discreet-confidential", title: "Discreet & Confidential", body: "We keep a low profile. Your vehicle's presence, registration, and ownership details stay strictly confidential — nothing is shared, and the facility address is given only to clients." },
+    { _key: "flexible-terms", title: "Flexible Terms", body: "Short or long-term storage to suit your needs. Whether it's seasonal or extended, we offer competitive rates with no long-term lock-in." },
+  ],
+  includedHeading: "What's Included",
+  includedItems: [
+    "Climate-controlled storage bay",
+    "24/7 CCTV security monitoring",
+    "Discreet, fully confidential handling",
+    "Regular vehicle check-ins (on request)",
+    "Battery trickle charging (available)",
+    "Easy access for viewings or collection",
+    "Flexible short or long-term rates",
+  ],
+  includedFootnote:
+    "Perfect for collectors, investment vehicles, classic cars, or simply parking your pride and joy somewhere it'll be looked after.",
+  ctaHeading: "Ready to Store With Confidence?",
+  ctaBody: "Get in touch to discuss your storage needs and receive a competitive quote.",
+  ctaLabel: "Get In Touch",
+};
+
+const MERCH_PAGE = {
+  _id: "merchPage",
+  _type: "merchPage",
+  eyebrow: "Shop",
+  heading: "The Dog House Shop",
+  intro:
+    "Official TDH apparel and garage essentials, built around the new Dog House artwork. Browse the collection below and check out securely through TikTok Shop.",
+  perks: [
+    { _key: "secure-checkout", title: "Secure TikTok checkout", detail: "Every order is completed and protected through TikTok Shop." },
+    { _key: "tracked-delivery", title: "Tracked delivery", detail: "Shipping and tracking handled end-to-end by TikTok Shop." },
+    { _key: "new-drop", title: "New drop incoming", detail: "The first Dog House collection lands soon — follow for the date." },
+  ],
+  productsLabel: "products",
+  collectionLabel: "The Dog House Drop",
+  ctaHeading: "Don't Miss the Drop",
+  ctaBody:
+    "Follow TDH on TikTok for the launch date, new drops, restocks, and behind-the-scenes previews.",
+  ctaLabel: "Follow on TikTok",
+};
+
+const MERCH_PRODUCTS = [
+  {
+    _id: "merchProduct.tdh-signature-hoodie",
+    _type: "merchProduct",
+    title: "TDH Signature Hoodie",
+    category: "Heavyweight Fleece",
+    description: "Charcoal pullover with the gold Dog House mark printed oversized across the chest.",
+    priceLabel: "Coming soon",
+    tiktokShopUrl: "https://www.tiktok.com/@thedoghouseas",
+    status: "coming-soon",
+    sortOrder: 10,
+  },
+  {
+    _id: "merchProduct.dog-house-tee",
+    _type: "merchProduct",
+    title: "Dog House Tee",
+    category: "Premium Cotton",
+    description: "Clean black tee with the TDH artwork up front and Automotive Solutions branding below.",
+    priceLabel: "Coming soon",
+    tiktokShopUrl: "https://www.tiktok.com/@thedoghouseas",
+    status: "coming-soon",
+    sortOrder: 20,
+  },
+  {
+    _id: "merchProduct.workshop-cap",
+    _type: "merchProduct",
+    title: "Workshop Cap",
+    category: "Embroidered Peak",
+    description: "Structured six-panel cap with a brushed-gold TDH patch made for show days and handovers.",
+    priceLabel: "Coming soon",
+    tiktokShopUrl: "https://www.tiktok.com/@thedoghouseas",
+    status: "coming-soon",
+    sortOrder: 30,
+  },
+  {
+    _id: "merchProduct.garage-mug",
+    _type: "merchProduct",
+    title: "Garage Mug",
+    category: "Ceramic Mug",
+    description: "TDH-branded mug for workshop brews, handover coffees, and early starts at the showroom.",
+    priceLabel: "Coming soon",
+    tiktokShopUrl: "https://www.tiktok.com/@thedoghouseas",
+    status: "coming-soon",
+    sortOrder: 40,
+  },
+];
 
 async function upsert(doc) {
   const name = doc._type;
-  // Find existing published doc with this type
-  const existingId = await client.fetch(`*[_type == $type][0]._id`, { type: name });
+  const existingId = await client.fetch(`*[_id == $id][0]._id`, { id: doc._id });
 
-  if (existingId && existingId !== doc._id) {
-    // Existing doc has a different auto-generated ID — patch it in place
+  if (existingId) {
     const fields = { ...doc };
     delete fields._id;
     delete fields._type;
     await client.patch(existingId).set(fields).commit();
     console.log(`  patched  ${name}  (${existingId})`);
-    // Also delete any drafts for this doc
     await discardDraft(existingId);
   } else {
-    await client.createOrReplace(doc);
+    await client.create(doc);
     console.log(`  written  ${name}  (${doc._id})`);
     await discardDraft(doc._id);
   }
@@ -192,14 +477,23 @@ async function discardDraft(publishedId) {
     await client.delete(draftId);
     console.log(`  removed draft  ${draftId}`);
   } catch {
-    // Draft didn't exist — fine
+    // Draft did not exist.
   }
 }
 
-// ─── Run ─────────────────────────────────────────────────────────────────────
-
-console.log("Seeding CMS content…\n");
-for (const doc of [HOME_PAGE, SITE_SETTINGS, SERVICES_PAGE, WHO_WE_ARE_PAGE]) {
+console.log("Seeding CMS content...\n");
+for (const doc of [
+  HOME_PAGE,
+  SITE_SETTINGS,
+  SERVICES_PAGE,
+  WHO_WE_ARE_PAGE,
+  DETAILING_PAGE,
+  CURATED_SALES_PAGE,
+  BESPOKE_SOURCING_PAGE,
+  STORAGE_PAGE,
+  MERCH_PAGE,
+  ...MERCH_PRODUCTS,
+]) {
   await upsert(doc);
 }
 console.log("\nDone.");

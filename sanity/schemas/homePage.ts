@@ -9,6 +9,8 @@ export const homePage = defineType({
     { name: "about", title: "About Section" },
     { name: "valueProps", title: "Value Props" },
     { name: "servicesStrip", title: "Services Strip" },
+    { name: "merch", title: "Merch Section" },
+    { name: "social", title: "Social Section" },
     { name: "cta", title: "Call to Action" },
     { name: "findUs", title: "Find Us" },
   ],
@@ -104,6 +106,34 @@ export const homePage = defineType({
         }),
       ],
       validation: (r) => r.max(4),
+    }),
+
+    defineField({ name: "merchEyebrow", title: "Merch eyebrow", type: "string", group: "merch" }),
+    defineField({ name: "merchHeading", title: "Merch heading", type: "string", group: "merch" }),
+    defineField({ name: "merchBody", title: "Merch body", type: "text", rows: 3, group: "merch" }),
+    defineField({ name: "merchPrimaryCta", title: "Merch primary CTA", type: "string", group: "merch" }),
+    defineField({ name: "merchSecondaryCta", title: "Merch secondary CTA", type: "string", group: "merch" }),
+
+    defineField({ name: "socialEyebrow", title: "Social eyebrow", type: "string", group: "social" }),
+    defineField({ name: "socialHeading", title: "Social heading", type: "string", group: "social" }),
+    defineField({ name: "socialBody", title: "Social body", type: "text", rows: 2, group: "social" }),
+    defineField({
+      name: "socialLinks",
+      title: "Social links",
+      type: "array",
+      group: "social",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({ name: "platform", title: "Platform", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "label", title: "Displayed handle/name", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "url", title: "URL", type: "url", validation: (r) => r.required() }),
+            defineField({ name: "ctaLabel", title: "CTA label", type: "string" }),
+          ],
+          preview: { select: { title: "platform", subtitle: "label" } },
+        }),
+      ],
     }),
 
     // Bottom CTA section

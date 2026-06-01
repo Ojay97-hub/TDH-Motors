@@ -1,0 +1,43 @@
+import { defineType, defineField, defineArrayMember } from "sanity";
+
+export const merchPage = defineType({
+  name: "merchPage",
+  title: "Merch Page",
+  type: "document",
+  groups: [
+    { name: "hero", title: "Hero", default: true },
+    { name: "perks", title: "Info Bar" },
+    { name: "products", title: "Products Header" },
+    { name: "cta", title: "Call to Action" },
+  ],
+  fields: [
+    defineField({ name: "eyebrow", title: "Eyebrow", type: "string", group: "hero" }),
+    defineField({ name: "heading", title: "Heading", type: "string", group: "hero" }),
+    defineField({ name: "intro", title: "Intro", type: "text", rows: 3, group: "hero" }),
+    defineField({
+      name: "perks",
+      title: "Store perks",
+      type: "array",
+      group: "perks",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({ name: "title", title: "Title", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "detail", title: "Detail", type: "text", rows: 2, validation: (r) => r.required() }),
+          ],
+          preview: { select: { title: "title" } },
+        }),
+      ],
+      validation: (r) => r.max(3),
+    }),
+    defineField({ name: "productsLabel", title: "Products label", type: "string", group: "products" }),
+    defineField({ name: "collectionLabel", title: "Collection label", type: "string", group: "products" }),
+    defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "cta" }),
+    defineField({ name: "ctaBody", title: "CTA body", type: "text", rows: 2, group: "cta" }),
+    defineField({ name: "ctaLabel", title: "CTA label", type: "string", group: "cta" }),
+  ],
+  preview: {
+    prepare: () => ({ title: "Merch Page" }),
+  },
+});

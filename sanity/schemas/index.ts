@@ -4,6 +4,10 @@ import { homePage } from "./homePage";
 import { servicesPage } from "./servicesPage";
 import { whoWeArePage } from "./whoWeArePage";
 import { detailingPage } from "./detailingPage";
+import { curatedSalesPage } from "./curatedSalesPage";
+import { bespokeSourcingPage } from "./bespokeSourcingPage";
+import { storagePage } from "./storagePage";
+import { merchPage } from "./merchPage";
 import { merchProduct } from "./merchProduct";
 
 export const schemaTypes = [
@@ -13,5 +17,9 @@ export const schemaTypes = [
   servicesPage,
   whoWeArePage,
   detailingPage,
+  curatedSalesPage,
+  bespokeSourcingPage,
+  storagePage,
+  merchPage,
   merchProduct,
 ];

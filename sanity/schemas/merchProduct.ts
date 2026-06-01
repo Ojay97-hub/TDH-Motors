@@ -12,6 +12,12 @@ export const merchProduct = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: "category",
+      title: "Category",
+      type: "string",
+      description: 'Matches the frontend product label, e.g. "Heavyweight Fleece".',
+    }),
+    defineField({
       name: "image",
       title: "Product image",
       type: "image",
