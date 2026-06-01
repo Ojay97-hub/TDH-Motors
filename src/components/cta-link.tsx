@@ -1,9 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-/** True for full URLs and mailto/tel — anything that should open as a plain anchor. */
+/**
+ * True for anything that should open as a plain anchor: full URLs (http/https),
+ * mailto/tel, and protocol-relative URLs ("//cdn.example.com"). Everything else
+ * is treated as an internal path.
+ */
 export function isExternalHref(href: string) {
-  return /^(https?:|mailto:|tel:)/i.test(href);
+  return /^(https?:|mailto:|tel:)/i.test(href) || href.startsWith("//");
 }
 
 /**
@@ -16,19 +20,28 @@ export function CtaLink({
   className,
   children,
 }: {
-  href: string;
+  href?: string | null;
   className?: string;
   children: ReactNode;
 }) {
-  if (isExternalHref(href)) {
+  const target = href?.trim();
+
+  // No link configured — render the label without an anchor rather than a
+  // broken <a href=""> (which would just reload the current page).
+  if (!target) {
+    return <span className={className}>{children}</span>;
+  }
+
+  if (isExternalHref(target)) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      <a href={target} target="_blank" rel="noopener noreferrer" className={className}>
         {children}
       </a>
     );
   }
+
   return (
-    <Link href={href} className={className}>
+    <Link href={target} className={className}>
       {children}
     </Link>
   );

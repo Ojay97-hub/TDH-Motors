@@ -79,7 +79,7 @@ export const homePageQuery = defineQuery(`*[_id == "homePage"][0]{
   "featuredCars": featuredCars[]->{
     ${carProjection}
   },
-  "homepageMerch": homepageMerch[]->{
+  "homepageMerch": homepageMerch[@->status != "hidden"]->{
     ${merchProductProjection}
   },
   comingSoonCard {
@@ -108,7 +108,7 @@ export const storagePageQuery = defineQuery(`*[_id == "storagePage"][0]`);
 // falls back to every visible product at render time).
 export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]{
   ...,
-  "products": products[]->{
+  "products": products[@->status != "hidden"]->{
     ${merchProductProjection}
   }
 }`);
