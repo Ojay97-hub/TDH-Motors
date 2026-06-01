@@ -12,6 +12,13 @@ export const metadata: Metadata = {
 
 const PRINCIPLE_ICONS = [Heart, Eye, Handshake];
 
+const PARTNER_OPPORTUNITIES_DEFAULTS = [
+  "Exclusive service partnerships",
+  "Product and supplier collaborations",
+  "Event and sponsorship opportunities",
+  "Media and content partnerships",
+];
+
 const PRINCIPLES_DEFAULTS = [
   {
     title: "Passion First",
@@ -40,6 +47,13 @@ export default async function WhoWeArePage() {
   const para2 = cms?.para2 ?? "We started TDH Motors to do things differently. Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. We sell cars we'd be proud to own — and we'd rather have fewer of the right ones than a full forecourt of the wrong ones.";
   const para3 = cms?.para3 ?? "We're a long way from a corporate showroom. There's no high-pressure sales floor, no commission targets, and no need to rush. We invite our customers to come and see us by appointment, take their time, ask questions, and only move forward when it feels right.";
   const principles = (cms?.principles && cms.principles.length > 0) ? cms.principles : PRINCIPLES_DEFAULTS;
+  const partnersEyebrow = cms?.partnersEyebrow ?? "Collaboration";
+  const partnersHeading = cms?.partnersHeading ?? "Business Partners";
+  const partnersBody = cms?.partnersBody ?? "We're always interested in exploring partnerships that align with our values. Whether you're a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we'd like to hear from you.";
+  const partnerOpportunities = cms?.partnerOpportunities?.length ? cms.partnerOpportunities : PARTNER_OPPORTUNITIES_DEFAULTS;
+  const partnersCardBody = cms?.partnersCardBody ?? "We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.";
+  const partnersCardFootnote = cms?.partnersCardFootnote ?? "Have an opportunity you think we should know about? Drop us a message and let's have a conversation. We're always open to the right opportunity.";
+  const partnersCtaLabel = cms?.partnersCtaLabel ?? "Get In Touch";
   const ctaHeading = cms?.ctaHeading ?? "Come and Visit Us.";
   const ctaBody = cms?.ctaBody ?? "The best way to understand how we work is to come and meet us. Book an appointment and we'll put the kettle on.";
 
@@ -104,43 +118,33 @@ export default async function WhoWeArePage() {
         <div className="container-page py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Collaboration</div>
-              <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">Business Partners</h2>
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{partnersEyebrow}</div>
+              <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-6">{partnersHeading}</h2>
               <p className="text-text-muted text-lg leading-relaxed mb-8">
-                We&apos;re always interested in exploring partnerships that align with our values. Whether you&apos;re a specialist service provider, a fellow enthusiast business, or have a unique opportunity — we&apos;d like to hear from you.
+                {partnersBody}
               </p>
               <ul className="space-y-4 mb-10">
-                <li className="flex gap-3">
-                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
-                  <span className="text-text-muted">Exclusive service partnerships</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
-                  <span className="text-text-muted">Product and supplier collaborations</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
-                  <span className="text-text-muted">Event and sponsorship opportunities</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-brand-light font-bold text-lg shrink-0">•</span>
-                  <span className="text-text-muted">Media and content partnerships</span>
-                </li>
+                {partnerOpportunities.map((item: string) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="text-brand-light font-bold text-lg shrink-0">•</span>
+                    <span className="text-text-muted">{item}</span>
+                  </li>
+                ))}
               </ul>
               <Link
                 href="/contact?subject=business-partnership"
                 className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
               >
-                Get In Touch <ArrowRight size={16} />
+                {partnersCtaLabel} <ArrowRight size={16} />
               </Link>
             </div>
 
             <div className="bg-bg-elevated border border-border p-8 md:p-12">
               <p className="text-text-muted leading-relaxed mb-6">
-                We work with partners who share our passion for quality, attention to detail, and honest, long-term relationships.
+                {partnersCardBody}
               </p>
               <p className="text-text-muted text-sm leading-relaxed">
-                Have an opportunity you think we should know about? Drop us a message and let&apos;s have a conversation. We&apos;re always open to the right opportunity.
+                {partnersCardFootnote}
               </p>
             </div>
           </div>

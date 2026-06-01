@@ -7,7 +7,6 @@ export const homePage = defineType({
   groups: [
     { name: "hero", title: "Hero", default: true },
     { name: "about", title: "About Section" },
-    { name: "valueProps", title: "Value Props" },
     { name: "servicesStrip", title: "Services Strip" },
     { name: "merch", title: "Merch Section" },
     { name: "social", title: "Social Section" },
@@ -66,26 +65,6 @@ export const homePage = defineType({
       type: "text",
       rows: 2,
       group: "about",
-    }),
-
-    // Value props (icons fixed in code by position)
-    defineField({
-      name: "valueProps",
-      title: "Value propositions",
-      description: "Up to 4 items. Icons are assigned by position in code.",
-      type: "array",
-      group: "valueProps",
-      of: [
-        defineArrayMember({
-          type: "object",
-          fields: [
-            defineField({ name: "title", title: "Title", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "text", title: "Text", type: "text", rows: 2, validation: (r) => r.required() }),
-          ],
-          preview: { select: { title: "title" } },
-        }),
-      ],
-      validation: (r) => r.max(4),
     }),
 
     // Services strip (icons fixed in code by position)

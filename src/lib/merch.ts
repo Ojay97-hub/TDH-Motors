@@ -1,5 +1,6 @@
 export type MerchItem = {
-  type: "hoodie" | "tshirt" | "cap" | "mug";
+  /** Optional legacy category key. Not used for rendering. */
+  type?: "hoodie" | "tshirt" | "cap" | "mug";
   title: string;
   category: string;
   detail: string;

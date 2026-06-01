@@ -30,9 +30,26 @@ function FacebookIcon({ size = 24 }: { size?: number }) {
 import { CarCard } from "@/components/car-card";
 import { ShowroomVideo } from "@/components/showroom-video";
 import { getFeaturedCars } from "@/lib/cars";
-import { MERCH_ITEMS, TIKTOK_SHOP_URL } from "@/lib/merch";
+import { TIKTOK_SHOP_URL } from "@/lib/merch";
+import { getMerchItems } from "@/lib/merch-products";
 import { safeSanityFetch } from "@/sanity/client";
 import { homePageQuery, siteSettingsQuery } from "@/sanity/queries";
+
+type SocialLink = { platform: string; label: string; url: string; ctaLabel?: string };
+
+const SOCIAL_LINKS_DEFAULTS: SocialLink[] = [
+  { platform: "Instagram", label: "@thedoghouse_as", url: "https://www.instagram.com/thedoghouse_as", ctaLabel: "Follow" },
+  { platform: "TikTok", label: "@thedoghouseas", url: "https://www.tiktok.com/@thedoghouseas", ctaLabel: "Follow" },
+  { platform: "Facebook", label: "The Dog House AS", url: "https://www.facebook.com/profile.php?id=61584858144187", ctaLabel: "Follow" },
+];
+
+function SocialPlatformIcon({ platform, size = 36 }: { platform: string; size?: number }) {
+  const key = platform.toLowerCase();
+  if (key.includes("instagram")) return <InstagramIcon size={size} />;
+  if (key.includes("tiktok")) return <TikTokIcon size={size} />;
+  if (key.includes("facebook")) return <FacebookIcon size={size} />;
+  return <ExternalLink size={size} />;
+}
 
 const SERVICES_STRIP_DEFAULTS = [
   { title: "Curated Sales", text: "Every car hand-picked and personally inspected. We only sell cars we'd happily own ourselves." },
@@ -42,10 +59,11 @@ const SERVICES_STRIP_DEFAULTS = [
 ];
 
 export default async function Home() {
-  const [featured, cms, settings] = await Promise.all([
+  const [featured, cms, settings, merchItems] = await Promise.all([
     getFeaturedCars(),
     safeSanityFetch(homePageQuery, {}, { next: { revalidate: 60, tags: ["homePage"] } }),
     safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
+    getMerchItems(),
   ]);
 
   const heroLine1 = cms?.heroLine1 ?? "Performance Cars,";
@@ -55,7 +73,16 @@ export default async function Home() {
   const aboutPara1 = cms?.aboutPara1 ?? "The Dog House is a small, family-run dealership tucked away in the Chilterns. We started it because buying a performance car should feel as good as driving one.";
   const aboutPara2 = cms?.aboutPara2 ?? "Every car we offer has been hand-picked, personally inspected, and prepared in our own workshop. No high-pressure sales floor, no commission targets — just an honest conversation and cars we're genuinely proud of.";
   const aboutPara3 = cms?.aboutPara3 ?? "Come and see us by appointment. We'll put the kettle on.";
-  const servicesStrip = SERVICES_STRIP_DEFAULTS;
+  const servicesStrip = cms?.servicesStrip?.length ? cms.servicesStrip : SERVICES_STRIP_DEFAULTS;
+  const merchEyebrow = cms?.merchEyebrow ?? "Upcoming Merch";
+  const merchHeading = cms?.merchHeading ?? "The Dog House Drop";
+  const merchBody = cms?.merchBody ?? "The new TDH artwork is being turned into a small merch line across hoodies, tees, caps, and garage essentials. Coming soon.";
+  const merchPrimaryCta = cms?.merchPrimaryCta ?? "Preview Merch";
+  const merchSecondaryCta = cms?.merchSecondaryCta ?? "Drop Updates";
+  const socialEyebrow = cms?.socialEyebrow ?? "Stay Connected";
+  const socialHeading = cms?.socialHeading ?? "Check Us Out on Our Socials";
+  const socialBody = cms?.socialBody ?? "Follow along for new arrivals, behind-the-scenes content, and everything cars.";
+  const socialLinks: SocialLink[] = cms?.socialLinks?.length ? cms.socialLinks : SOCIAL_LINKS_DEFAULTS;
   const ctaHeading = cms?.ctaHeading ?? "By Appointment, In the Chilterns.";
   const ctaBody = cms?.ctaBody ?? "Our showroom is open by appointment, allowing us to give every visitor the time and attention they deserve. Get in touch to arrange a viewing.";
   const findUsHeading = cms?.findUsHeading ?? "Better yet, see us in person.";
@@ -226,12 +253,12 @@ export default async function Home() {
         <div className="container-page py-24 md:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-end mb-12">
             <div>
-              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Upcoming Merch</div>
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{merchEyebrow}</div>
               <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-5">
-                The Dog House Drop
+                {merchHeading}
               </h2>
               <p className="text-text-muted text-lg leading-relaxed">
-                The new TDH artwork is being turned into a small merch line across hoodies, tees, caps, and garage essentials. Coming soon.
+                {merchBody}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:justify-end gap-3">
@@ -239,7 +266,7 @@ export default async function Home() {
                 href="/merch"
                 className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
               >
-                Preview Merch <ShoppingBag size={15} />
+                {merchPrimaryCta} <ShoppingBag size={15} />
               </Link>
               <a
                 href="https://www.tiktok.com/@thedoghouseas"
@@ -247,13 +274,13 @@ export default async function Home() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 border border-border hover:border-brand text-text px-7 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
               >
-                Drop Updates <ExternalLink size={13} />
+                {merchSecondaryCta} <ExternalLink size={13} />
               </a>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            {MERCH_ITEMS.map((item) => (
+            {merchItems.map((item) => (
               <article
                 key={item.title}
                 className="group relative overflow-hidden border border-border bg-bg transition-all duration-300 hover:-translate-y-1 hover:border-brand hover:shadow-xl hover:shadow-black/10"
@@ -299,62 +326,31 @@ export default async function Home() {
       <section className="border-t border-border bg-bg-elevated py-24 md:py-28">
         <div className="container-page">
           <div className="text-center mb-12">
-            <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Stay Connected</div>
-            <h2 className="font-display text-4xl md:text-5xl tracking-tight">Check Us Out on Our Socials</h2>
-            <p className="text-text-muted mt-4 max-w-md mx-auto leading-relaxed">Follow along for new arrivals, behind-the-scenes content, and everything cars.</p>
+            <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{socialEyebrow}</div>
+            <h2 className="font-display text-4xl md:text-5xl tracking-tight">{socialHeading}</h2>
+            <p className="text-text-muted mt-4 max-w-md mx-auto leading-relaxed">{socialBody}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a
-              href="https://www.instagram.com/thedoghouse_as"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-bg border border-border hover:border-brand transition-all duration-200 p-10 flex flex-col items-center text-center gap-5"
-            >
-              <div className="text-text-muted group-hover:text-brand-light transition-colors">
-                <InstagramIcon size={36} />
-              </div>
-              <div>
-                <div className="font-display text-xl tracking-wide mb-1">Instagram</div>
-                <div className="text-text-muted text-sm">@thedoghouse_as</div>
-              </div>
-              <div className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-text-subtle group-hover:text-brand-light transition-colors">
-                Follow <ExternalLink size={11} />
-              </div>
-            </a>
-            <a
-              href="https://www.tiktok.com/@thedoghouseas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-bg border border-border hover:border-brand transition-all duration-200 p-10 flex flex-col items-center text-center gap-5"
-            >
-              <div className="text-text-muted group-hover:text-brand-light transition-colors">
-                <TikTokIcon size={36} />
-              </div>
-              <div>
-                <div className="font-display text-xl tracking-wide mb-1">TikTok</div>
-                <div className="text-text-muted text-sm">@thedoghouseas</div>
-              </div>
-              <div className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-text-subtle group-hover:text-brand-light transition-colors">
-                Follow <ExternalLink size={11} />
-              </div>
-            </a>
-            <a
-              href="https://www.facebook.com/profile.php?id=61584858144187"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-bg border border-border hover:border-brand transition-all duration-200 p-10 flex flex-col items-center text-center gap-5"
-            >
-              <div className="text-text-muted group-hover:text-brand-light transition-colors">
-                <FacebookIcon size={36} />
-              </div>
-              <div>
-                <div className="font-display text-xl tracking-wide mb-1">Facebook</div>
-                <div className="text-text-muted text-sm">The Dog House AS</div>
-              </div>
-              <div className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-text-subtle group-hover:text-brand-light transition-colors">
-                Follow <ExternalLink size={11} />
-              </div>
-            </a>
+            {socialLinks.map((link) => (
+              <a
+                key={link.platform}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-bg border border-border hover:border-brand transition-all duration-200 p-10 flex flex-col items-center text-center gap-5"
+              >
+                <div className="text-text-muted group-hover:text-brand-light transition-colors">
+                  <SocialPlatformIcon platform={link.platform} size={36} />
+                </div>
+                <div>
+                  <div className="font-display text-xl tracking-wide mb-1">{link.platform}</div>
+                  <div className="text-text-muted text-sm">{link.label}</div>
+                </div>
+                <div className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-text-subtle group-hover:text-brand-light transition-colors">
+                  {link.ctaLabel ?? "Follow"} <ExternalLink size={11} />
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>

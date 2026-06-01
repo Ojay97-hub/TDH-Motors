@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Professional car detailing — protection, correction, enhancement, and valeting services.",
 };
 
+const SERVICE_ICONS = [Shield, Wrench, Sparkles, Droplets];
+
 const SERVICES = [
   {
     icon: Shield,
@@ -131,8 +133,27 @@ export default async function DetailingPage() {
   type BeforeAfterItem = { label: string; serviceTag?: string; beforeImage?: string; beforeVideo?: string; afterImage?: string; afterVideo?: string };
   type GalleryItem = { image: string; caption?: string; serviceTag?: string };
   type VideoItem = { title: string; caption?: string; orientation?: string; videoFile?: string; videoUrl?: string };
+  type ServiceItem = {
+    title: string;
+    tag?: string;
+    tagline?: string;
+    description?: string;
+    price?: string;
+    bullets?: string[];
+    includes?: string[];
+    icon?: typeof Shield;
+  };
 
   const cms = await safeSanityFetch<{
+    eyebrow?: string;
+    heading?: string;
+    intro?: string;
+    pricingBody?: string;
+    services?: ServiceItem[];
+    partnerNote?: string;
+    ctaHeading?: string;
+    ctaBody?: string;
+    ctaLabel?: string;
     beforeAfterGallery?: BeforeAfterItem[];
     gallery?: GalleryItem[];
     videos?: VideoItem[];
@@ -142,6 +163,15 @@ export default async function DetailingPage() {
     { next: { revalidate: 60, tags: ["detailingPage"] } },
   );
 
+  const eyebrow = cms?.eyebrow ?? "Service";
+  const heading = cms?.heading ?? "Detailing";
+  const intro = cms?.intro;
+  const pricingBody = cms?.pricingBody;
+  const services: ServiceItem[] = cms?.services?.length ? cms.services : SERVICES;
+  const partnerNote = cms?.partnerNote;
+  const ctaHeading = cms?.ctaHeading ?? "Book Your Detail";
+  const ctaBody = cms?.ctaBody ?? "Every job is assessed individually. Get in touch to discuss your car's needs and we'll recommend the right service for you.";
+  const ctaLabel = cms?.ctaLabel ?? "Get In Touch";
   const beforeAfterGallery: BeforeAfterItem[] = cms?.beforeAfterGallery ?? [];
   const gallery: GalleryItem[] = cms?.gallery ?? [];
   const videos: VideoItem[] = cms?.videos ?? [];
@@ -149,34 +179,42 @@ export default async function DetailingPage() {
   return (
     <>
       <section className="container-page pt-32 md:pt-40 pb-12">
-        <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Service</div>
-        <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">Detailing</h1>
-        <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
-          From ceramic coating protection to full paintwork correction, our professional detailing team —{" "}
-          <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
-          <a
-            href="https://www.ttautodetailing.co.uk/detailing-and-protection"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand hover:text-brand-light transition-colors font-medium"
-          >
-            TT Auto detailers
-          </a>{" "}
-          — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.
-        </p>
-        <p className="text-text-muted max-w-2xl leading-relaxed mt-4">
-          Prices start from <span className="text-text font-medium">£200</span>. Every car is different, so final
-          costing is assessed case by case —{" "}
-          <Link href="/contact" className="text-brand hover:text-brand-light transition-colors font-medium">
-            get in touch
-          </Link>{" "}
-          for a tailored quote.
-        </p>
+        <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{eyebrow}</div>
+        <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">{heading}</h1>
+        {intro ? (
+          <p className="text-text-muted text-lg max-w-2xl leading-relaxed">{intro}</p>
+        ) : (
+          <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
+            From ceramic coating protection to full paintwork correction, our professional detailing team —{" "}
+            <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
+            <a
+              href="https://www.ttautodetailing.co.uk/detailing-and-protection"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:text-brand-light transition-colors font-medium"
+            >
+              TT Auto detailers
+            </a>{" "}
+            — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.
+          </p>
+        )}
+        {pricingBody ? (
+          <p className="text-text-muted max-w-2xl leading-relaxed mt-4">{pricingBody}</p>
+        ) : (
+          <p className="text-text-muted max-w-2xl leading-relaxed mt-4">
+            Prices start from <span className="text-text font-medium">£200</span>. Every car is different, so final
+            costing is assessed case by case —{" "}
+            <Link href="/contact" className="text-brand hover:text-brand-light transition-colors font-medium">
+              get in touch
+            </Link>{" "}
+            for a tailored quote.
+          </p>
+        )}
       </section>
 
       <section className="container-page pb-24 space-y-16">
-        {SERVICES.map((svc, i) => {
-          const Icon = svc.icon;
+        {services.map((svc, i) => {
+          const Icon = svc.icon ?? SERVICE_ICONS[i] ?? Sparkles;
           const isEven = i % 2 === 0;
           return (
             <div
@@ -194,10 +232,10 @@ export default async function DetailingPage() {
                     {svc.price}
                   </div>
                 )}
-                <p className="text-text-muted leading-relaxed mb-6 italic text-sm">{svc.tagline}</p>
-                <p className="text-text-muted leading-relaxed mb-8">{svc.description}</p>
+                {svc.tagline && <p className="text-text-muted leading-relaxed mb-6 italic text-sm">{svc.tagline}</p>}
+                {svc.description && <p className="text-text-muted leading-relaxed mb-8">{svc.description}</p>}
                 <ul className="space-y-2">
-                  {svc.bullets.map((b) => (
+                  {(svc.bullets ?? []).map((b) => (
                     <li key={b} className="flex items-start gap-2.5 text-sm text-text-muted">
                       <CheckCircle size={15} className="text-brand-light shrink-0 mt-0.5" />
                       <span>{b}</span>
@@ -209,7 +247,7 @@ export default async function DetailingPage() {
               <div className={`p-8 md:p-12 bg-bg border-t lg:border-t-0 border-border ${!isEven ? "lg:order-1 lg:border-r border-border" : "lg:border-l border-border"}`}>
                 <h3 className="font-display text-xl tracking-wide mb-6 text-text">What&apos;s Included</h3>
                 <ul className="space-y-3">
-                  {svc.includes.map((item) => (
+                  {(svc.includes ?? []).map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-text-muted">
                       <span className="text-brand-light shrink-0 font-bold">✓</span>
                       <span>{item}</span>
@@ -345,32 +383,36 @@ export default async function DetailingPage() {
 
       <section className="border-t border-border bg-bg py-16 md:py-20">
         <div className="container-page">
-          <p className="text-text-muted text-center">
-            Our detailing work is carried out by{" "}
-            <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
-            <a
-              href="https://www.ttautodetailing.co.uk/detailing-and-protection"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand hover:text-brand-light transition-colors font-medium inline-flex items-center gap-1"
-            >
-              TT Auto detailers <ExternalLink size={12} />
-            </a>
-          </p>
+          {partnerNote ? (
+            <p className="text-text-muted text-center">{partnerNote}</p>
+          ) : (
+            <p className="text-text-muted text-center">
+              Our detailing work is carried out by{" "}
+              <span className="text-brand font-medium">TDH Detailing</span> in partnership with{" "}
+              <a
+                href="https://www.ttautodetailing.co.uk/detailing-and-protection"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand hover:text-brand-light transition-colors font-medium inline-flex items-center gap-1"
+              >
+                TT Auto detailers <ExternalLink size={12} />
+              </a>
+            </p>
+          )}
         </div>
       </section>
 
       <section className="border-t border-border bg-bg-elevated">
         <div className="container-page py-24 text-center">
-          <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">Book Your Detail</h2>
+          <h2 className="font-display text-3xl md:text-4xl tracking-tight mb-6">{ctaHeading}</h2>
           <p className="text-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-            Every job is assessed individually. Get in touch to discuss your car&apos;s needs and we&apos;ll recommend the right service for you.
+            {ctaBody}
           </p>
           <Link
             href="/contact"
             className="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors"
           >
-            Get In Touch <ArrowRight size={16} />
+            {ctaLabel} <ArrowRight size={16} />
           </Link>
         </div>
       </section>

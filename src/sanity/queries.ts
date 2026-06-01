@@ -59,7 +59,16 @@ export const servicesPageQuery = defineQuery(`*[_type == "servicesPage"][0]`);
 
 export const whoWeArePageQuery = defineQuery(`*[_type == "whoWeArePage"][0]`);
 
+export const curatedSalesPageQuery = defineQuery(`*[_type == "curatedSalesPage"][0]`);
+
+export const bespokeSourcingPageQuery = defineQuery(`*[_type == "bespokeSourcingPage"][0]`);
+
+export const storagePageQuery = defineQuery(`*[_type == "storagePage"][0]`);
+
+export const merchPageQuery = defineQuery(`*[_type == "merchPage"][0]`);
+
 export const detailingPageQuery = defineQuery(`*[_type == "detailingPage"][0] {
+  ...,
   "beforeAfterGallery": beforeAfterGallery[] {
     label,
     serviceTag,
