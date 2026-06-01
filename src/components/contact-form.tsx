@@ -117,7 +117,7 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
         disabled={submitting}
         className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-light text-on-brand px-8 py-4 font-medium tracking-wider uppercase text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {submitting ? "Sending…" : <><span>Send Enquiry</span> <Send size={16} /></>}
+        {submitting ? "Sending..." : <><span>Send Enquiry</span> <Send size={16} /></>}
       </button>
 
       <p className="text-xs text-text-subtle">
