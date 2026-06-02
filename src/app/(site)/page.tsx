@@ -72,9 +72,14 @@ export default async function Home() {
     getMerchItems(),
   ]);
 
-  // Curated homepage lists take priority; fall back to the per-car `featured`
-  // flag and the full product catalogue when an editor hasn't curated a list.
-  const featured = cms?.featuredCars?.length ? normalizeCars(cms.featuredCars) : fallbackFeatured;
+  // The curated list controls *which cars and in what order*, but the per-car
+  // "Featured on homepage" checkbox is always the final say: un-ticking a car
+  // drops it from the homepage even if it's still in the curated list. When no
+  // list is curated we fall back to every ticked car. (`fallbackFeatured` is
+  // already filtered to `featured == true`, so the filter is a no-op there.)
+  const featured = (
+    cms?.featuredCars?.length ? normalizeCars(cms.featuredCars) : fallbackFeatured
+  ).filter((car) => car.featured);
   const merchItems = cms?.homepageMerch?.length ? toMerchItems(cms.homepageMerch) : fallbackMerch;
 
   const heroLine1 = cms?.heroLine1 ?? "Performance Cars,";

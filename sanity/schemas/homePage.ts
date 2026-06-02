@@ -99,7 +99,7 @@ export const homePage = defineType({
       name: "featuredCars",
       title: "Featured cars",
       description:
-        "Cars shown in the “Featured Cars” section on the homepage, in this order. Remove one here to drop it from the homepage without deleting the car. Leave empty to fall back to every car with the “Featured” checkbox ticked.",
+        "Cars shown in the “Featured Cars” section on the homepage, in this order. Only cars that also have the “Featured on homepage” checkbox ticked will appear — un-ticking a car removes it from the homepage even if it’s still listed here. Leave empty to fall back to every car with the checkbox ticked.",
       type: "array",
       group: "featuredCars",
       of: [defineArrayMember({ type: "reference", to: [{ type: "car" }] })],

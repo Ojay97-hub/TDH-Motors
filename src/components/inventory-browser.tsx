@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createDataAttribute } from "next-sanity";
 import { useMemo, useRef, useState } from "react";
-import { ArrowUpRight, ChevronDown, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Clock, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import type { Car } from "@/lib/cars";
 
 // Cars with no photos yet (typically an in-progress draft viewed in Presentation
@@ -14,6 +14,17 @@ function NoPhotoPlaceholder() {
     <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-bg-elevated text-text-subtle">
       <ImageOff size={20} />
       <span className="text-[10px] uppercase tracking-widest">No photo</span>
+    </div>
+  );
+}
+
+// Coming-soon cars hide their photo behind this teaser (mirroring the homepage
+// CarCard) so the inventory list visibly reflects the status.
+function ComingSoonPlaceholder() {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-linear-to-br from-stone-600 to-stone-800 text-stone-300">
+      <Clock size={24} />
+      <span className="text-[10px] uppercase tracking-widest">Coming Soon</span>
     </div>
   );
 }
@@ -302,6 +313,72 @@ function GridCard({ car }: { car: Car }) {
     type: car._type,
     path: "make",
   });
+  const isComingSoon = car.status === "coming-soon";
+
+  const media = (
+    <div className="relative aspect-4/3 overflow-hidden bg-bg-elevated">
+      {isComingSoon ? (
+        <ComingSoonPlaceholder />
+      ) : car.images[0] ? (
+        <Image
+          src={car.images[0]}
+          alt={`${car.year} ${car.make} ${car.model}`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+      ) : (
+        <NoPhotoPlaceholder />
+      )}
+      {car.status === "reserved" && (
+        <div className="absolute top-3 left-3 bg-accent text-stone-900 px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
+          Reserved
+        </div>
+      )}
+      {car.status === "sold" && (
+        <div className="absolute top-3 left-3 bg-red-600 text-white px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
+          Sold
+        </div>
+      )}
+      {isComingSoon && (
+        <div className="absolute top-3 left-3 bg-amber-500 text-stone-900 px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
+          Coming Soon
+        </div>
+      )}
+      {!isComingSoon && (
+        <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <ArrowUpRight size={16} className="text-text" />
+        </div>
+      )}
+    </div>
+  );
+
+  const details = (
+    <div className="p-5">
+      <div className="text-xs text-text-subtle tracking-widest uppercase mb-1.5">
+        {car.year} · {car.bodyType}
+      </div>
+      <h3 className="font-display font-bold text-lg mb-0.5">{car.make} {car.model}</h3>
+      {car.variant && <div className="text-sm text-text-muted mb-3">{car.variant}</div>}
+      <div className="flex items-center justify-between pt-3.5 border-t border-border">
+        <div className="font-display font-bold text-lg">{formatPrice(car.price)}</div>
+        <div className="text-xs text-text-subtle uppercase tracking-wider">{formatMileage(car.mileage)}</div>
+      </div>
+    </div>
+  );
+
+  // Coming-soon cars have no detail page to link to, so render a static card.
+  if (isComingSoon) {
+    return (
+      <div
+        data-sanity={sanity.toString()}
+        className="group block bg-surface border border-border overflow-hidden cursor-default"
+      >
+        {media}
+        {details}
+      </div>
+    );
+  }
 
   return (
     <Link
@@ -309,43 +386,8 @@ function GridCard({ car }: { car: Car }) {
       data-sanity={sanity.toString()}
       className="group block bg-surface border border-border hover:border-brand dark:hover:border-white hover:ring-2 hover:ring-brand dark:hover:ring-white transition-all overflow-hidden"
     >
-      <div className="relative aspect-4/3 overflow-hidden bg-bg-elevated">
-        {car.images[0] ? (
-          <Image
-            src={car.images[0]}
-            alt={`${car.year} ${car.make} ${car.model}`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-        ) : (
-          <NoPhotoPlaceholder />
-        )}
-        {car.status === "reserved" && (
-          <div className="absolute top-3 left-3 bg-accent text-stone-900 px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
-            Reserved
-          </div>
-        )}
-        {car.status === "sold" && (
-          <div className="absolute top-3 left-3 bg-red-600 text-white px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
-            Sold
-          </div>
-        )}
-        <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <ArrowUpRight size={16} className="text-text" />
-        </div>
-      </div>
-      <div className="p-5">
-        <div className="text-xs text-text-subtle tracking-widest uppercase mb-1.5">
-          {car.year} · {car.bodyType}
-        </div>
-        <h3 className="font-display font-bold text-lg mb-0.5">{car.make} {car.model}</h3>
-        {car.variant && <div className="text-sm text-text-muted mb-3">{car.variant}</div>}
-        <div className="flex items-center justify-between pt-3.5 border-t border-border">
-          <div className="font-display font-bold text-lg">{formatPrice(car.price)}</div>
-          <div className="text-xs text-text-subtle uppercase tracking-wider">{formatMileage(car.mileage)}</div>
-        </div>
-      </div>
+      {media}
+      {details}
     </Link>
   );
 }
@@ -357,40 +399,61 @@ function ListCard({ car }: { car: Car }) {
     type: car._type,
     path: "make",
   });
+  const isComingSoon = car.status === "coming-soon";
+
+  const imageInner = (
+    <>
+      {isComingSoon ? (
+        <ComingSoonPlaceholder />
+      ) : car.images[0] ? (
+        <Image
+          src={car.images[0]}
+          alt={`${car.year} ${car.make} ${car.model}`}
+          fill
+          sizes="(max-width: 768px) 120px, 55vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+      ) : (
+        <NoPhotoPlaceholder />
+      )}
+      {car.status === "reserved" && (
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-accent text-stone-900 px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
+          Reserved
+        </div>
+      )}
+      {car.status === "sold" && (
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-red-600 text-white px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
+          Sold
+        </div>
+      )}
+      {isComingSoon && (
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-amber-500 text-stone-900 px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
+          Coming Soon
+        </div>
+      )}
+    </>
+  );
+
+  const imageClassName =
+    "relative aspect-4/3 md:aspect-16/10 overflow-hidden bg-bg-elevated block self-center md:self-auto";
 
   return (
     <div
       data-sanity={sanity.toString()}
       className="group grid grid-cols-[120px_1fr_auto] md:grid-cols-[55%_45%] py-4 md:py-6 gap-0 hover:bg-bg-elevated transition-colors"
     >
-      {/* Image */}
-      <Link
-        href={`/inventory/${car.slug}`}
-        className="relative aspect-4/3 md:aspect-16/10 overflow-hidden bg-bg-elevated block self-center md:self-auto"
-        aria-label={`${car.year} ${car.make} ${car.model}`}
-      >
-        {car.images[0] ? (
-          <Image
-            src={car.images[0]}
-            alt={`${car.year} ${car.make} ${car.model}`}
-            fill
-            sizes="(max-width: 768px) 120px, 55vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-        ) : (
-          <NoPhotoPlaceholder />
-        )}
-        {car.status === "reserved" && (
-          <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-accent text-stone-900 px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
-            Reserved
-          </div>
-        )}
-        {car.status === "sold" && (
-          <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-red-600 text-white px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
-            Sold
-          </div>
-        )}
-      </Link>
+      {/* Image — coming-soon cars have no detail page, so render a static block. */}
+      {isComingSoon ? (
+        <div className={`${imageClassName} cursor-default`}>{imageInner}</div>
+      ) : (
+        <Link
+          href={`/inventory/${car.slug}`}
+          className={imageClassName}
+          aria-label={`${car.year} ${car.make} ${car.model}`}
+        >
+          {imageInner}
+        </Link>
+      )}
 
       {/* Details */}
       <div className="flex flex-col justify-center md:justify-between px-4 md:px-8 py-1 md:py-0">
@@ -416,31 +479,35 @@ function ListCard({ car }: { car: Car }) {
           <div className="font-display font-bold text-base md:text-3xl md:mb-5">
             {formatPrice(car.price)}
           </div>
-          <div className="hidden md:flex gap-3 mt-5">
-            <Link
-              href={`/contact?car=${car.slug}`}
-              className="px-6 py-2.5 border border-border hover:border-text text-text text-xs uppercase tracking-widest font-medium transition-colors"
-            >
-              Reserve
-            </Link>
-            <Link
-              href={`/inventory/${car.slug}`}
-              className="px-6 py-2.5 bg-brand hover:bg-brand-light text-on-brand text-xs uppercase tracking-widest font-medium transition-colors"
-            >
-              Discover
-            </Link>
-          </div>
+          {!isComingSoon && (
+            <div className="hidden md:flex gap-3 mt-5">
+              <Link
+                href={`/contact?car=${car.slug}`}
+                className="px-6 py-2.5 border border-border hover:border-text text-text text-xs uppercase tracking-widest font-medium transition-colors"
+              >
+                Reserve
+              </Link>
+              <Link
+                href={`/inventory/${car.slug}`}
+                className="px-6 py-2.5 bg-brand hover:bg-brand-light text-on-brand text-xs uppercase tracking-widest font-medium transition-colors"
+              >
+                Discover
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Mobile: far-right view arrow */}
-      <Link
-        href={`/inventory/${car.slug}`}
-        className="md:hidden flex items-center self-center pl-3 pr-4 text-brand hover:text-brand-light transition-colors"
-        aria-label={`View ${car.make} ${car.model}`}
-      >
-        <ArrowUpRight size={18} />
-      </Link>
+      {/* Mobile: far-right view arrow (not shown for coming-soon — no detail page) */}
+      {!isComingSoon && (
+        <Link
+          href={`/inventory/${car.slug}`}
+          className="md:hidden flex items-center self-center pl-3 pr-4 text-brand hover:text-brand-light transition-colors"
+          aria-label={`View ${car.make} ${car.model}`}
+        >
+          <ArrowUpRight size={18} />
+        </Link>
+      )}
     </div>
   );
 }
