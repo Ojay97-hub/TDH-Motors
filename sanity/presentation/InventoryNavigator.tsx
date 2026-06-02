@@ -153,6 +153,21 @@ function statusLabel(status: string) {
   return statusLabels[status] ?? status;
 }
 
+function documentIdsToDelete(id: string) {
+  // Version documents (for example `versions.agent-...`) are standalone Sanity
+  // variants. Prefixing them with `drafts.` creates an invalid ID, so delete the
+  // version directly. Normal published cars also have a draft companion.
+  if (id.startsWith("versions.")) {
+    return [id];
+  }
+
+  if (id.startsWith("drafts.")) {
+    return [id, id.replace(/^drafts\./, "")];
+  }
+
+  return [`drafts.${id}`, id];
+}
+
 function CreateCarLink() {
   const link = useIntentLink({
     intent: "create",
@@ -240,18 +255,23 @@ export function InventoryNavigator() {
 
   async function deleteCar(car: InventoryCar) {
     const title = carTitle(car);
-    if (!window.confirm(`Delete ${title}? This removes the published vehicle and any draft edits.`)) {
+    const ids = documentIdsToDelete(car._id);
+    if (
+      !window.confirm(
+        `Delete ${title}? This removes ${ids.length > 1 ? "the published vehicle and any draft edits" : "this version document"}.`,
+      )
+    ) {
       return;
     }
 
     setDeletingId(car._id);
     setError(null);
     try {
-      await client
-        .transaction()
-        .delete(`drafts.${car._id}`)
-        .delete(car._id)
-        .commit();
+      let transaction = client.transaction();
+      for (const id of ids) {
+        transaction = transaction.delete(id);
+      }
+      await transaction.commit();
       await loadCars();
     } catch (err) {
       setError(err instanceof Error ? err.message : `Unable to delete ${title}.`);
