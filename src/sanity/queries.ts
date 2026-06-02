@@ -1,6 +1,8 @@
 import { defineQuery } from "next-sanity";
 
 const carProjection = /* groq */ `
+  _id,
+  _type,
   "slug": slug.current,
   make,
   model,

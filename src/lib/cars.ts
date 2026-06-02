@@ -14,6 +14,8 @@ export type Video = {
 };
 
 type CarRaw = {
+  _id: string;
+  _type: "car";
   slug: string;
   make: string;
   model: string;
@@ -56,6 +58,10 @@ function normalizeCarVideos(car: CarRaw): Car {
 
   return {
     ...car,
+    // A car with no photos yet (e.g. an in-progress draft shown in Presentation
+    // preview) projects `images` as null. Coerce to an array so every consumer
+    // can safely read `.length`/`[0]` without guarding against null.
+    images: car.images ?? [],
     videos: videos.length > 0 ? videos : undefined,
   };
 }
