@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Car, formatPrice, formatMileage } from "@/lib/cars";
-import { ArrowUpRight, Clock } from "lucide-react";
+import { ArrowUpRight, Clock, ImageOff } from "lucide-react";
 
 function CardContent({ car }: { car: Car }) {
   const isComingSoon = car.status === "coming-soon";
@@ -13,7 +13,7 @@ function CardContent({ car }: { car: Car }) {
             <Clock size={32} className="text-stone-300 mb-2" />
             <div className="text-stone-300 text-sm font-medium">Coming Soon</div>
           </div>
-        ) : (
+        ) : car.images[0] ? (
           <Image
             src={car.images[0]}
             alt={`${car.year} ${car.make} ${car.model}`}
@@ -21,6 +21,11 @@ function CardContent({ car }: { car: Car }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-700"
           />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-stone-700 text-stone-300">
+            <ImageOff size={28} />
+            <span className="text-xs uppercase tracking-widest">No photo</span>
+          </div>
         )}
         {car.status === "reserved" && (
           <div className="absolute top-4 left-4 bg-accent text-stone-900 px-3 py-1 text-xs uppercase tracking-widest font-medium">

@@ -2,9 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { createDataAttribute } from "next-sanity";
 import { useMemo, useRef, useState } from "react";
-import { ArrowUpRight, ChevronDown, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import type { Car } from "@/lib/cars";
+
+// Cars with no photos yet (typically an in-progress draft viewed in Presentation
+// preview) render this instead of a broken/empty image.
+function NoPhotoPlaceholder() {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-bg-elevated text-text-subtle">
+      <ImageOff size={20} />
+      <span className="text-[10px] uppercase tracking-widest">No photo</span>
+    </div>
+  );
+}
 
 type ViewMode = "grid" | "list";
 type SortKey = "year-desc" | "year-asc" | "price-desc" | "price-asc";
@@ -284,19 +296,31 @@ function FilterGroup({
 }
 
 function GridCard({ car }: { car: Car }) {
+  const sanity = createDataAttribute({
+    baseUrl: "/studio",
+    id: car._id,
+    type: car._type,
+    path: "make",
+  });
+
   return (
     <Link
       href={`/inventory/${car.slug}`}
+      data-sanity={sanity.toString()}
       className="group block bg-surface border border-border hover:border-brand dark:hover:border-white hover:ring-2 hover:ring-brand dark:hover:ring-white transition-all overflow-hidden"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-bg-elevated">
-        <Image
-          src={car.images[0]}
-          alt={`${car.year} ${car.make} ${car.model}`}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-        />
+        {car.images[0] ? (
+          <Image
+            src={car.images[0]}
+            alt={`${car.year} ${car.make} ${car.model}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : (
+          <NoPhotoPlaceholder />
+        )}
         {car.status === "reserved" && (
           <div className="absolute top-3 left-3 bg-accent text-stone-900 px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
             Reserved
@@ -327,21 +351,35 @@ function GridCard({ car }: { car: Car }) {
 }
 
 function ListCard({ car }: { car: Car }) {
+  const sanity = createDataAttribute({
+    baseUrl: "/studio",
+    id: car._id,
+    type: car._type,
+    path: "make",
+  });
+
   return (
-    <div className="group grid grid-cols-[120px_1fr_auto] md:grid-cols-[55%_45%] py-4 md:py-6 gap-0 hover:bg-bg-elevated transition-colors">
+    <div
+      data-sanity={sanity.toString()}
+      className="group grid grid-cols-[120px_1fr_auto] md:grid-cols-[55%_45%] py-4 md:py-6 gap-0 hover:bg-bg-elevated transition-colors"
+    >
       {/* Image */}
       <Link
         href={`/inventory/${car.slug}`}
         className="relative aspect-4/3 md:aspect-16/10 overflow-hidden bg-bg-elevated block self-center md:self-auto"
         aria-label={`${car.year} ${car.make} ${car.model}`}
       >
-        <Image
-          src={car.images[0]}
-          alt={`${car.year} ${car.make} ${car.model}`}
-          fill
-          sizes="(max-width: 768px) 120px, 55vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-        />
+        {car.images[0] ? (
+          <Image
+            src={car.images[0]}
+            alt={`${car.year} ${car.make} ${car.model}`}
+            fill
+            sizes="(max-width: 768px) 120px, 55vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : (
+          <NoPhotoPlaceholder />
+        )}
         {car.status === "reserved" && (
           <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-accent text-stone-900 px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
             Reserved

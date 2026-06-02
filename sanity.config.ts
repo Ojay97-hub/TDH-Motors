@@ -3,6 +3,8 @@ import { presentationTool } from "sanity/presentation";
 import { structureTool, type StructureBuilder } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
+import { InventoryNavigator } from "./sanity/presentation/InventoryNavigator";
+import { ViewDetailPageAction } from "./sanity/presentation/viewDetailPageAction";
 
 const singletonTypeNames = new Set([
   "siteSettings",
@@ -117,6 +119,13 @@ export default defineConfig({
           },
         },
       },
+      components: {
+        unstable_navigator: {
+          minWidth: 280,
+          maxWidth: 420,
+          component: InventoryNavigator,
+        },
+      },
     }),
     structureTool({
       structure: (S) =>
@@ -151,12 +160,18 @@ export default defineConfig({
         ? prev.filter((template) => !singletonTypeNames.has(template.templateId))
         : prev,
     // ...and drop the duplicate/delete/unpublish actions on singleton docs.
-    actions: (prev, { schemaType }) =>
-      singletonTypeNames.has(schemaType)
-        ? prev.filter(
-            ({ action }) =>
-              action !== "duplicate" && action !== "delete" && action !== "unpublish",
-          )
-        : prev,
+    actions: (prev, { schemaType }) => {
+      if (singletonTypeNames.has(schemaType)) {
+        return prev.filter(
+          ({ action }) =>
+            action !== "duplicate" && action !== "delete" && action !== "unpublish",
+        );
+      }
+      // Add a "View detail page" action to cars (shows only in Presentation).
+      if (schemaType === "car") {
+        return [...prev, ViewDetailPageAction];
+      }
+      return prev;
+    },
   },
 });
