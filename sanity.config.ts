@@ -35,20 +35,26 @@ function normalizePreviewOrigin(value?: string) {
   return normalized || "http://localhost:3000";
 }
 
-function requiredEnv(name: string) {
-  const value = process.env[name]?.trim();
-  if (!value) {
+function requiredEnv(name: string, value: string | undefined) {
+  const trimmed = value?.trim();
+  if (!trimmed) {
     throw new Error(`Missing required environment variable ${name}.`);
   }
-  return value;
+  return trimmed;
 }
 
 const isProduction = process.env.NODE_ENV === "production";
-const projectId = requiredEnv("NEXT_PUBLIC_SANITY_PROJECT_ID");
-const dataset = requiredEnv("NEXT_PUBLIC_SANITY_DATASET");
+const projectId = requiredEnv(
+  "NEXT_PUBLIC_SANITY_PROJECT_ID",
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+);
+const dataset = requiredEnv(
+  "NEXT_PUBLIC_SANITY_DATASET",
+  process.env.NEXT_PUBLIC_SANITY_DATASET,
+);
 const allowProductionDataset = process.env.FORCE_PROD_MUTATION === "true";
 
-if (dataset === "production" && !allowProductionDataset) {
+if (typeof window === "undefined" && dataset === "production" && !allowProductionDataset) {
   throw new Error(
     'Refusing to configure Sanity Studio against dataset "production". Set FORCE_PROD_MUTATION=true to proceed.',
   );
