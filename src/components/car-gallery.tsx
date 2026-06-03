@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
@@ -14,7 +14,16 @@ export function CarGallery({ images, alt, status }: Props) {
   const [active, setActive] = useState(0);
   const stripRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setActive((current) => {
+      if (images.length === 0) return 0;
+      return Math.min(current, images.length - 1);
+    });
+  }, [images.length]);
+
   if (!images.length) return null;
+
+  const activeIndex = Math.min(active, images.length - 1);
 
   function scrollThumbnail(index: number) {
     const el = stripRef.current;
@@ -26,8 +35,8 @@ export function CarGallery({ images, alt, status }: Props) {
   function navigate(dir: "prev" | "next") {
     const next =
       dir === "next"
-        ? (active + 1) % images.length
-        : (active - 1 + images.length) % images.length;
+        ? (activeIndex + 1) % images.length
+        : (activeIndex - 1 + images.length) % images.length;
     setActive(next);
     scrollThumbnail(next);
   }
@@ -48,7 +57,7 @@ export function CarGallery({ images, alt, status }: Props) {
             fill
             loading={i === 0 ? "eager" : "lazy"}
             fetchPriority={i === 0 ? "high" : "auto"}
-            className={`object-cover transition-opacity duration-300 ${i === active ? "opacity-100" : "opacity-0"}`}
+            className={`object-cover transition-opacity duration-300 ${i === activeIndex ? "opacity-100" : "opacity-0"}`}
             sizes="(min-width: 1280px) 1216px, 100vw"
           />
         ))}
@@ -95,9 +104,9 @@ export function CarGallery({ images, alt, status }: Props) {
               type="button"
               onClick={() => handleThumbClick(i)}
               aria-label={`View image ${i + 1}`}
-              aria-pressed={i === active}
+              aria-pressed={i === activeIndex}
               className={`relative shrink-0 w-24 sm:w-28 md:w-32 aspect-4/3 overflow-hidden snap-start transition-all ${
-                i === active
+                i === activeIndex
                   ? "ring-2 ring-brand opacity-100"
                   : "opacity-55 hover:opacity-100"
               }`}

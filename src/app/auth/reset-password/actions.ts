@@ -12,10 +12,18 @@ export async function requestPasswordReset(formData: FormData) {
   const origin = h.get("origin") ?? `https://${h.get("host")}`;
 
   const supabase = await createAuthServerClient();
-  await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback`,
-  });
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/callback`,
+    });
 
-  // Always redirect to the sent state — don't reveal whether the email exists
+    if (error) {
+      console.error("Supabase password reset request error:", error);
+    }
+  } catch (error) {
+    console.error("Supabase password reset request exception:", error);
+  }
+
+  // Always redirect to the sent state - don't reveal whether the email exists.
   redirect("/auth/reset-password?sent=1");
 }

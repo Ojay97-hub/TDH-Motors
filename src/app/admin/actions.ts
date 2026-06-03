@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { assertAdmin } from "@/lib/admin-auth";
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { VALID_STATUSES, type Status } from "@/lib/constants";
@@ -15,6 +16,7 @@ export async function updateEnquiryStatus(id: string, status: string) {
     data: { user },
   } = await supabaseAuth.auth.getUser();
   if (!user) redirect("/admin/login");
+  await assertAdmin(user);
 
   const supabase = createServiceClient();
   const { error } = await supabase
@@ -28,6 +30,11 @@ export async function updateEnquiryStatus(id: string, status: string) {
 
 export async function signOut() {
   const supabase = await createAuthServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await assertAdmin(user);
+
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.error("Sign-out error:", error.message);

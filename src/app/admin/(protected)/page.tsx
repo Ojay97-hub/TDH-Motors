@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/admin-auth";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import Link from "next/link";
 import { SignOutButton } from "../_components/SignOutButton";
@@ -8,6 +9,7 @@ export default async function AdminDashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  await requireAdmin(user);
 
   return (
     <div className="min-h-screen bg-bg">

@@ -30,10 +30,34 @@ function singletonListItem(S: StructureBuilder, typeName: string, title: string)
     );
 }
 
-const previewOrigin =
+function normalizePreviewOrigin(value?: string) {
+  const normalized = value?.trim().replace(/\/+$/, "");
+  return normalized || "http://localhost:3000";
+}
+
+function requiredEnv(name: string) {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`Missing required environment variable ${name}.`);
+  }
+  return value;
+}
+
+const isProduction = process.env.NODE_ENV === "production";
+const projectId = requiredEnv("NEXT_PUBLIC_SANITY_PROJECT_ID");
+const dataset = requiredEnv("NEXT_PUBLIC_SANITY_DATASET");
+const allowProductionDataset = process.env.FORCE_PROD_MUTATION === "true";
+
+if (dataset === "production" && !allowProductionDataset) {
+  throw new Error(
+    'Refusing to configure Sanity Studio against dataset "production". Set FORCE_PROD_MUTATION=true to proceed.',
+  );
+}
+
+const previewOrigin = normalizePreviewOrigin(
   process.env.SANITY_STUDIO_PREVIEW_URL ||
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "http://localhost:3000";
+    process.env.NEXT_PUBLIC_SITE_URL,
+);
 const draftMode = {
   enable: `${previewOrigin}/api/draft-mode/enable`,
   disable: `${previewOrigin}/api/draft-mode/disable`,
@@ -55,8 +79,8 @@ const pageLocations = {
 export default defineConfig({
   name: "tdh-motors",
   title: "TDH Motors",
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "sk5os0jg",
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
+  projectId,
+  dataset,
   basePath: "/studio",
   schema: { types: schemaTypes },
   plugins: [
@@ -149,7 +173,7 @@ export default defineConfig({
             ),
           ]),
     }),
-    visionTool({ defaultApiVersion: "2025-05-20" }),
+    ...(isProduction ? [] : [visionTool({ defaultApiVersion: "2025-05-20" })]),
   ],
   document: {
     // Singletons must never be duplicated: a second copy of a singleton type

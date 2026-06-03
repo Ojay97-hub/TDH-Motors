@@ -26,30 +26,49 @@ export default function AuthCallbackPage() {
       return "/admin";
     }
 
-    if (accessToken && refreshToken) {
-      supabase.auth
-        .setSession({ access_token: accessToken, refresh_token: refreshToken })
-        .then(({ error }) => {
-          router.replace(error ? "/admin/login?error=1" : successRedirect());
-        });
-    } else {
-      // PKCE flow — code is in query params
-      const code = searchParams.get("code");
-      if (code) {
-        supabase.auth
-          .exchangeCodeForSession(code)
-          .then(({ error }) => {
-            router.replace(error ? "/admin/login?error=1" : successRedirect());
+    let cancelled = false;
+
+    function replace(path: string) {
+      if (!cancelled) router.replace(path);
+    }
+
+    async function completeAuth() {
+      try {
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
           });
-      } else {
-        router.replace("/admin/login?error=1");
+
+          replace(error ? "/admin/login?error=invalid_token" : successRedirect());
+          return;
+        }
+
+        // PKCE flow - code is in query params.
+        const code = searchParams.get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          replace(error ? "/admin/login?error=invalid_token" : successRedirect());
+          return;
+        }
+
+        replace("/admin/login?error=invalid_token");
+      } catch (error) {
+        console.error("Auth callback error:", error);
+        replace("/admin/login?error=invalid_token");
       }
     }
+
+    void completeAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
-      <p className="text-text-muted text-sm tracking-wider uppercase">Signing you in…</p>
+      <p className="text-text-muted text-sm tracking-wider uppercase">Signing you in...</p>
     </div>
   );
 }

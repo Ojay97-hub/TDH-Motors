@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/admin-auth";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { createServiceClient } from "@/lib/supabase-server";
 import Link from "next/link";
@@ -16,15 +17,13 @@ function formatDate(iso: string | null) {
 }
 
 export default async function UsersPage() {
-  const [supabaseAuth, supabaseService] = await Promise.all([
-    createAuthServerClient(),
-    Promise.resolve(createServiceClient()),
-  ]);
-
+  const supabaseAuth = await createAuthServerClient();
   const {
     data: { user: currentUser },
   } = await supabaseAuth.auth.getUser();
+  await requireAdmin(currentUser);
 
+  const supabaseService = createServiceClient();
   const { data, error } = await supabaseService.auth.admin.listUsers();
   if (error) throw new Error("Failed to load users");
 

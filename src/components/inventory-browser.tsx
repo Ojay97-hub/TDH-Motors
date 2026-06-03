@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createDataAttribute } from "next-sanity";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, ChevronDown, Clock, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import type { Car } from "@/lib/cars";
 
@@ -65,6 +65,18 @@ export function InventoryBrowser({ cars }: { cars: Car[] }) {
   const allCategories = useMemo(() => [...new Set(cars.map((c) => c.category))].sort(), [cars]);
 
   const activeFilterCount = selectedMakes.length + selectedBodyTypes.length + selectedCategories.length;
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    if (typeof document === "undefined") return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [filtersOpen]);
 
   const filtered = useMemo(() => {
     let result = [...cars];

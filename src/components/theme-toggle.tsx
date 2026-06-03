@@ -11,8 +11,14 @@ function getThemeSnapshot() {
 }
 
 function subscribeToTheme(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+
   function handleStorageChange(e: StorageEvent) {
-    if (e.key === "theme" && e.newValue) {
+    if (
+      typeof document !== "undefined" &&
+      e.key === "theme" &&
+      (e.newValue === "dark" || e.newValue === "light")
+    ) {
       document.documentElement.setAttribute("data-theme", e.newValue);
     }
     onStoreChange();
@@ -32,8 +38,18 @@ export function ThemeToggle() {
 
   function toggle() {
     const next = !dark;
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    localStorage.setItem("theme", next ? "dark" : "light");
+    const nextTheme = next ? "dark" : "light";
+
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", nextTheme);
+    }
+
+    try {
+      window.localStorage.setItem("theme", nextTheme);
+    } catch {
+      // Storage can be disabled; the in-memory DOM theme still updates.
+    }
+
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
 

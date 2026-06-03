@@ -16,6 +16,7 @@ type InventoryCar = {
 };
 
 const previewSearchParams: [string, string][] = [["preview", "/inventory"]];
+const LISTENER_RETRY_DELAY_MS = 4000;
 
 const styles = {
   shell: {
@@ -134,6 +135,16 @@ const styles = {
     fontSize: 13,
     padding: 16,
   },
+  connectionNotice: {
+    margin: "12px 12px 0",
+    border: "1px solid #7a5a21",
+    borderRadius: 8,
+    background: "#2a2112",
+    color: "#ffd27a",
+    fontSize: 13,
+    fontWeight: 700,
+    padding: "10px 12px",
+  },
 } satisfies Record<string, CSSProperties>;
 
 function carTitle(car: InventoryCar) {
@@ -205,6 +216,7 @@ export function InventoryNavigator() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [connectionLost, setConnectionLost] = useState(false);
 
   const loadCars = useCallback(async () => {
     setLoading(true);
@@ -222,6 +234,7 @@ export function InventoryNavigator() {
         }`,
       );
       setCars(results);
+      setConnectionLost(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load vehicles.");
     } finally {
@@ -230,27 +243,68 @@ export function InventoryNavigator() {
   }, [client]);
 
   useEffect(() => {
-    void loadCars();
-
     // Keep the list in sync the way Structure mode does: re-fetch whenever a
     // car is created, edited, published, or deleted (drafts included) so adds
     // and edits made via the document pane show up without reloading Studio.
-    const subscription = client
-      .listen(
-        `*[_type == "car"]`,
-        {},
-        { visibility: "query", includeResult: false },
-      )
-      .subscribe({
-        next: () => {
-          void loadCars();
-        },
-        // A dropped listen connection shouldn't surface as an error; the next
-        // mount or manual action re-fetches anyway.
-        error: () => {},
-      });
+    let disposed = false;
+    const initialLoadTimer = setTimeout(() => void loadCars(), 0);
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    return () => subscription.unsubscribe();
+    function clearRetryTimer() {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = null;
+      }
+    }
+
+    function scheduleRetry() {
+      if (disposed || retryTimer) return;
+      retryTimer = setTimeout(() => {
+        retryTimer = null;
+        connect();
+      }, LISTENER_RETRY_DELAY_MS);
+    }
+
+    function connect() {
+      if (disposed) return;
+
+      try {
+        subscription?.unsubscribe();
+        subscription = client
+          .listen(
+            `*[_type == "car"]`,
+            {},
+            { visibility: "query", includeResult: false },
+          )
+          .subscribe({
+            next: () => {
+              setConnectionLost(false);
+              void loadCars();
+            },
+            error: (err) => {
+              console.warn("Inventory listener connection lost:", err);
+              setConnectionLost(true);
+              subscription?.unsubscribe();
+              subscription = null;
+              scheduleRetry();
+            },
+          });
+      } catch (err) {
+        console.warn("Inventory listener failed to start:", err);
+        setConnectionLost(true);
+        scheduleRetry();
+      }
+    }
+
+    connect();
+
+    return () => {
+      disposed = true;
+      clearTimeout(initialLoadTimer);
+      clearRetryTimer();
+      subscription?.unsubscribe();
+    };
   }, [client, loadCars]);
 
   async function deleteCar(car: InventoryCar) {
@@ -294,6 +348,9 @@ export function InventoryNavigator() {
       </div>
 
       {loading ? <div style={styles.message}>Loading vehicles...</div> : null}
+      {connectionLost ? (
+        <div style={styles.connectionNotice}>Connection lost. Retrying...</div>
+      ) : null}
       {error ? <div style={styles.message}>{error}</div> : null}
 
       {!loading && cars.length === 0 ? (
