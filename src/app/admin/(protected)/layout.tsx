@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/admin-auth";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 
 export const metadata = { title: "Admin | TDH Motors" };
@@ -13,9 +13,7 @@ export default async function AdminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/admin/login");
-  }
+  await requireAdmin(user);
 
   return (
     <div className="min-h-screen bg-bg text-text font-sans">

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { requireAdmin } from "@/lib/admin-auth";
 import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import Link from "next/link";
@@ -43,15 +44,13 @@ export default async function EnquiryDetailPage({
 }) {
   const { id } = await params;
 
-  const [supabaseAuth, supabaseService] = await Promise.all([
-    createAuthServerClient(),
-    Promise.resolve(createServiceClient()),
-  ]);
-
+  const supabaseAuth = await createAuthServerClient();
   const {
     data: { user },
   } = await supabaseAuth.auth.getUser();
+  await requireAdmin(user);
 
+  const supabaseService = createServiceClient();
   const { data, error } = await supabaseService
     .from("enquiries")
     .select("*")

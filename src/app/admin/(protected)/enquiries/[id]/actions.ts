@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { assertAdmin } from "@/lib/admin-auth";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { createServiceClient } from "@/lib/supabase-server";
 
@@ -14,6 +15,7 @@ async function requireAuth() {
     data: { user },
   } = await supabaseAuth.auth.getUser();
   if (!user) redirect("/admin/login");
+  await assertAdmin(user);
 }
 
 export async function saveNotes(id: string, notes: string) {
