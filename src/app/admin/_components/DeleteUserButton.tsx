@@ -11,8 +11,13 @@ export function DeleteUserButton({ userId, email }: { userId: string; email: str
     if (!confirm(`Delete ${email}? This cannot be undone.`)) return;
     setError(null);
     startTransition(async () => {
-      const result = await deleteUser(userId);
-      if (result.error) setError(result.error);
+      try {
+        const result = await deleteUser(userId);
+        if (result.error) setError(result.error);
+      } catch (error) {
+        console.error("Delete user failed:", error);
+        setError("Could not delete user.");
+      }
     });
   }
 
