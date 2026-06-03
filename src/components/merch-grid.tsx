@@ -7,21 +7,39 @@ import type { MerchItem } from "@/lib/merch";
 
 export function MerchGrid({ items }: { items: MerchItem[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const isOpen = activeIndex !== null;
-  const active = activeIndex !== null ? items[activeIndex] : null;
+  const active =
+    activeIndex !== null && activeIndex >= 0 && activeIndex < items.length
+      ? items[activeIndex]
+      : null;
+  const isOpen = active !== null;
 
   const close = useCallback(() => setActiveIndex(null), []);
   const showPrev = useCallback(
-    () => setActiveIndex((i) => (i === null ? i : (i - 1 + items.length) % items.length)),
+    () =>
+      setActiveIndex((i) =>
+        i === null || items.length === 0 ? i : (i - 1 + items.length) % items.length
+      ),
     [items.length],
   );
   const showNext = useCallback(
-    () => setActiveIndex((i) => (i === null ? i : (i + 1) % items.length)),
+    () =>
+      setActiveIndex((i) =>
+        i === null || items.length === 0 ? i : (i + 1) % items.length
+      ),
     [items.length],
   );
 
   useEffect(() => {
+    setActiveIndex((current) => {
+      if (current === null) return current;
+      if (items.length === 0) return null;
+      return Math.min(current, items.length - 1);
+    });
+  }, [items.length]);
+
+  useEffect(() => {
     if (!isOpen) return;
+    if (typeof document === "undefined") return;
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();

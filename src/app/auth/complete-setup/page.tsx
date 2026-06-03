@@ -10,13 +10,24 @@ export default function CompleteSetupPage() {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
+    let cancelled = false;
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) router.replace("/admin/login");
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (!cancelled && !session) router.replace("/admin/login");
+      })
+      .catch((error) => {
+        console.error("Account setup session check failed:", error);
+        if (!cancelled) router.replace("/admin/login?error=invalid_token");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
