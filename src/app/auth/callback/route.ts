@@ -31,6 +31,15 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createAuthServerClient();
 
+  // Clear any existing session before redeeming a fresh link. Without this, an
+  // admin who is already signed in (e.g. clicking an invite for someone else in
+  // the same browser) collides with the incoming token and bounces through
+  // /admin/login into a redirect loop. Scope is local so we only drop this
+  // browser's cookie — other sessions for that user are left untouched.
+  if (code || (tokenHash && type)) {
+    await supabase.auth.signOut({ scope: "local" });
+  }
+
   // 1. PKCE / OAuth — exchange the code for a session. The matching code
   //    verifier was stored as an httpOnly cookie when the email was sent, so
   //    only the server can complete this.
