@@ -30,9 +30,13 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
     };
 
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 10000);
+
     try {
       const res = await fetch("/api/enquiries", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
@@ -43,9 +47,14 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
       }
 
       setSubmitted(true);
-    } catch {
-      setError("Something went wrong. Please try again or call us directly.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setError("The request timed out. Please try again or call us directly.");
+      } else {
+        setError("Something went wrong. Please try again or call us directly.");
+      }
     } finally {
+      window.clearTimeout(timeoutId);
       setSubmitting(false);
     }
   }

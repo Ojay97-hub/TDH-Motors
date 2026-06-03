@@ -12,12 +12,12 @@ const enquiryTypes = [
 ] as const;
 
 const schema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  car: z.string().optional(),
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(120),
+  phone: z.string().trim().max(60).optional(),
+  car: z.string().trim().max(160).optional(),
   type: z.enum(enquiryTypes),
-  message: z.string().min(1),
+  message: z.string().trim().min(1).max(4000),
 });
 
 type Enquiry = z.infer<typeof schema>;
@@ -129,6 +129,7 @@ async function sendAdminEmail(enquiry: Enquiry, enquiryId?: string, requestOrigi
   const email = buildAdminEmail(enquiry, enquiryId, requestOrigin);
   const response = await fetch(brevoEndpoint, {
     method: "POST",
+    signal: AbortSignal.timeout(8000),
     headers: {
       "api-key": apiKey,
       "Content-Type": "application/json",
@@ -152,12 +153,19 @@ async function sendAdminEmail(enquiry: Enquiry, enquiryId?: string, requestOrigi
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
   const parsed = schema.safeParse(body);
   const requestOrigin = new URL(request.url).origin;
 
   if (!parsed.success) {
-    return Response.json({ error: "Invalid data", issues: parsed.error.flatten() }, { status: 422 });
+    return Response.json({ error: "Invalid data", issues: parsed.error.flatten() }, { status: 400 });
   }
 
   const supabase = createServiceClient();
