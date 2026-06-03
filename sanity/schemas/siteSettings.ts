@@ -10,12 +10,23 @@ export const siteSettings = defineType({
       title: "Phone number",
       type: "string",
       description: 'e.g. "+44 (0) 1000 000 000"',
+      // The site builds `tel:` hrefs from this value, so reject characters that
+      // would produce a broken link. Allows digits, spaces, and + ( ) - .
+      validation: (r) =>
+        r.custom((value) => {
+          if (!value) return true;
+          return /^[+()\d\s.-]{7,}$/.test(value)
+            ? true
+            : 'Use only digits, spaces, and + ( ) - . (e.g. "+44 (0) 1000 000 000").';
+        }),
     }),
     defineField({
       name: "email",
       title: "Email address",
       type: "string",
       description: 'e.g. "hello@tdhmotors.co.uk"',
+      // The site builds `mailto:` hrefs from this value.
+      validation: (r) => r.email(),
     }),
     defineField({
       name: "addressLine1",

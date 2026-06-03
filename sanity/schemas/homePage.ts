@@ -174,7 +174,12 @@ export const homePage = defineType({
           fields: [
             defineField({ name: "platform", title: "Platform", type: "string", validation: (r) => r.required() }),
             defineField({ name: "label", title: "Displayed handle/name", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "url", title: "URL", type: "url", validation: (r) => r.required() }),
+            defineField({
+              name: "url",
+              title: "URL",
+              type: "url",
+              validation: (r) => r.uri({ scheme: ["https"], allowRelative: false }).required(),
+            }),
             defineField({ name: "ctaLabel", title: "CTA label", type: "string" }),
           ],
           preview: { select: { title: "platform", subtitle: "label" } },

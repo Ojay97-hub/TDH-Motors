@@ -1,3 +1,8 @@
+// ⚠️ DUPLICATED LOGIC — keep in sync with `isSafeCmsHref` in
+// `sanity/schemas/_ctaLink.ts`. The Studio schema can't import from `src/`
+// (separate tsconfig roots / build), so the allowlist is intentionally copied
+// there. If you change the safe-protocol rules here, update both files in
+// tandem or CMS schema validation and runtime validation will drift apart.
 const SAFE_EXTERNAL_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
 export function isSafeCmsHref(value: string): boolean {

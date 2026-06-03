@@ -1,5 +1,11 @@
 import { defineField } from "sanity";
 
+// ⚠️ DUPLICATED LOGIC — this is a copy of `isSafeCmsHref` in `src/lib/urls.ts`.
+// The Studio schema can't import from `src/` (separate tsconfig roots / build),
+// so the allowlist is intentionally duplicated here to enforce the same rule at
+// edit time that the frontend enforces at render time. If you change the
+// safe-protocol rules in one file, update the other in tandem or schema-time and
+// runtime validation will drift apart.
 const SAFE_EXTERNAL_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
 function isSafeCmsHref(value: string) {

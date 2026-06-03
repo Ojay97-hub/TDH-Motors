@@ -1,7 +1,7 @@
 /**
  * Populates singleton CMS documents with the content currently shown on the
- * frontend. Safe to re-run: it patches existing published docs or creates the
- * expected singleton IDs, then removes stale drafts for those docs.
+ * frontend. Safe to re-run: it creates missing docs and fills missing fields
+ * without overwriting curated published content or deleting drafts.
  *
  * Usage:
  *   node --env-file=.env scripts/seed-content.mjs
@@ -9,32 +9,13 @@
  */
 
 import { createClient } from "@sanity/client";
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import { getSanityWriteConfig } from "./sanity-write-config.mjs";
 
-const __dir = dirname(fileURLToPath(import.meta.url));
-const envPath = resolve(__dir, "../.env");
-
-try {
-  const lines = readFileSync(envPath, "utf8").split("\n");
-  for (const line of lines) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m) process.env[m[1]] ??= m[2].trim();
-  }
-} catch {
-  // .env optional
-}
-
-const token = process.env.SANITY_API_WRITE_TOKEN;
-if (!token) {
-  console.error("Error: SANITY_API_WRITE_TOKEN is not set. Add it to your .env file.");
-  process.exit(1);
-}
+const { projectId, dataset, token } = getSanityWriteConfig();
 
 const client = createClient({
-  projectId: "sk5os0jg",
-  dataset: "production",
+  projectId,
+  dataset,
   apiVersion: "2025-05-20",
   token,
   useCdn: false,
@@ -453,29 +434,19 @@ const MERCH_PRODUCTS = [
 
 async function upsert(doc) {
   const name = doc._type;
-  const existingId = await client.fetch(`*[_id == $id][0]._id`, { id: doc._id });
+  const fields = { ...doc };
+  delete fields._id;
+  delete fields._type;
 
-  if (existingId) {
-    const fields = { ...doc };
-    delete fields._id;
-    delete fields._type;
-    await client.patch(existingId).set(fields).commit();
-    console.log(`  patched  ${name}  (${existingId})`);
-    await discardDraft(existingId);
-  } else {
-    await client.create(doc);
-    console.log(`  written  ${name}  (${doc._id})`);
-    await discardDraft(doc._id);
-  }
-}
+  await client.createIfNotExists(doc);
+  await client.patch(doc._id).setIfMissing(fields).commit();
+  console.log(`  seeded defaults  ${name}  (${doc._id})`);
 
-async function discardDraft(publishedId) {
-  const draftId = `drafts.${publishedId}`;
-  try {
-    await client.delete(draftId);
-    console.log(`  removed draft  ${draftId}`);
-  } catch {
-    // Draft did not exist.
+  const draftId = `drafts.${doc._id}`;
+  const draftExists = await client.fetch(`defined(*[_id == $id][0]._id)`, { id: draftId });
+  if (draftExists) {
+    await client.patch(draftId).setIfMissing(fields).commit();
+    console.log(`  seeded draft defaults  ${name}  (${draftId})`);
   }
 }
 
