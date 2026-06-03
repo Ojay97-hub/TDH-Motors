@@ -30,10 +30,16 @@ function singletonListItem(S: StructureBuilder, typeName: string, title: string)
     );
 }
 
-const previewOrigin =
+function normalizePreviewOrigin(value?: string) {
+  const normalized = value?.trim().replace(/\/+$/, "");
+  return normalized || "http://localhost:3000";
+}
+
+const isProduction = process.env.NODE_ENV === "production";
+const previewOrigin = normalizePreviewOrigin(
   process.env.SANITY_STUDIO_PREVIEW_URL ||
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "http://localhost:3000";
+    process.env.NEXT_PUBLIC_SITE_URL,
+);
 const draftMode = {
   enable: `${previewOrigin}/api/draft-mode/enable`,
   disable: `${previewOrigin}/api/draft-mode/disable`,
@@ -149,7 +155,7 @@ export default defineConfig({
             ),
           ]),
     }),
-    visionTool({ defaultApiVersion: "2025-05-20" }),
+    ...(isProduction ? [] : [visionTool({ defaultApiVersion: "2025-05-20" })]),
   ],
   document: {
     // Singletons must never be duplicated: a second copy of a singleton type
