@@ -3,15 +3,25 @@ import { merchProductsQuery } from "@/sanity/queries";
 import { MERCH_ITEMS, TIKTOK_SHOP_URL, type MerchItem } from "@/lib/merch";
 
 export type MerchProductRaw = {
-  _id: string;
-  title: string;
-  category?: string;
-  description?: string;
-  priceLabel?: string;
-  tiktokShopUrl?: string;
-  status?: "available" | "coming-soon" | "hidden";
-  image?: string;
+  _id?: string | null;
+  title?: string | null;
+  category?: string | null;
+  description?: string | null;
+  priceLabel?: string | null;
+  tiktokShopUrl?: string | null;
+  status?: "available" | "coming-soon" | "hidden" | null;
+  image?: string | null;
 };
+
+function stringOr(value: unknown, fallback = ""): string {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+}
+
+function hasUsableTitleAndImage(
+  product: MerchProductRaw | null | undefined,
+): product is MerchProductRaw & { title: string; image: string } {
+  return Boolean(stringOr(product?.title) && stringOr(product?.image));
+}
 
 /**
  * Maps raw CMS merch products into the `MerchItem` shape the cards render.
@@ -24,16 +34,15 @@ export function toMerchItems(
 ): MerchItem[] {
   return (products ?? [])
     // Resolved references can be null (target missing/unpublished); drop them.
-    .filter((p): p is MerchProductRaw => Boolean(p))
+    .filter(hasUsableTitleAndImage)
     .filter((p) => p.status !== "hidden")
-    .filter((p) => p.image)
     .map((p) => ({
-      title: p.title,
-      category: p.category ?? "",
-      detail: p.description ?? "",
-      image: p.image as string,
+      title: stringOr(p.title),
+      category: stringOr(p.category),
+      detail: stringOr(p.description),
+      image: stringOr(p.image),
       comingSoon: p.status === "coming-soon",
-      tiktokShopUrl: p.tiktokShopUrl || TIKTOK_SHOP_URL,
+      tiktokShopUrl: stringOr(p.tiktokShopUrl, TIKTOK_SHOP_URL),
     }));
 }
 
