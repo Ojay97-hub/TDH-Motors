@@ -1,6 +1,5 @@
-import type { FilteredResponseQueryOptions } from "next-sanity";
+import type { FilteredResponseQueryOptions, QueryParams } from "@sanity/client";
 import { sanityClient } from "./base-client";
-import { sanityFetch } from "./live";
 
 export { sanityClient };
 
@@ -24,18 +23,14 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function safeSanityFetch<T = any>(
   query: string,
-  params: Record<string, unknown> = {},
+  params: QueryParams = {},
   options?: FilteredResponseQueryOptions,
   fallback: T | null = null,
 ): Promise<T | null> {
   let lastErr: unknown;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      const tags = options?.next?.tags?.filter(
-        (tag): tag is string => typeof tag === "string",
-      ) ?? [];
-      const { data } = await sanityFetch({ query, params, tags });
-      return data as T;
+      return await sanityClient.fetch<T>(query, params, options);
     } catch (err) {
       lastErr = err;
       if (attempt < MAX_ATTEMPTS) {

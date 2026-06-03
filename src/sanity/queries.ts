@@ -18,13 +18,13 @@ const carProjection = /* groq */ `
   power,
   colour,
   description,
-  highlights,
-  "images": images[].asset->url,
-  "videos": videos[] {
+  "highlights": coalesce(highlights, []),
+  "images": coalesce(images[].asset->url, []),
+  "videos": coalesce(videos[] {
     title,
     "videoFile": videoFile.asset->url,
     videoUrl,
-  },
+  }, []),
   "legacyVideoFile": video.asset->url,
   "legacyVideoUrl": videoUrl,
   featured,
@@ -34,6 +34,7 @@ const carProjection = /* groq */ `
 const merchProductProjection = /* groq */ `
   _id,
   title,
+  category,
   description,
   priceLabel,
   tiktokShopUrl,
@@ -78,12 +79,12 @@ export const siteSettingsQuery = defineQuery(`*[_id == "siteSettings"][0]`);
 // shows all visible products.
 export const homePageQuery = defineQuery(`*[_id == "homePage"][0]{
   ...,
-  "featuredCars": featuredCars[]->{
+  "featuredCars": coalesce(featuredCars[]->{
     ${carProjection}
-  },
-  "homepageMerch": homepageMerch[@->status != "hidden"]->{
+  }, []),
+  "homepageMerch": coalesce(homepageMerch[@->status != "hidden"]->{
     ${merchProductProjection}
-  },
+  }, []),
   comingSoonCard {
     show,
     eyebrow,
@@ -110,33 +111,33 @@ export const storagePageQuery = defineQuery(`*[_id == "storagePage"][0]`);
 // falls back to every visible product at render time).
 export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]{
   ...,
-  "products": products[@->status != "hidden"]->{
+  "products": coalesce(products[@->status != "hidden"]->{
     ${merchProductProjection}
-  }
+  }, [])
 }`);
 
 export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
   ...,
-  "beforeAfterGallery": beforeAfterGallery[] {
+  "beforeAfterGallery": coalesce(beforeAfterGallery[] {
     label,
     serviceTag,
     "beforeImage": beforeImage.asset->url,
     "beforeVideo": beforeVideo.asset->url,
     "afterImage": afterImage.asset->url,
     "afterVideo": afterVideo.asset->url,
-  },
-  "gallery": gallery[] {
+  }, []),
+  "gallery": coalesce(gallery[] {
     caption,
     serviceTag,
     "image": image.asset->url,
-  },
-  "videos": videos[] {
+  }, []),
+  "videos": coalesce(videos[] {
     title,
     caption,
     orientation,
     "videoFile": videoFile.asset->url,
     videoUrl,
-  }
+  }, [])
 }`);
 
 export const merchProductsQuery = defineQuery(`

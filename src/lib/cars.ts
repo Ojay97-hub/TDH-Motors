@@ -14,6 +14,39 @@ export type Video = {
 };
 
 type CarRaw = {
+  _id?: string | null;
+  _type?: string | null;
+  slug?: string | null;
+  make?: string | null;
+  model?: string | null;
+  variant?: string | null;
+  year?: number | null;
+  price?: number | null;
+  mileage?: number | null;
+  transmission?: string | null;
+  fuel?: string | null;
+  bodyType?: string | null;
+  category?: string | null;
+  engine?: string | null;
+  power?: string | null;
+  colour?: string | null;
+  description?: string | null;
+  highlights?: Array<string | null | undefined> | null;
+  images?: Array<string | null | undefined> | null;
+  videos?: Array<Video | null | undefined> | null;
+  legacyVideoFile?: string | null;
+  legacyVideoUrl?: string | null;
+  featured?: boolean | null;
+  status?: string | null;
+};
+
+const transmissions = ["Manual", "Automatic", "PDK", "DCT"] as const;
+const fuels = ["Petrol", "Diesel", "Electric", "Hybrid"] as const;
+const bodyTypes = ["Coupe", "Convertible", "Saloon", "Estate", "SUV", "Hatchback"] as const;
+const categories = ["luxury", "sports", "performance", "electric", "classic"] as const;
+const statuses = ["available", "reserved", "sold", "coming-soon"] as const;
+
+export type Car = {
   _id: string;
   _type: "car";
   slug: string;
@@ -23,10 +56,10 @@ type CarRaw = {
   year: number;
   price: number;
   mileage: number;
-  transmission: "Manual" | "Automatic" | "PDK" | "DCT";
-  fuel: "Petrol" | "Diesel" | "Electric" | "Hybrid";
-  bodyType: "Coupe" | "Convertible" | "Saloon" | "Estate" | "SUV" | "Hatchback";
-  category: "luxury" | "sports" | "performance" | "electric" | "classic";
+  transmission: (typeof transmissions)[number];
+  fuel: (typeof fuels)[number];
+  bodyType: (typeof bodyTypes)[number];
+  category: (typeof categories)[number];
   engine: string;
   power: string;
   colour: string;
@@ -34,35 +67,90 @@ type CarRaw = {
   highlights: string[];
   images: string[];
   videos?: Video[];
-  legacyVideoFile?: string;
-  legacyVideoUrl?: string;
   featured?: boolean;
-  status: "available" | "reserved" | "sold" | "coming-soon";
+  status: (typeof statuses)[number];
 };
 
-export type Car = Omit<CarRaw, "legacyVideoFile" | "legacyVideoUrl"> & {
-  videos?: Video[];
-};
+function stringOr(value: unknown, fallback = ""): string {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+}
 
-function normalizeCarVideos(car: CarRaw): Car {
-  const videos = [...(car.videos || [])];
+function optionalString(value: unknown): string | undefined {
+  const normalized = stringOr(value);
+  return normalized || undefined;
+}
 
-  // Only include legacy video if there are no new videos yet
-  if ((videos.length === 0) && (car.legacyVideoFile || car.legacyVideoUrl)) {
+function numberOr(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function stringArrayOrEmpty(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => stringOr(item))
+    .filter((item) => item.length > 0);
+}
+
+function oneOf<const T extends readonly string[]>(
+  value: unknown,
+  allowed: T,
+  fallback: T[number],
+): T[number] {
+  return typeof value === "string" && allowed.includes(value) ? value : fallback;
+}
+
+function normalizeVideos(car: CarRaw): Video[] {
+  const videos = Array.isArray(car.videos)
+    ? car.videos
+        .filter((video): video is Video => Boolean(video))
+        .map((video) => ({
+          title: stringOr(video.title) || null,
+          videoFile: optionalString(video.videoFile),
+          videoUrl: optionalString(video.videoUrl),
+        }))
+        .filter((video) => video.videoFile || video.videoUrl)
+    : [];
+
+  // Only include legacy video if there are no new videos yet.
+  if (videos.length === 0 && (optionalString(car.legacyVideoFile) || optionalString(car.legacyVideoUrl))) {
     videos.push({
       title: null,
-      videoFile: car.legacyVideoFile,
-      videoUrl: car.legacyVideoUrl,
+      videoFile: optionalString(car.legacyVideoFile),
+      videoUrl: optionalString(car.legacyVideoUrl),
     });
   }
 
+  return videos;
+}
+
+function normalizeCar(car: CarRaw): Car {
+  const videos = normalizeVideos(car);
+  const fallbackId = stringOr(car._id, "unknown-car");
+
   return {
-    ...car,
-    // A car with no photos yet (e.g. an in-progress draft shown in Presentation
-    // preview) projects `images` as null. Coerce to an array so every consumer
-    // can safely read `.length`/`[0]` without guarding against null.
-    images: car.images ?? [],
+    _id: fallbackId,
+    _type: "car",
+    slug: stringOr(car.slug, fallbackId),
+    make: stringOr(car.make, "Unknown"),
+    model: stringOr(car.model, "Vehicle"),
+    variant: optionalString(car.variant),
+    year: numberOr(car.year),
+    price: numberOr(car.price),
+    mileage: numberOr(car.mileage),
+    transmission: oneOf(car.transmission, transmissions, "Automatic"),
+    fuel: oneOf(car.fuel, fuels, "Petrol"),
+    bodyType: oneOf(car.bodyType, bodyTypes, "Coupe"),
+    category: oneOf(car.category, categories, "performance"),
+    engine: stringOr(car.engine, "Not specified"),
+    power: stringOr(car.power, "Not specified"),
+    colour: stringOr(car.colour, "Not specified"),
+    description: stringOr(car.description, "Details coming soon."),
+    highlights: stringArrayOrEmpty(car.highlights),
+    images: stringArrayOrEmpty(car.images),
     videos: videos.length > 0 ? videos : undefined,
+    featured: car.featured === true,
+    status: oneOf(car.status, statuses, "available"),
   };
 }
 
@@ -77,7 +165,7 @@ export function normalizeCars(
   // Resolved references can be null (target missing/unpublished); drop them.
   return (cars ?? [])
     .filter((c): c is CarRaw => Boolean(c))
-    .map(normalizeCarVideos);
+    .map(normalizeCar);
 }
 
 export async function getAllCars(): Promise<Car[]> {
@@ -87,7 +175,7 @@ export async function getAllCars(): Promise<Car[]> {
     { next: { revalidate: 60, tags: ["car"] } },
     [],
   );
-  return (cars ?? []).map(normalizeCarVideos);
+  return (cars ?? []).map(normalizeCar);
 }
 
 export async function getFeaturedCars(): Promise<Car[]> {
@@ -97,7 +185,7 @@ export async function getFeaturedCars(): Promise<Car[]> {
     { next: { revalidate: 60, tags: ["car"] } },
     [],
   );
-  return (cars ?? []).map(normalizeCarVideos);
+  return (cars ?? []).map(normalizeCar);
 }
 
 export async function getCarBySlug(slug: string): Promise<Car | null> {
@@ -106,7 +194,7 @@ export async function getCarBySlug(slug: string): Promise<Car | null> {
     { slug },
     { next: { revalidate: 60, tags: ["car", `car:${slug}`] } },
   );
-  return car ? normalizeCarVideos(car) : null;
+  return car ? normalizeCar(car) : null;
 }
 
 export async function getAllCarSlugs(): Promise<string[]> {
