@@ -19,7 +19,16 @@ async function isAdminInTable(userId: string) {
     .maybeSingle();
 
   if (error) {
-    console.error("Admin role lookup failed:", error.message);
+    // The admin_users table is optional. When it doesn't exist, admin status is
+    // driven entirely by app_metadata.role, so treat "table missing" as simply
+    // "no table-based admins" instead of spamming errors. Surface anything else.
+    const tableMissing =
+      error.code === "PGRST205" ||
+      error.code === "42P01" ||
+      /schema cache|does not exist/i.test(error.message);
+    if (!tableMissing) {
+      console.error("Admin role lookup failed:", error.message);
+    }
     return false;
   }
 

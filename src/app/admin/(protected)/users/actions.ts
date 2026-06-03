@@ -25,11 +25,22 @@ export async function inviteUser(_prev: { error?: string; success?: string }, fo
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const supabase = createServiceClient();
-  const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
+  const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${siteUrl}/auth/callback`,
   });
 
   if (error) return { error: error.message };
+
+  // Grant admin access so the invitee can reach /admin once they accept the
+  // invite and set a password. Admin status is driven by app_metadata.role.
+  if (data?.user?.id) {
+    const { error: roleError } = await supabase.auth.admin.updateUserById(data.user.id, {
+      app_metadata: { role: "admin" },
+    });
+    if (roleError) {
+      return { error: `Invited ${email}, but couldn't grant admin role: ${roleError.message}` };
+    }
+  }
 
   revalidatePath("/admin/users");
   return { success: `Invite sent to ${email}.` };
