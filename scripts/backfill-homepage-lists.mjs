@@ -16,32 +16,13 @@
  */
 
 import { createClient } from "@sanity/client";
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import { getSanityWriteConfig } from "./sanity-write-config.mjs";
 
-const __dir = dirname(fileURLToPath(import.meta.url));
-const envPath = resolve(__dir, "../.env");
-
-try {
-  const lines = readFileSync(envPath, "utf8").split("\n");
-  for (const line of lines) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m) process.env[m[1]] ??= m[2].trim();
-  }
-} catch {
-  // .env optional
-}
-
-const token = process.env.SANITY_API_WRITE_TOKEN;
-if (!token) {
-  console.error("Error: SANITY_API_WRITE_TOKEN is not set. Add it to your .env file.");
-  process.exit(1);
-}
+const { projectId, dataset, token } = getSanityWriteConfig();
 
 const client = createClient({
-  projectId: "sk5os0jg",
-  dataset: "production",
+  projectId,
+  dataset,
   apiVersion: "2025-05-20",
   token,
   useCdn: false,

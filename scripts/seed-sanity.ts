@@ -12,13 +12,24 @@
 import { createClient } from "@sanity/client";
 import { seedCars, type SeedCar } from "./seed-data";
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
-const token = process.env.SANITY_API_WRITE_TOKEN;
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET?.trim();
+const token = process.env.SANITY_API_WRITE_TOKEN?.trim();
 
 if (!projectId || !dataset || !token) {
   console.error(
     "Missing env. Need NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET, SANITY_API_WRITE_TOKEN in .env",
+  );
+  process.exit(1);
+}
+
+const forceProduction =
+  process.env.FORCE_PROD_MUTATION === "true" ||
+  process.argv.includes("--confirm-production");
+
+if (dataset === "production" && !forceProduction) {
+  console.error(
+    'Refusing to mutate Sanity dataset "production". Set FORCE_PROD_MUTATION=true or pass --confirm-production to proceed.',
   );
   process.exit(1);
 }

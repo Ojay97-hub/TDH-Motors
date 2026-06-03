@@ -6,39 +6,20 @@
  * site never sees them, even though they're published.
  *
  * This re-creates each merch product under a non-dotted ID (`merch-<slug>`),
- * repoints the homepage's `homepageMerch` references, and deletes the old docs,
- * all in a single atomic transaction.
+ * repoints references to the old IDs, and deletes the old docs, all in a
+ * single atomic transaction.
  *
  * Usage: node --env-file=.env scripts/fix-merch-ids.mjs
  */
 
 import { createClient } from "@sanity/client";
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import { getSanityWriteConfig } from "./sanity-write-config.mjs";
 
-const __dir = dirname(fileURLToPath(import.meta.url));
-const envPath = resolve(__dir, "../.env");
-
-try {
-  const lines = readFileSync(envPath, "utf8").split("\n");
-  for (const line of lines) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m) process.env[m[1]] ??= m[2].trim();
-  }
-} catch {
-  // .env optional
-}
-
-const token = process.env.SANITY_API_WRITE_TOKEN;
-if (!token) {
-  console.error("Error: SANITY_API_WRITE_TOKEN is not set. Add it to your .env file.");
-  process.exit(1);
-}
+const { projectId, dataset, token } = getSanityWriteConfig();
 
 const client = createClient({
-  projectId: "sk5os0jg",
-  dataset: "production",
+  projectId,
+  dataset,
   apiVersion: "2025-05-20",
   token,
   useCdn: false,
@@ -54,8 +35,37 @@ const idMap = {
 
 const SYSTEM_FIELDS = new Set(["_id", "_rev", "_createdAt", "_updatedAt"]);
 
+function replaceRefs(value) {
+  if (Array.isArray(value)) {
+    return value.map(replaceRefs);
+  }
+
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  const next = {};
+  for (const [key, nested] of Object.entries(value)) {
+    next[key] = key === "_ref" && idMap[nested] ? idMap[nested] : replaceRefs(nested);
+  }
+  return next;
+}
+
+function changedTopLevelFields(doc) {
+  const patch = {};
+  for (const [key, value] of Object.entries(doc)) {
+    if (SYSTEM_FIELDS.has(key)) continue;
+    const next = replaceRefs(value);
+    if (JSON.stringify(next) !== JSON.stringify(value)) {
+      patch[key] = next;
+    }
+  }
+  return patch;
+}
+
 async function main() {
   const oldIds = Object.keys(idMap);
+  const newIds = Object.values(idMap);
 
   // Pull the full source docs (raw perspective, authenticated).
   const docs = await client.withConfig({ perspective: "raw" }).fetch(
@@ -63,15 +73,23 @@ async function main() {
     { ids: oldIds },
   );
 
+  if (docs.length === 0) {
+    const replacementDocs = await client.fetch(`*[_id in $ids]._id`, { ids: newIds });
+    if (replacementDocs.length === newIds.length) {
+      console.log("No dotted merch docs found. Migration already complete.");
+      return;
+    }
+  }
+
   if (docs.length !== oldIds.length) {
     const found = docs.map((d) => d._id);
     console.error("Expected 4 merch docs, found:", found);
     process.exit(1);
   }
 
-  // Pull the homepage's current merch reference list so we can repoint it.
-  const home = await client.withConfig({ perspective: "raw" }).fetch(
-    `*[_id == "homePage"][0]{ homepageMerch }`,
+  const referencingDocs = await client.withConfig({ perspective: "raw" }).fetch(
+    `*[references($ids)]`,
+    { ids: oldIds },
   );
 
   const tx = client.transaction();
@@ -86,13 +104,13 @@ async function main() {
     tx.createOrReplace(clone);
   }
 
-  // 2. Repoint homePage.homepageMerch references to the new IDs (keep _key/order).
-  if (home?.homepageMerch?.length) {
-    const repointed = home.homepageMerch.map((ref) => ({
-      ...ref,
-      _ref: idMap[ref._ref] ?? ref._ref,
-    }));
-    tx.patch("homePage", (p) => p.set({ homepageMerch: repointed }));
+  // 2. Repoint every document that references the old IDs.
+  for (const doc of referencingDocs) {
+    if (oldIds.includes(doc._id)) continue;
+    const patch = changedTopLevelFields(doc);
+    if (Object.keys(patch).length > 0) {
+      tx.patch(doc._id, (p) => p.set(patch));
+    }
   }
 
   // 3. Delete the old dotted docs (refs already repointed above, so no
