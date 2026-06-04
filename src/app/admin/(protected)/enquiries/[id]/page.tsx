@@ -43,6 +43,31 @@ function getStatusBadge(status: string) {
   return STATUS_BADGE[status] ?? STATUS_BADGE.fallback;
 }
 
+function splitEmails(value?: string) {
+  return (value ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+}
+
+function getReplySender(userEmail?: string | null) {
+  const fallbackSender = process.env.BREVO_SENDER_EMAIL?.trim();
+  const allowedSenders = new Set(
+    [
+      ...splitEmails(process.env.BREVO_VERIFIED_SENDERS),
+      ...splitEmails(process.env.BREVO_ADMIN_EMAILS ?? process.env.ADMIN_EMAILS),
+      ...(fallbackSender ? [fallbackSender] : []),
+    ].map((email) => email.toLowerCase())
+  );
+
+  const normalizedUserEmail = userEmail?.trim().toLowerCase();
+  if (normalizedUserEmail && allowedSenders.has(normalizedUserEmail)) {
+    return normalizedUserEmail;
+  }
+
+  return fallbackSender;
+}
+
 export default async function EnquiryDetailPage({
   params,
 }: {
@@ -66,6 +91,7 @@ export default async function EnquiryDetailPage({
   if (error || !data) notFound();
 
   const enquiry = data as Enquiry;
+  const replySenderEmail = getReplySender(user?.email);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -208,7 +234,7 @@ export default async function EnquiryDetailPage({
               <ReplyForm
                 enquiryId={enquiry.id}
                 customerName={enquiry.name}
-                currentUserEmail={user?.email}
+                senderEmail={replySenderEmail}
               />
             </div>
 

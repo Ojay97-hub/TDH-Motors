@@ -1,5 +1,6 @@
 import type { FilteredResponseQueryOptions, QueryParams } from "@sanity/client";
 import { sanityClient } from "./base-client";
+import { sanityFetch } from "./live";
 
 export { sanityClient };
 
@@ -28,9 +29,16 @@ export async function safeSanityFetch<T = any>(
   fallback: T | null = null,
 ): Promise<T | null> {
   let lastErr: unknown;
+  const tags = options?.next?.tags;
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      return await sanityClient.fetch<T>(query, params, options);
+      const { data } = await sanityFetch({
+        query,
+        params,
+        tags: Array.isArray(tags) ? tags : undefined,
+      });
+      return data as T;
     } catch (err) {
       lastErr = err;
       if (attempt < MAX_ATTEMPTS) {

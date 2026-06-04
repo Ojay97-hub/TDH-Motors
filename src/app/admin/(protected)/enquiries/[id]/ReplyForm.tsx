@@ -6,10 +6,10 @@ import { sendEnquiryReply } from "./actions";
 type ReplyFormProps = {
   enquiryId: string;
   customerName: string;
-  currentUserEmail?: string | null;
+  senderEmail?: string;
 };
 
-export function ReplyForm({ enquiryId, customerName, currentUserEmail }: ReplyFormProps) {
+export function ReplyForm({ enquiryId, customerName, senderEmail }: ReplyFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, action, pending] = useActionState(sendEnquiryReply, {});
 
@@ -27,7 +27,7 @@ export function ReplyForm({ enquiryId, customerName, currentUserEmail }: ReplyFo
         <input
           id="reply-subject"
           name="subject"
-          defaultValue="Your enquiry - TDH Motors"
+          defaultValue="Your enquiry — TDH Motors"
           maxLength={180}
           required
           className="w-full px-3 py-2 bg-bg border border-border text-text text-sm placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
@@ -55,9 +55,9 @@ export function ReplyForm({ enquiryId, customerName, currentUserEmail }: ReplyFo
         >
           {pending ? "Sending..." : "Send reply"}
         </button>
-        {currentUserEmail && (
+        {senderEmail && (
           <p className="text-sm text-text-muted">
-            Sends as {currentUserEmail}
+            Sends as {senderEmail}
           </p>
         )}
         {state.success && (
