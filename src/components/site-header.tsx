@@ -18,9 +18,9 @@ const rightNav = [
 ];
 
 const whoWeAreNav = {
-  href: "/who-we-are",
-  label: "Who We Are",
-  children: [{ href: "/contact", label: "Contact" }],
+  href: "/contact",
+  label: "Contact",
+  children: [{ href: "/who-we-are", label: "Who We Are" }],
 };
 
 const inventoryNav = {
