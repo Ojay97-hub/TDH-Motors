@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Barlow } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -41,13 +40,6 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth" className={barlow.variable} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-bg text-text">
         {children}
-        <Script
-          id="theme-bootstrap"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`,
-          }}
-        />
       </body>
     </html>
   );

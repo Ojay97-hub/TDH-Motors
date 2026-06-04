@@ -5,6 +5,20 @@ import { Moon, Sun } from "lucide-react";
 
 const THEME_CHANGE_EVENT = "tdh-theme-change";
 
+function applyStoredTheme() {
+  if (typeof document === "undefined" || typeof window === "undefined") return;
+
+  try {
+    const stored = window.localStorage.getItem("theme");
+    document.documentElement.setAttribute(
+      "data-theme",
+      stored === "dark" || stored === "light" ? stored : "light",
+    );
+  } catch {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+}
+
 function getThemeSnapshot() {
   if (typeof document === "undefined") return "light";
   return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -12,6 +26,9 @@ function getThemeSnapshot() {
 
 function subscribeToTheme(onStoreChange: () => void) {
   if (typeof window === "undefined") return () => {};
+
+  applyStoredTheme();
+  onStoreChange();
 
   function handleStorageChange(e: StorageEvent) {
     if (

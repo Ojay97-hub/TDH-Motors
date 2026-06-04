@@ -143,11 +143,19 @@ export async function SiteFooter() {
             <ul className="space-y-3 text-sm text-text-muted">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 text-brand-light shrink-0" />
-                <span>{addressLine1}<br />{addressLine2}</span>
+                <span>
+                  <span>{addressLine1}</span>
+                  <br />
+                  <span>{addressLine2}</span>
+                </span>
               </li>
               <li className="flex items-start gap-3">
                 <Clock size={16} className="mt-0.5 text-brand-light shrink-0" />
-                <span>{hoursLabel}<br />{hoursDetail}</span>
+                <span>
+                  <span>{hoursLabel}</span>
+                  <br />
+                  <span>{hoursDetail}</span>
+                </span>
               </li>
             </ul>
           </div>
@@ -159,13 +167,19 @@ export async function SiteFooter() {
             <ul className="space-y-3 text-sm text-text-muted">
               <li className="flex items-center gap-3">
                 <Phone size={16} className="text-brand-light shrink-0" />
-                <a href={`tel:${phone.replace(/\s/g, "")}`} className="hover:text-text transition-colors">
+                <a
+                  href={`tel:${phone.replace(/\s/g, "")}`}
+                  className="hover:text-text transition-colors"
+                >
                   {phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-brand-light shrink-0" />
-                <a href={`mailto:${email}`} className="hover:text-text transition-colors">
+                <a
+                  href={`mailto:${email}`}
+                  className="hover:text-text transition-colors"
+                >
                   {email}
                 </a>
               </li>

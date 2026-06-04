@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { InventoryBrowser } from "@/components/inventory-browser";
 import { getAllCars } from "@/lib/cars";
+import { safeSanityFetch } from "@/sanity/client";
+import { inventoryPageQuery } from "@/sanity/queries";
 
 export const metadata: Metadata = {
   title: "Inventory",
@@ -10,6 +12,10 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function InventoryPage() {
-  const cars = await getAllCars();
-  return <InventoryBrowser cars={cars} />;
+  const [cars, cms] = await Promise.all([
+    getAllCars(),
+    safeSanityFetch(inventoryPageQuery, {}, { next: { revalidate: 60, tags: ["inventoryPage"] } }),
+  ]);
+
+  return <InventoryBrowser cars={cars} page={cms} />;
 }

@@ -9,6 +9,8 @@ import { bespokeSourcingPage } from "./bespokeSourcingPage";
 import { storagePage } from "./storagePage";
 import { merchPage } from "./merchPage";
 import { merchProduct } from "./merchProduct";
+import { contactPage } from "./contactPage";
+import { inventoryPage } from "./inventoryPage";
 
 export const schemaTypes = [
   car,
@@ -21,5 +23,7 @@ export const schemaTypes = [
   bespokeSourcingPage,
   storagePage,
   merchPage,
+  contactPage,
+  inventoryPage,
   merchProduct,
 ];

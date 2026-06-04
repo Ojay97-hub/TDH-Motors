@@ -91,11 +91,11 @@ export function ContactForm({ prefilledCar }: { prefilledCar?: string }) {
         <label className="block text-xs uppercase tracking-wider text-text-muted mb-2">
           Enquiry Type
         </label>
-        <div className="flex flex-wrap gap-2">
-          {["Viewing", "Curated Sales", "Part-Exchange", "Detailing", "Storage", "Bespoke Sourcing", "General"].map((type) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-[1fr_1.2fr_1fr_1fr_1.45fr_1fr] gap-2">
+          {["Viewing", "Curated Sales", "Detailing", "Storage", "Bespoke Sourcing", "General"].map((type) => (
             <label key={type} className="cursor-pointer">
               <input type="radio" name="type" value={type} className="peer sr-only" defaultChecked={type === "Viewing"} />
-              <span className="inline-block px-4 py-2 text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text peer-checked:text-on-brand transition-colors">
+              <span className="flex min-h-11 w-full items-center justify-center whitespace-nowrap px-2 py-2 text-center text-sm border border-border peer-checked:bg-brand peer-checked:border-brand text-text peer-checked:text-on-brand transition-colors">
                 {type}
               </span>
             </label>

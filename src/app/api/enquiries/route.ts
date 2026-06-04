@@ -4,7 +4,6 @@ import { createServiceClient } from "@/lib/supabase-server";
 const enquiryTypes = [
   "Viewing",
   "Curated Sales",
-  "Part-Exchange",
   "Detailing",
   "Storage",
   "Bespoke Sourcing",

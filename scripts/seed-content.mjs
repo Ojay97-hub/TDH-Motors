@@ -381,6 +381,28 @@ const MERCH_PAGE = {
   ctaLabel: "Follow on TikTok",
 };
 
+const CONTACT_PAGE = {
+  _id: "contactPage",
+  _type: "contactPage",
+  eyebrow: "Get In Touch",
+  heading: "Contact Us",
+  intro:
+    "Drop us a line below, or come and see us. Viewings are by appointment so we can give you our undivided attention.",
+  sidebarHeading: "Visit Us",
+  responseEyebrow: "Response Time",
+  responseBody:
+    "We typically respond to all enquiries within one working day. For urgent queries, please give us a call.",
+};
+
+const INVENTORY_PAGE = {
+  _id: "inventoryPage",
+  _type: "inventoryPage",
+  eyebrow: "Current Stock",
+  heading: "Our Inventory",
+  intro:
+    "Every car listed below is in our care and available for viewing by appointment. Don't see what you're after? We can source it.",
+};
+
 const MERCH_PRODUCTS = [
   {
     // IDs must NOT contain a dot: on a public dataset Sanity's anonymous read
@@ -450,6 +472,25 @@ async function upsert(doc) {
   }
 }
 
+async function seedInventoryCarReferences() {
+  const cars = await client.fetch(
+    `*[_type == "car" && !(_id in path("drafts.**"))] | order(year desc, _createdAt desc) {
+      _id
+    }`,
+  );
+
+  if (!cars.length) return;
+
+  const refs = cars.map((car) => ({
+    _key: car._id.replace(/[^a-zA-Z0-9_-]/g, "-"),
+    _type: "reference",
+    _ref: car._id,
+  }));
+
+  await client.patch("inventoryPage").setIfMissing({ inventoryCars: refs }).commit();
+  console.log(`  seeded inventory car links  inventoryPage  (${refs.length} cars)`);
+}
+
 console.log("Seeding CMS content...\n");
 for (const doc of [
   HOME_PAGE,
@@ -461,8 +502,11 @@ for (const doc of [
   BESPOKE_SOURCING_PAGE,
   STORAGE_PAGE,
   MERCH_PAGE,
+  CONTACT_PAGE,
+  INVENTORY_PAGE,
   ...MERCH_PRODUCTS,
 ]) {
   await upsert(doc);
 }
+await seedInventoryCarReferences();
 console.log("\nDone.");

@@ -52,7 +52,19 @@ function formatMileage(miles: number): string {
   return new Intl.NumberFormat("en-GB").format(miles) + " mi";
 }
 
-export function InventoryBrowser({ cars }: { cars: Car[] }) {
+type InventoryPageContent = {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+};
+
+export function InventoryBrowser({
+  cars,
+  page,
+}: {
+  cars: Car[];
+  page?: InventoryPageContent | null;
+}) {
   const [view, setView] = useState<ViewMode>("grid");
   const [sort, setSort] = useState<SortKey>("year-desc");
   const [selectedMakes, setSelectedMakes] = useState<string[]>([]);
@@ -93,6 +105,18 @@ export function InventoryBrowser({ cars }: { cars: Car[] }) {
   }, [cars, selectedMakes, selectedBodyTypes, selectedCategories, sort]);
 
   const hasFilters = selectedMakes.length > 0 || selectedBodyTypes.length > 0 || selectedCategories.length > 0;
+  const eyebrow = page?.eyebrow ?? "Current Stock";
+  const heading = page?.heading ?? "Our Inventory";
+  const intro =
+    page?.intro ??
+    "Every car listed below is in our care and available for viewing by appointment. Don't see what you're after? We can source it.";
+  const pageAttr = (path: string) =>
+    createDataAttribute({
+      baseUrl: "/studio",
+      id: "inventoryPage",
+      type: "inventoryPage",
+      path,
+    }).toString();
 
   function toggle<T>(list: T[], set: (v: T[]) => void, val: T) {
     set(list.includes(val) ? list.filter((x) => x !== val) : [...list, val]);
@@ -163,11 +187,17 @@ export function InventoryBrowser({ cars }: { cars: Car[] }) {
 
     {/* Page header */}
     <section className="container-page pt-32 md:pt-40 pb-10">
-      <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3">Current Stock</div>
-      <h1 className="font-display font-bold text-5xl md:text-6xl tracking-tight mb-4">Our Inventory</h1>
-      <p className="text-text-muted text-lg max-w-2xl leading-relaxed mb-6">
-        Every car listed below is in our care and available for viewing by appointment.
-        Don&apos;t see what you&apos;re after? We can source it.
+      <div className="text-xs tracking-[0.3em] uppercase text-brand mb-3" data-sanity={pageAttr("eyebrow")}>
+        {eyebrow}
+      </div>
+      <h1
+        className="font-display font-bold text-5xl md:text-6xl tracking-tight mb-4"
+        data-sanity={pageAttr("heading")}
+      >
+        {heading}
+      </h1>
+      <p className="text-text-muted text-lg max-w-2xl leading-relaxed mb-6" data-sanity={pageAttr("intro")}>
+        {intro}
       </p>
       <span className="text-sm text-text-muted">
         <span className="font-semibold text-text">{filtered.length}</span>{" "}
@@ -319,12 +349,14 @@ function FilterGroup({
 }
 
 function GridCard({ car }: { car: Car }) {
-  const sanity = createDataAttribute({
-    baseUrl: "/studio",
-    id: car._id,
-    type: car._type,
-    path: "make",
-  });
+  const carAttr = (path: string) =>
+    createDataAttribute({
+      baseUrl: "/studio",
+      id: car._id,
+      type: car._type,
+      path,
+    }).toString();
+  const sanity = carAttr("make");
   const isComingSoon = car.status === "coming-soon";
 
   const media = (
@@ -370,11 +402,21 @@ function GridCard({ car }: { car: Car }) {
       <div className="text-xs text-text-subtle tracking-widest uppercase mb-1.5">
         {car.year} · {car.bodyType}
       </div>
-      <h3 className="font-display font-bold text-lg mb-0.5">{car.make} {car.model}</h3>
-      {car.variant && <div className="text-sm text-text-muted mb-3">{car.variant}</div>}
+      <h3 className="font-display font-bold text-lg mb-0.5" data-sanity={carAttr("model")}>
+        {car.make} {car.model}
+      </h3>
+      {car.variant && (
+        <div className="text-sm text-text-muted mb-3" data-sanity={carAttr("variant")}>
+          {car.variant}
+        </div>
+      )}
       <div className="flex items-center justify-between pt-3.5 border-t border-border">
-        <div className="font-display font-bold text-lg">{formatPrice(car.price)}</div>
-        <div className="text-xs text-text-subtle uppercase tracking-wider">{formatMileage(car.mileage)}</div>
+        <div className="font-display font-bold text-lg" data-sanity={carAttr("price")}>
+          {formatPrice(car.price)}
+        </div>
+        <div className="text-xs text-text-subtle uppercase tracking-wider" data-sanity={carAttr("mileage")}>
+          {formatMileage(car.mileage)}
+        </div>
       </div>
     </div>
   );
@@ -383,7 +425,7 @@ function GridCard({ car }: { car: Car }) {
   if (isComingSoon) {
     return (
       <div
-        data-sanity={sanity.toString()}
+        data-sanity={sanity}
         className="group block bg-surface border border-border overflow-hidden cursor-default"
       >
         {media}
@@ -395,7 +437,7 @@ function GridCard({ car }: { car: Car }) {
   return (
     <Link
       href={`/inventory/${car.slug}`}
-      data-sanity={sanity.toString()}
+      data-sanity={sanity}
       className="group block bg-surface border border-border hover:border-brand dark:hover:border-white hover:ring-2 hover:ring-brand dark:hover:ring-white transition-all overflow-hidden"
     >
       {media}
@@ -405,12 +447,14 @@ function GridCard({ car }: { car: Car }) {
 }
 
 function ListCard({ car }: { car: Car }) {
-  const sanity = createDataAttribute({
-    baseUrl: "/studio",
-    id: car._id,
-    type: car._type,
-    path: "make",
-  });
+  const carAttr = (path: string) =>
+    createDataAttribute({
+      baseUrl: "/studio",
+      id: car._id,
+      type: car._type,
+      path,
+    }).toString();
+  const sanity = carAttr("make");
   const isComingSoon = car.status === "coming-soon";
 
   const imageInner = (
@@ -451,7 +495,7 @@ function ListCard({ car }: { car: Car }) {
 
   return (
     <div
-      data-sanity={sanity.toString()}
+      data-sanity={sanity}
       className="group grid grid-cols-[120px_1fr_auto] md:grid-cols-[55%_45%] py-4 md:py-6 gap-0 hover:bg-bg-elevated transition-colors"
     >
       {/* Image — coming-soon cars have no detail page, so render a static block. */}
@@ -474,10 +518,12 @@ function ListCard({ car }: { car: Car }) {
             {car.year} · {car.bodyType}
           </div>
           <h3 className="font-display font-bold text-base md:text-3xl mb-0.5 md:mb-1 leading-tight">
-            {car.make} {car.model}
+            <span data-sanity={carAttr("model")}>{car.make} {car.model}</span>
           </h3>
           {car.variant && (
-            <div className="text-text-muted text-xs md:text-base md:mb-4">{car.variant}</div>
+            <div className="text-text-muted text-xs md:text-base md:mb-4" data-sanity={carAttr("variant")}>
+              {car.variant}
+            </div>
           )}
           <div className="hidden md:flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-subtle mt-4">
             <span>{car.fuel}</span>
@@ -489,7 +535,7 @@ function ListCard({ car }: { car: Car }) {
 
         <div className="mt-2 md:mt-6">
           <div className="font-display font-bold text-base md:text-3xl md:mb-5">
-            {formatPrice(car.price)}
+            <span data-sanity={carAttr("price")}>{formatPrice(car.price)}</span>
           </div>
           {!isComingSoon && (
             <div className="hidden md:flex gap-3 mt-5">

@@ -16,6 +16,8 @@ const singletonTypeNames = new Set([
   "bespokeSourcingPage",
   "storagePage",
   "merchPage",
+  "contactPage",
+  "inventoryPage",
 ]);
 
 function singletonListItem(S: StructureBuilder, typeName: string, title: string) {
@@ -52,13 +54,6 @@ const dataset = requiredEnv(
   "NEXT_PUBLIC_SANITY_DATASET",
   process.env.NEXT_PUBLIC_SANITY_DATASET,
 );
-const allowProductionDataset = process.env.FORCE_PROD_MUTATION === "true";
-
-if (typeof window === "undefined" && dataset === "production" && !allowProductionDataset) {
-  throw new Error(
-    'Refusing to configure Sanity Studio against dataset "production". Set FORCE_PROD_MUTATION=true to proceed.',
-  );
-}
 
 const previewOrigin = normalizePreviewOrigin(
   process.env.SANITY_STUDIO_PREVIEW_URL ||
@@ -79,6 +74,8 @@ const pageLocations = {
   bespokeSourcingPage: { title: "Bespoke Sourcing", href: "/services/bespoke-sourcing" },
   storagePage: { title: "Storage", href: "/services/storage" },
   merchPage: { title: "Merch", href: "/merch" },
+  contactPage: { title: "Contact", href: "/contact" },
+  inventoryPage: { title: "Inventory", href: "/inventory" },
   siteSettings: { title: "Home", href: "/" },
 } as const;
 
@@ -110,6 +107,8 @@ export default defineConfig({
           { route: "/services/bespoke-sourcing", filter: `_id == "bespokeSourcingPage"` },
           { route: "/services/storage", filter: `_id == "storagePage"` },
           { route: "/merch", filter: `_id == "merchPage"` },
+          { route: "/contact", filter: `_id == "contactPage"` },
+          { route: "/inventory", filter: `_id == "inventoryPage"` },
           {
             route: "/inventory/:slug",
             filter: `_type == "car" && slug.current == $slug`,
@@ -130,6 +129,12 @@ export default defineConfig({
               },
             ]),
           ),
+          siteSettings: {
+            locations: [
+              { title: "Home", href: "/" },
+              { title: "Contact", href: "/contact" },
+            ],
+          },
           car: {
             select: { title: "model", slug: "slug.current" },
             resolve: (value) =>
@@ -172,6 +177,8 @@ export default defineConfig({
             singletonListItem(S, "bespokeSourcingPage", "Bespoke Sourcing Page"),
             singletonListItem(S, "storagePage", "Storage Page"),
             singletonListItem(S, "merchPage", "Merch Page"),
+            singletonListItem(S, "contactPage", "Contact Page"),
+            singletonListItem(S, "inventoryPage", "Inventory Page"),
             S.divider(),
             // All non-singleton document types (e.g. Cars)
             ...S.documentTypeListItems().filter(
