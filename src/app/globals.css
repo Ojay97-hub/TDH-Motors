@@ -19,6 +19,7 @@
 
   --font-display: var(--font-barlow);
   --font-sans: var(--font-barlow);
+  --font-nova: var(--font-outfit);
 
   --animate-fade-up: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in: fade-in 1s ease-out both;

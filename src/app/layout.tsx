@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
+import { Barlow, Outfit } from "next/font/google";
 import "./globals.css";
 
 const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -37,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={barlow.variable} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={`${barlow.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-bg text-text">
         {children}
       </body>
