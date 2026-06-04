@@ -94,7 +94,6 @@ export default defineConfig({
         preview: "/",
         previewMode: draftMode,
       },
-      allowOrigins: [previewOrigin],
       resolve: {
         mainDocuments: [
           // Pin each singleton route to its fixed document id so Presentation
