@@ -7,6 +7,7 @@ import { SignOutButton } from "../../../_components/SignOutButton";
 import { StatusSelect } from "../../../_components/StatusSelect";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotesForm } from "./NotesForm";
+import { ReplyForm } from "./ReplyForm";
 
 type Enquiry = {
   id: string;
@@ -199,6 +200,17 @@ export default async function EnquiryDetailPage({
             >
               Reply by email
             </a>
+
+            <div className="bg-surface border border-border p-5">
+              <h2 className="text-xs uppercase tracking-wider text-text-muted font-medium mb-3">
+                Send website reply
+              </h2>
+              <ReplyForm
+                enquiryId={enquiry.id}
+                customerName={enquiry.name}
+                currentUserEmail={user?.email}
+              />
+            </div>
 
             {enquiry.phone && (
               <a
