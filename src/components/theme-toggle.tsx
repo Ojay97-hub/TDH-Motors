@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 
 const THEME_CHANGE_EVENT = "tdh-theme-change";
+const DEFAULT_THEME = "dark";
 
 function applyStoredTheme() {
   if (typeof document === "undefined" || typeof window === "undefined") return;
@@ -12,15 +13,15 @@ function applyStoredTheme() {
     const stored = window.localStorage.getItem("theme");
     document.documentElement.setAttribute(
       "data-theme",
-      stored === "dark" || stored === "light" ? stored : "light",
+      stored === "dark" || stored === "light" ? stored : DEFAULT_THEME,
     );
   } catch {
-    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.setAttribute("data-theme", DEFAULT_THEME);
   }
 }
 
 function getThemeSnapshot() {
-  if (typeof document === "undefined") return "light";
+  if (typeof document === "undefined") return DEFAULT_THEME;
   return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
 }
 
@@ -50,7 +51,7 @@ function subscribeToTheme(onStoreChange: () => void) {
 }
 
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => "light");
+  const theme = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => DEFAULT_THEME);
   const dark = theme === "dark";
 
   function toggle() {

@@ -37,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={barlow.variable} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={barlow.variable} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-bg text-text">
         {children}
       </body>
