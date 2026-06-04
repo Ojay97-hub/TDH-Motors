@@ -389,6 +389,10 @@ const CONTACT_PAGE = {
   intro:
     "Drop us a line below, or come and see us. Viewings are by appointment so we can give you our undivided attention.",
   sidebarHeading: "Visit Us",
+  sharedContactDetails: {
+    _type: "reference",
+    _ref: "siteSettings",
+  },
   responseEyebrow: "Response Time",
   responseBody:
     "We typically respond to all enquiries within one working day. For urgent queries, please give us a call.",
