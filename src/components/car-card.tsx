@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Car, formatPrice, formatMileage } from "@/lib/cars";
-import { ArrowUpRight, Clock, ImageOff } from "lucide-react";
+import { ArrowUpRight, ImageOff } from "lucide-react";
 
 function CardContent({ car }: { car: Car }) {
   const isComingSoon = car.status === "coming-soon";
@@ -9,9 +9,14 @@ function CardContent({ car }: { car: Car }) {
     <>
       <div className="relative aspect-4/3 overflow-hidden bg-stone-700">
         {isComingSoon ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-stone-600 to-stone-800">
-            <Clock size={32} className="text-stone-300 mb-2" />
-            <div className="text-stone-300 text-sm font-medium">Coming Soon</div>
+          <div className="absolute inset-0 bg-black">
+            <Image
+              src="/coming-soon-tdh.png"
+              alt="Coming soon"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-contain"
+            />
           </div>
         ) : car.images[0] ? (
           <Image
@@ -35,11 +40,6 @@ function CardContent({ car }: { car: Car }) {
         {car.status === "sold" && (
           <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 text-xs uppercase tracking-widest font-medium">
             Sold
-          </div>
-        )}
-        {isComingSoon && (
-          <div className="absolute top-4 left-4 bg-amber-500 text-stone-900 px-3 py-1 text-xs uppercase tracking-widest font-medium">
-            Coming Soon
           </div>
         )}
         {!isComingSoon && (

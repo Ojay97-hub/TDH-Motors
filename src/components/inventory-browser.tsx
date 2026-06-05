@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createDataAttribute } from "next-sanity";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, ChevronDown, Clock, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ImageOff, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import type { Car } from "@/lib/cars";
 
 // Cars with no photos yet (typically an in-progress draft viewed in Presentation
@@ -22,9 +22,14 @@ function NoPhotoPlaceholder() {
 // CarCard) so the inventory list visibly reflects the status.
 function ComingSoonPlaceholder() {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-linear-to-br from-stone-600 to-stone-800 text-stone-300">
-      <Clock size={24} />
-      <span className="text-[10px] uppercase tracking-widest">Coming Soon</span>
+    <div className="absolute inset-0 bg-black">
+      <Image
+        src="/coming-soon-tdh.png"
+        alt="Coming soon"
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className="object-contain"
+      />
     </div>
   );
 }
@@ -384,11 +389,6 @@ function GridCard({ car }: { car: Car }) {
           Sold
         </div>
       )}
-      {isComingSoon && (
-        <div className="absolute top-3 left-3 bg-amber-500 text-stone-900 px-2.5 py-1 text-xs uppercase tracking-widest font-medium">
-          Coming Soon
-        </div>
-      )}
       {!isComingSoon && (
         <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <ArrowUpRight size={16} className="text-text" />
@@ -480,11 +480,6 @@ function ListCard({ car }: { car: Car }) {
       {car.status === "sold" && (
         <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-red-600 text-white px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
           Sold
-        </div>
-      )}
-      {isComingSoon && (
-        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-amber-500 text-stone-900 px-2 py-0.5 md:px-2.5 md:py-1 text-xs uppercase tracking-widest font-medium">
-          Coming Soon
         </div>
       )}
     </>
