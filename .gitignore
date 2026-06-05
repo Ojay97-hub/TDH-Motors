@@ -54,3 +54,6 @@ next-env.d.ts
 
 # review artifacts
 recent_changes.diff
+
+# invoices (kept locally, not for version control)
+/invoices/

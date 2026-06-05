@@ -6,35 +6,29 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 
-const leftNav = [
-  { href: "/", label: "Home" },
+const servicesItems = [
   { href: "/services/detailing", label: "Detailing" },
   { href: "/services/curated-sales", label: "Curated Sales" },
   { href: "/services/storage", label: "Storage" },
-];
-
-const rightNav = [
   { href: "/services/bespoke-sourcing", label: "Bespoke Sourcing" },
 ];
 
-const whoWeAreNav = {
-  href: "/contact",
-  label: "Contact",
-  children: [{ href: "/who-we-are", label: "Who We Are" }],
-};
+const leftNav = [
+  { href: "/", label: "Home" },
+  { href: "/who-we-are", label: "About" },
+];
 
-const inventoryNav = {
-  href: "/inventory",
-  label: "Inventory",
-  children: [{ href: "/merch", label: "Merch" }],
-};
+const rightNav = [
+  { href: "/contact", label: "Contact" },
+];
 
 const mobileNav = [
-  ...leftNav,
-  ...rightNav,
-  { href: "/who-we-are", label: "Who We Are" },
-  { href: "/contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  ...servicesItems,
+  { href: "/who-we-are", label: "About" },
   { href: "/merch", label: "Merch" },
+  { href: "/contact", label: "Contact" },
+  { href: "/inventory", label: "Inventory" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -60,10 +54,6 @@ function dropdownPanelClass(open: boolean) {
   }`;
 }
 
-// Drives a nav dropdown that opens on hover (mouse) or tap (touch).
-// `open = hovered || pinned`; the chevron toggles `pinned`, hover drives the
-// rest, and an outside tap or route change collapses it again. The owning
-// component passes its own `ref` so the outside-tap check can read it.
 function useNavDropdown(
   ref: RefObject<HTMLDivElement | null>,
   pathname: string,
@@ -72,8 +62,6 @@ function useNavDropdown(
   const [hovered, setHovered] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
 
-  // Collapse the dropdown when the route changes — React's recommended
-  // "adjust state during render" pattern, no extra effect pass needed.
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
     setPinned(false);
@@ -109,20 +97,8 @@ function dropdownItemClass(pathname: string, href: string) {
   }`;
 }
 
-function NavDropdown({
-  href,
-  label,
-  items,
-  pathname,
-}: {
-  href: string;
-  label: string;
-  items: { href: string; label: string }[];
-  pathname: string;
-}) {
-  const parentActive =
-    isActive(pathname, href) ||
-    items.some((child) => isActive(pathname, child.href));
+function ServicesDropdown({ pathname }: { pathname: string }) {
+  const parentActive = servicesItems.some((item) => isActive(pathname, item.href));
   const ref = useRef<HTMLDivElement>(null);
   const dropdown = useNavDropdown(ref, pathname);
 
@@ -133,100 +109,33 @@ function NavDropdown({
       onMouseEnter={dropdown.onMouseEnter}
       onMouseLeave={dropdown.onMouseLeave}
     >
-      <div
-        className={`flex items-center gap-0.5 pb-0.5 border-b-2 transition-colors ${
-          parentActive ? "border-brand" : "border-transparent"
+      <button
+        type="button"
+        onClick={dropdown.togglePinned}
+        aria-expanded={dropdown.open}
+        aria-label="Toggle Services menu"
+        className={`flex items-center gap-0.5 text-sm tracking-wider uppercase font-medium transition-colors pb-0.5 border-b-2 ${
+          parentActive
+            ? "text-text border-brand"
+            : "text-text/85 hover:text-text border-transparent"
         }`}
       >
-        <Link
-          href={href}
-          className={`text-sm tracking-wider uppercase font-medium transition-colors ${
-            parentActive ? "text-text" : "text-text/85 hover:text-text"
-          }`}
-        >
-          {label}
-        </Link>
-        <button
-          type="button"
-          onClick={dropdown.togglePinned}
-          aria-expanded={dropdown.open}
-          aria-label={`Toggle ${label} menu`}
-          className="flex items-center -m-1 p-1"
-        >
-          <ChevronDown
-            size={14}
-            className={`shrink-0 transition-transform ${
-              dropdown.open ? "rotate-180" : ""
-            } ${parentActive ? "text-text" : "text-text/85"}`}
-            aria-hidden
-          />
-        </button>
-      </div>
-      <div className={`right-0 ${dropdownPanelClass(dropdown.open)}`}>
-        <div className="min-w-40 border border-border/60 bg-bg shadow-lg py-1">
-          {items.map((child) => (
+        Services
+        <ChevronDown
+          size={14}
+          className={`shrink-0 transition-transform ${dropdown.open ? "rotate-180" : ""} ${parentActive ? "text-text" : "text-text/85"}`}
+          aria-hidden
+        />
+      </button>
+      <div className={dropdownPanelClass(dropdown.open)}>
+        <div className="min-w-44 border border-border/60 bg-bg shadow-lg py-1">
+          {servicesItems.map((item) => (
             <Link
-              key={child.href}
-              href={child.href}
-              className={dropdownItemClass(pathname, child.href)}
+              key={item.href}
+              href={item.href}
+              className={dropdownItemClass(pathname, item.href)}
             >
-              {child.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InventoryDropdown({ pathname }: { pathname: string }) {
-  const { href, label, children: items } = inventoryNav;
-  const parentActive =
-    isActive(pathname, href) ||
-    items.some((child) => isActive(pathname, child.href));
-  const ref = useRef<HTMLDivElement>(null);
-  const dropdown = useNavDropdown(ref, pathname);
-
-  return (
-    <div
-      ref={ref}
-      className="relative hidden lg:block"
-      onMouseEnter={dropdown.onMouseEnter}
-      onMouseLeave={dropdown.onMouseLeave}
-    >
-      <div
-        className={`inline-flex items-center font-medium text-sm tracking-wider uppercase transition-colors text-on-brand ${
-          parentActive ? "bg-brand-light" : "bg-brand hover:bg-brand-light"
-        }`}
-      >
-        <Link href={href} className="py-2.5 pl-5 pr-1">
-          {label}
-        </Link>
-        <button
-          type="button"
-          onClick={dropdown.togglePinned}
-          aria-expanded={dropdown.open}
-          aria-label={`Toggle ${label} menu`}
-          className="flex items-center py-2.5 pr-4 pl-1"
-        >
-          <ChevronDown
-            size={14}
-            className={`transition-transform ${
-              dropdown.open ? "rotate-180" : ""
-            }`}
-            aria-hidden
-          />
-        </button>
-      </div>
-      <div className={`right-0 ${dropdownPanelClass(dropdown.open)}`}>
-        <div className="min-w-40 border border-border/60 bg-bg shadow-lg py-1">
-          {items.map((child) => (
-            <Link
-              key={child.href}
-              href={child.href}
-              className={dropdownItemClass(pathname, child.href)}
-            >
-              {child.label}
+              {item.label}
             </Link>
           ))}
         </div>
@@ -253,6 +162,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <ServicesDropdown pathname={pathname} />
         </nav>
 
         <Link href="/" className="flex items-center lg:justify-self-center group">
@@ -278,15 +188,27 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <NavDropdown
-              href={whoWeAreNav.href}
-              label={whoWeAreNav.label}
-              items={whoWeAreNav.children}
-              pathname={pathname}
-            />
           </nav>
 
-          <InventoryDropdown pathname={pathname} />
+          <Link
+            href="/merch"
+            className={`hidden lg:inline-flex items-center font-medium text-sm tracking-wider uppercase transition-colors py-2.5 px-5 border border-text/60 ${
+              isActive(pathname, "/merch")
+                ? "bg-text/10 text-text"
+                : "bg-transparent text-text/85 hover:text-text hover:border-text/80 hover:bg-text/5"
+            }`}
+          >
+            Merch
+          </Link>
+
+          <Link
+            href="/inventory"
+            className={`hidden lg:inline-flex items-center font-medium text-sm tracking-wider uppercase transition-colors text-on-brand py-2.5 px-5 ${
+              isActive(pathname, "/inventory") ? "bg-brand-light" : "bg-brand hover:bg-brand-light"
+            }`}
+          >
+            Inventory
+          </Link>
 
           <button
             onClick={() => setOpen(!open)}
@@ -311,13 +233,6 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href={inventoryNav.href}
-              onClick={closeMenu}
-              className="inline-flex items-center justify-center w-full px-5 py-3 bg-brand hover:bg-brand-light text-on-brand font-medium tracking-wider uppercase transition-colors mt-2"
-            >
-              {inventoryNav.label}
-            </Link>
           </nav>
         </div>
       )}
