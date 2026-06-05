@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin, hasAdminMetadata } from "@/lib/admin-auth";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import { createServiceClient } from "@/lib/supabase-server";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { SignOutButton } from "../../_components/SignOutButton";
 import { InviteUserForm } from "../../_components/InviteUserForm";
 import { DeleteUserButton } from "../../_components/DeleteUserButton";
 import { EditEmailForm } from "../../_components/EditEmailForm";
+import { RoleToggleButton } from "../../_components/RoleToggleButton";
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
@@ -92,6 +93,9 @@ export default async function UsersPage() {
                       Status
                     </th>
                     <th className="text-left px-6 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
+                      Admin access
+                    </th>
+                    <th className="text-left px-6 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
                       Invited
                     </th>
                     <th className="text-left px-6 py-3 text-text-subtle font-medium uppercase tracking-wider text-xs">
@@ -104,6 +108,7 @@ export default async function UsersPage() {
                   {users.map((u) => {
                     const isCurrentUser = u.id === currentUser?.id;
                     const isPending = !u.last_sign_in_at;
+                    const isAdmin = hasAdminMetadata(u);
 
                     return (
                       <tr key={u.id} className="hover:bg-bg-elevated transition-colors">
@@ -123,6 +128,25 @@ export default async function UsersPage() {
                           >
                             {isPending ? "Pending" : "Active"}
                           </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
+                                isAdmin
+                                  ? "bg-brand/10 text-brand"
+                                  : "bg-bg-elevated text-text-subtle"
+                              }`}
+                            >
+                              {isAdmin ? "Admin" : "No access"}
+                            </span>
+                            <RoleToggleButton
+                              userId={u.id}
+                              email={u.email ?? u.id}
+                              isAdmin={isAdmin}
+                              isSelf={isCurrentUser}
+                            />
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-text-muted whitespace-nowrap">
                           {formatDate(u.created_at)}

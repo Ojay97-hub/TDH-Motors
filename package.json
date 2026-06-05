@@ -11,7 +11,8 @@
     "verify": "npm run typecheck && npm run lint && npm run build",
     "studio": "sanity dev",
     "seed": "node --env-file=.env --import tsx scripts/seed-sanity.ts",
-    "seed:content": "node --env-file=.env scripts/seed-content.mjs"
+    "seed:content": "node --env-file=.env scripts/seed-content.mjs",
+    "grant-admin": "node --env-file=.env scripts/grant-admin.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

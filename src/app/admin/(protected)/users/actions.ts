@@ -46,6 +46,31 @@ export async function inviteUser(_prev: { error?: string; success?: string }, fo
   return { success: `Invite sent to ${email}.` };
 }
 
+export async function setAdminRole(
+  userId: string,
+  makeAdmin: boolean
+): Promise<{ error?: string }> {
+  if (!userId || typeof userId !== "string") return { error: "Invalid user ID." };
+
+  const caller = await requireAuth();
+  // Guard against locking yourself out — you can always be re-granted via the
+  // `grant-admin` break-glass script, but prevent the obvious foot-gun.
+  if (caller.id === userId && !makeAdmin) {
+    return { error: "You cannot remove your own admin access." };
+  }
+
+  const supabase = createServiceClient();
+  // Supabase merges app_metadata keys; setting role to null removes it. This
+  // preserves other metadata (provider, etc.) and only touches the role.
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    app_metadata: { role: makeAdmin ? "admin" : null },
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/users");
+  return {};
+}
+
 export async function deleteUser(userId: string): Promise<{ error?: string }> {
   if (!userId || typeof userId !== "string") return { error: "Invalid user ID." };
 

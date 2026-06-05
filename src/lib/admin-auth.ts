@@ -2,7 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase-server";
 
-function hasAdminMetadata(user: User) {
+export function hasAdminMetadata(user: User) {
   const role = user.app_metadata?.role;
   const roles = user.app_metadata?.roles;
 
