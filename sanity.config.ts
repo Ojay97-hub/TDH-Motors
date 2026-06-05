@@ -46,13 +46,26 @@ function requiredEnv(name: string, value: string | undefined) {
 }
 
 const isProduction = process.env.NODE_ENV === "production";
+
+// projectId/dataset must resolve in BOTH bundlers:
+//  - Next.js (the embedded /studio route) exposes NEXT_PUBLIC_* vars.
+//  - The Sanity CLI (`sanity deploy` → tdh-motors.sanity.studio) ONLY bakes in
+//    vars prefixed SANITY_STUDIO_; it ignores NEXT_PUBLIC_*. Without a source it
+//    can see, the hosted studio throws "Missing required environment variable".
+// Neither value is secret (the projectId is shipped to the browser regardless),
+// so a hardcoded fallback is safe and keeps the hosted studio working even if no
+// env var is set. Use literal static member access so Vite can replace it.
 const projectId = requiredEnv(
-  "NEXT_PUBLIC_SANITY_PROJECT_ID",
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  "SANITY_STUDIO_SANITY_PROJECT_ID / NEXT_PUBLIC_SANITY_PROJECT_ID",
+  process.env.SANITY_STUDIO_SANITY_PROJECT_ID ??
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??
+    "sk5os0jg",
 );
 const dataset = requiredEnv(
-  "NEXT_PUBLIC_SANITY_DATASET",
-  process.env.NEXT_PUBLIC_SANITY_DATASET,
+  "SANITY_STUDIO_SANITY_DATASET / NEXT_PUBLIC_SANITY_DATASET",
+  process.env.SANITY_STUDIO_SANITY_DATASET ??
+    process.env.NEXT_PUBLIC_SANITY_DATASET ??
+    "production",
 );
 
 const previewOrigin = normalizePreviewOrigin(
