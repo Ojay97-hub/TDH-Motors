@@ -120,8 +120,32 @@ export const merchPageQuery = defineQuery(`*[_id == "merchPage"][0]{
   }, [])
 }`);
 
+const detailingPackageProjection = /* groq */ `
+  name,
+  "slug": slug.current,
+  tier,
+  tagline,
+  price,
+  priceNote,
+  duration,
+  "includes": coalesce(includes, []),
+  featured,
+  badgeLabel,
+  ctaLabel,
+  ctaLink,
+  longDescription,
+  "detailSections": coalesce(detailSections[] {
+    title,
+    "items": coalesce(items, []),
+  }, []),
+  "image": image.asset->url
+`;
+
 export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
   ...,
+  "packages": coalesce(packages[] {
+    ${detailingPackageProjection}
+  }, []),
   "beforeAfterGallery": coalesce(beforeAfterGallery[] {
     label,
     serviceTag,
@@ -141,8 +165,42 @@ export const detailingPageQuery = defineQuery(`*[_id == "detailingPage"][0] {
     orientation,
     "videoFile": videoFile.asset->url,
     videoUrl,
+  }, []),
+  "socialFeed": coalesce(socialFeed[] {
+    platform,
+    caption,
+    postUrl,
+    "image": image.asset->url,
+    "videoFile": videoFile.asset->url,
   }, [])
 }`);
+
+// Package detail pages read only the slice of the detailing page they need:
+// the matching package plus the shared booking CTA copy.
+export const detailingPackageBySlugQuery = defineQuery(`*[_id == "detailingPage"][0] {
+  "package": packages[slug.current == $slug][0] {
+    ${detailingPackageProjection}
+  },
+  ctaHeading,
+  ctaBody,
+  ctaLabel,
+  ctaLink,
+  partnerNote
+}`);
+
+export const detailingPackageSlugsQuery = defineQuery(`
+  *[_id == "detailingPage"][0].packages[defined(slug.current)].slug.current
+`);
+
+// The contact form only needs enough to label and identify each tier in its
+// package picker, so it skips the heavy projection above.
+export const detailingPackageOptionsQuery = defineQuery(`
+  coalesce(*[_id == "detailingPage"][0].packages[] {
+    name,
+    "slug": slug.current,
+    price
+  }, [])
+`);
 
 export const merchProductsQuery = defineQuery(`
   *[_type == "merchProduct" && status != "hidden"] | order(coalesce(sortOrder, 100) asc, _createdAt desc) {

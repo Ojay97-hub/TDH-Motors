@@ -51,10 +51,19 @@ export function ctaLinkField(opts: {
       opts.description ??
       'Where this button goes. Use an internal path like "/contact", an anchor like "#section", or a full URL like "https://...".',
     validation: (r) =>
-      r.custom((value) =>
-        !value || isSafeCmsHref(value)
-          ? true
-          : 'Use an internal path like "/contact", an anchor like "#section", or http/https/mailto/tel.',
-      ),
+      r
+        // The `url` type carries an implicit `uri({allowRelative: false, scheme:
+        // ['http', 'https']})` rule that the custom check below cannot override —
+        // user validation is chained onto that base rule, not swapped for it. Left
+        // alone it rejects every internal path, anchor and mailto:/tel: link this
+        // field exists to accept. Re-declaring `uri()` replaces the implicit
+        // constraint; `isSafeCmsHref` below still rejects protocol-relative hrefs
+        // such as //example.com, which `allowRelative` on its own would permit.
+        .uri({ allowRelative: true, scheme: ["http", "https", "mailto", "tel"] })
+        .custom((value) =>
+          !value || isSafeCmsHref(value)
+            ? true
+            : 'Use an internal path like "/contact", an anchor like "#section", or http/https/mailto/tel.',
+        ),
   });
 }

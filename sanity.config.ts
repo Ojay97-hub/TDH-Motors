@@ -1,5 +1,5 @@
 import { defineConfig } from "sanity";
-import { presentationTool } from "sanity/presentation";
+import { presentationTool, type PreviewUrlResolverOptions } from "sanity/presentation";
 import { structureTool, type StructureBuilder } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
@@ -33,8 +33,7 @@ function singletonListItem(S: StructureBuilder, typeName: string, title: string)
 }
 
 function normalizePreviewOrigin(value?: string) {
-  const normalized = value?.trim().replace(/\/+$/, "");
-  return normalized || "http://localhost:3000";
+  return value?.trim().replace(/\/+$/, "") || "";
 }
 
 function requiredEnv(name: string, value: string | undefined) {
@@ -68,14 +67,33 @@ const dataset = requiredEnv(
     "production",
 );
 
+// The site Presentation previews in its iframe. Each bundler only ever sees one
+// of these vars (the Sanity CLI bakes in SANITY_STUDIO_*, Next.js bakes in
+// NEXT_PUBLIC_*), and both may be unset — hence the empty fallback, which makes
+// `initial` below default to the studio's own location.origin. Never hardcode a
+// dev port here: `next dev` falls back to 3001+ whenever 3000 is taken, and a
+// stale localhost:3000 silently previews whatever *other* app claimed that port.
+// That app doesn't load @sanity/visual-editing, so Presentation just sits there
+// until it times out with "Unable to connect to visual editing".
 const previewOrigin = normalizePreviewOrigin(
   process.env.SANITY_STUDIO_PREVIEW_URL ||
     process.env.NEXT_PUBLIC_SITE_URL,
 );
-const draftMode = {
-  enable: `${previewOrigin}/api/draft-mode/enable`,
-  disable: `${previewOrigin}/api/draft-mode/disable`,
-  shareAccess: true,
+
+const previewUrl: PreviewUrlResolverOptions = {
+  // Left undefined when no env var is set, so Presentation defaults to the
+  // studio's own location.origin — correct for the embedded /studio route on
+  // any port and in every deployed environment. (`origin`/`preview` are
+  // deprecated in favour of this single `initial` URL.)
+  initial: previewOrigin || undefined,
+  // Derive the draft-mode routes from the origin actually being previewed
+  // rather than from a build-time constant, so they can never point at a
+  // different host than the iframe itself.
+  previewMode: ({ targetOrigin }) => ({
+    enable: `${targetOrigin}/api/draft-mode/enable`,
+    disable: `${targetOrigin}/api/draft-mode/disable`,
+    shareAccess: true,
+  }),
 };
 
 const pageLocations = {
@@ -101,12 +119,7 @@ export default defineConfig({
   schema: { types: schemaTypes },
   plugins: [
     presentationTool({
-      previewUrl: {
-        initial: previewOrigin,
-        origin: previewOrigin,
-        preview: "/",
-        previewMode: draftMode,
-      },
+      previewUrl,
       resolve: {
         mainDocuments: [
           // Pin each singleton route to its fixed document id so Presentation

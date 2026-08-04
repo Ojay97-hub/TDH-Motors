@@ -2,8 +2,17 @@ import type { Metadata } from "next";
 import { createDataAttribute } from "next-sanity";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
+import {
+  DEFAULT_DETAILING_PACKAGES,
+  toPackageOptions,
+  type DetailingPackage,
+} from "@/lib/detailing-packages";
 import { safeSanityFetch } from "@/sanity/client";
-import { contactPageQuery, siteSettingsQuery } from "@/sanity/queries";
+import {
+  contactPageQuery,
+  detailingPackageOptionsQuery,
+  siteSettingsQuery,
+} from "@/sanity/queries";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -13,13 +22,27 @@ export const metadata: Metadata = {
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ car?: string }>;
+  searchParams: Promise<{ car?: string; type?: string; package?: string }>;
 }) {
-  const [{ car }, settings, cms] = await Promise.all([
-    searchParams,
-    safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
-    safeSanityFetch(contactPageQuery, {}, { next: { revalidate: 60, tags: ["contactPage"] } }),
-  ]);
+  // `package` is a reserved word in strict mode, so it can't be destructured
+  // under its own name.
+  const [{ car, type: enquiryType, package: packageParam }, settings, cms, cmsPackages] =
+    await Promise.all([
+      searchParams,
+      safeSanityFetch(siteSettingsQuery, {}, { next: { revalidate: 60, tags: ["siteSettings"] } }),
+      safeSanityFetch(contactPageQuery, {}, { next: { revalidate: 60, tags: ["contactPage"] } }),
+      safeSanityFetch<DetailingPackage[]>(
+        detailingPackageOptionsQuery,
+        {},
+        { next: { revalidate: 60, tags: ["detailingPage"] } },
+      ),
+    ]);
+
+  // Mirrors the detailing page's fallback so both surfaces always offer the
+  // same tiers, even before an editor has populated Sanity.
+  const packageOptions = toPackageOptions(
+    cmsPackages?.length ? cmsPackages : DEFAULT_DETAILING_PACKAGES,
+  );
 
   const eyebrow = cms?.eyebrow ?? "Get In Touch";
   const heading = cms?.heading ?? "Contact Us";
@@ -58,7 +81,12 @@ export default async function ContactPage({
       <section className="container-page pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <ContactForm prefilledCar={car} />
+            <ContactForm
+              prefilledCar={car}
+              prefilledType={enquiryType}
+              prefilledPackage={packageParam}
+              packages={packageOptions}
+            />
           </div>
 
           <div className="lg:col-span-5">

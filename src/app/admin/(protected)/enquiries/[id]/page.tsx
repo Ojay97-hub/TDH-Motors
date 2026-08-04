@@ -17,6 +17,7 @@ type Enquiry = {
   phone: string | null;
   car: string | null;
   type: string;
+  package: string | null;
   message: string;
   status: string;
   notes: string | null;
@@ -183,6 +184,12 @@ export default async function EnquiryDetailPage({
                   <dt className="text-sm text-text-muted mb-0.5">Type</dt>
                   <dd className="text-sm text-text">{enquiry.type}</dd>
                 </div>
+                {enquiry.package && (
+                  <div>
+                    <dt className="text-sm text-text-muted mb-0.5">Package</dt>
+                    <dd className="text-sm text-text">{enquiry.package}</dd>
+                  </div>
+                )}
                 {enquiry.car && (
                   <div className="sm:col-span-2">
                     <dt className="text-sm text-text-muted mb-0.5">Car interest</dt>

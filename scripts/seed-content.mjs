@@ -164,6 +164,163 @@ const DETAILING_PAGE = {
     "From ceramic coating protection to full paintwork correction, our professional detailing team — TDH Detailing in partnership with TT Auto detailers — delivers showroom results that last. Every service uses industry-leading Gtechniq products and meticulous preparation.",
   pricingBody:
     "Prices start from £200. Every car is different, so final costing is assessed case by case — get in touch for a tailored quote.",
+  packagesEyebrow: "Packages",
+  packagesHeading: "Choose Your Detail",
+  packagesIntro:
+    "Three levels of detail, from a thorough maintenance clean through to full paint correction and ceramic protection. Not sure which you need? Send us a photo and we'll tell you straight.",
+  // ⚠️ PLACEHOLDER PRICING — tier prices and durations are unconfirmed. Replace
+  // with the detailing team's real figures before this goes in front of customers.
+  packages: [
+    {
+      _key: "silver",
+      slug: { _type: "slug", current: "silver" },
+      tier: "Tier One",
+      name: "Silver",
+      tagline: "A thorough interior and exterior clean to refresh and maintain a pristine appearance.",
+      price: "From £200",
+      duration: "Approx. 3 hours",
+      includes: [
+        "Wheel, arch and tyre deep clean",
+        "Snow foam pre-wash and two-bucket wash",
+        "Contactless dry and detail spray",
+        "Full interior vacuum and wipe-down",
+        "Glass cleaned inside and out, streak-free",
+        "Tyre dressing and trim finish",
+      ],
+      ctaLabel: "Book Silver",
+      ctaLink: "/contact",
+      longDescription:
+        "Our entry-level detail is built around doing the basics properly. Every stage uses pH-neutral products and a scratch-avoiding wash method, so the car comes back genuinely clean without picking up the swirl marks a quick supermarket wash would leave behind. Ideal as regular upkeep between bigger details, or to smarten a car up before it goes on sale.",
+      detailSections: [
+        {
+          _key: "silver-exterior",
+          title: "Exterior",
+          items: [
+            "Wheels rinsed and cleaned with a dedicated wheel cleaner",
+            "Arches, tyres and wheel faces agitated with soft brushes",
+            "pH-neutral snow foam pre-wash to lift loose grit",
+            "Two-bucket contact wash with lamb's wool mitts",
+            "Contactless dry with filtered air and plush drying towels",
+            "Detail spray for gloss, plus tyre dressing and trim finish",
+          ],
+        },
+        {
+          _key: "silver-interior",
+          title: "Interior",
+          items: [
+            "Full vacuum of carpets, mats, seats and boot",
+            "All hard surfaces wiped down and dressed",
+            "Vents, switchgear and tight areas cleaned with detail brushes",
+            "Glass cleaned inside and out for a streak-free finish",
+            "Light odour neutralise and interior fragrance",
+          ],
+        },
+      ],
+    },
+    {
+      _key: "gold",
+      slug: { _type: "slug", current: "gold" },
+      tier: "Tier Two",
+      name: "Gold",
+      tagline: "Everything in Silver plus decontamination and a single-stage machine polish for real gloss.",
+      price: "From £350",
+      duration: "Approx. 6 hours",
+      featured: true,
+      badgeLabel: "Most Popular",
+      includes: [
+        "Everything in the Silver package",
+        "Iron X and Tardis chemical decontamination",
+        "Clay bar treatment across all panels",
+        "Single-stage machine polish",
+        "Gtechniq C2 Liquid Crystal applied",
+        "Interior steam clean and fabric protection",
+      ],
+      ctaLabel: "Book Gold",
+      ctaLink: "/contact",
+      longDescription:
+        "Gold is where the paint starts to properly transform. On top of everything in the Silver package, we chemically and mechanically decontaminate the paintwork, then machine polish to remove light marring and lift gloss. The finish is sealed with Gtechniq C2 Liquid Crystal for months of protection and strong water beading. This is the package most customers land on.",
+      detailSections: [
+        {
+          _key: "gold-paint",
+          title: "Everything in Silver, plus",
+          items: [
+            "Iron X fallout remover to dissolve bonded iron particles",
+            "Tardis tar and glue removal on lower panels and arches",
+            "Clay bar treatment to leave the paint glass-smooth",
+            "Single-stage machine polish to remove light swirls and haze",
+            "Gtechniq C2 Liquid Crystal sealant applied by hand",
+          ],
+        },
+        {
+          _key: "gold-interior",
+          title: "Interior",
+          items: [
+            "Seat shampoo and extraction on fabric interiors",
+            "Steam clean of trim, vents and tight seams",
+            "Leather cleaned and conditioned where fitted",
+            "Fabric and carpet protection applied",
+          ],
+        },
+      ],
+    },
+    {
+      _key: "platinum",
+      slug: { _type: "slug", current: "platinum" },
+      tier: "Tier Three",
+      name: "Platinum",
+      tagline: "Our ultimate detail — multi-stage paint correction finished with Gtechniq ceramic protection.",
+      price: "From £600",
+      duration: "1–2 days",
+      includes: [
+        "Everything in the Gold package",
+        "1–5 stage machine polish to remove swirls",
+        "Panel wipe to strip all oils and fillers",
+        "Gtechniq Crystal Serum Light and Exo coating",
+        "Wheel Armour and glass coating",
+        "Leather, fabric and dash protection",
+      ],
+      ctaLabel: "Book Platinum",
+      ctaLink: "/contact",
+      longDescription:
+        "The full works. Platinum is a multi-stage paint correction that removes the swirl marks, holograms and fine scratches that dull a finish in direct sunlight, followed by a nano ceramic coating that locks the result in for years rather than months. Paintwork is panel-wiped before coating so nothing is hidden by polishing oils — what you see is the true corrected finish.",
+      detailSections: [
+        {
+          _key: "platinum-correction",
+          title: "Paint correction",
+          items: [
+            "Full decontamination wash, clay and panel prep",
+            "Paint depth readings taken before any correction",
+            "1–5 stage machine polish depending on condition",
+            "Removal of swirl marks, holograms and fine scratches",
+            "Panel wipe to strip all oils, fillers and residues",
+          ],
+        },
+        {
+          _key: "platinum-protection",
+          title: "Protection",
+          items: [
+            "Gtechniq Crystal Serum Light nano ceramic coating",
+            "Gtechniq Exo hydrophobic top layer",
+            "Wheel Armour applied to wheel faces and barrels",
+            "Glass coating for improved wet-weather visibility",
+            "Matt Dash, i Leather and i Fabric interior protection",
+          ],
+        },
+      ],
+    },
+  ],
+  packagesNote:
+    "Prices are a guide based on a standard-size car in average condition. Larger vehicles, heavier soiling and severe paint defects are quoted individually — every car is assessed before we commit to a price.",
+  socialEyebrow: "Straight From The Socials",
+  socialHeading: "See The Work As It Happens",
+  socialIntro:
+    "Every car that comes through the unit ends up on our Instagram and TikTok. Tap any post to watch the full thing.",
+  socialHandles: [
+    { _key: "instagram", platform: "Instagram", handle: "@thedoghouse_as", url: "https://www.instagram.com/thedoghouse_as" },
+    { _key: "tiktok", platform: "TikTok", handle: "@thedoghouseas", url: "https://www.tiktok.com/@thedoghouseas" },
+  ],
+  socialCtaLabel: "See More On Instagram",
+  socialCtaLink: "https://www.instagram.com/thedoghouse_as",
   services: [
     {
       _key: "new-car-protection",

@@ -16,6 +16,9 @@ const schema = z.object({
   phone: z.string().trim().max(60).optional(),
   car: z.string().trim().max(160).optional(),
   type: z.enum(enquiryTypes),
+  // Detailing tier the enquiry came from, e.g. "Silver". Free text rather than
+  // an enum because the tiers are editor-defined in Sanity.
+  package: z.string().trim().max(120).optional(),
   message: z.string().trim().min(1).max(4000),
 });
 
@@ -42,6 +45,9 @@ function escapeHtml(value: string) {
 function detailRows(enquiry: Enquiry) {
   return [
     ["Enquiry type", enquiry.type],
+    // Only shown when set, so non-detailing enquiries aren't padded with an
+    // empty row.
+    ...(enquiry.package ? [["Package", enquiry.package]] : []),
     ["Name", enquiry.name],
     ["Email", enquiry.email],
     ["Phone", enquiry.phone || "Not provided"],
@@ -71,6 +77,7 @@ function buildAdminEmail(enquiry: Enquiry, enquiryId?: string, requestOrigin?: s
   const adminUrl = siteUrl && enquiryId ? `${siteUrl}/admin/enquiries/${enquiryId}` : undefined;
   const subjectParts = ["New", enquiry.type, "enquiry"];
 
+  if (enquiry.package) subjectParts.push(`for ${enquiry.package}`);
   if (enquiry.car) subjectParts.push(`about ${enquiry.car}`);
 
   const subject = `TDH Motors: ${subjectParts.join(" ")} from ${enquiry.name}`;

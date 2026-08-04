@@ -7,10 +7,12 @@ export const detailingPage = defineType({
   type: "document",
   groups: [
     { name: "hero", title: "Hero", default: true },
+    { name: "packages", title: "Packages" },
     { name: "services", title: "Services" },
     { name: "beforeAfter", title: "Before & After" },
     { name: "gallery", title: "Photo Gallery" },
     { name: "videos", title: "Videos" },
+    { name: "social", title: "Social Feed" },
     { name: "footer", title: "Footer CTA" },
   ],
   fields: [
@@ -18,6 +20,154 @@ export const detailingPage = defineType({
     defineField({ name: "heading", title: "Heading", type: "string", group: "hero" }),
     defineField({ name: "intro", title: "Intro", type: "text", rows: 4, group: "hero" }),
     defineField({ name: "pricingBody", title: "Pricing body", type: "text", rows: 3, group: "hero" }),
+    defineField({ name: "packagesEyebrow", title: "Packages eyebrow", type: "string", group: "packages" }),
+    defineField({ name: "packagesHeading", title: "Packages heading", type: "string", group: "packages" }),
+    defineField({ name: "packagesIntro", title: "Packages intro", type: "text", rows: 3, group: "packages" }),
+    defineField({
+      name: "packages",
+      title: "Packages",
+      description:
+        "Tiered packages shown as a row of cards, cheapest first. Leave empty to hide the whole section. Confirm every price and duration with the detailing team before publishing.",
+      type: "array",
+      group: "packages",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "name",
+              title: "Package name",
+              type: "string",
+              description: 'e.g. "Silver" or "Essential Detail"',
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "slug",
+              title: "Slug",
+              type: "slug",
+              description: "Used for the package's own page, e.g. /services/detailing/packages/silver",
+              options: { source: "name", maxLength: 60 },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "tier",
+              title: "Tier label",
+              type: "string",
+              description: 'Small text above the name, e.g. "Tier One" or "Entry".',
+            }),
+            defineField({
+              name: "image",
+              title: "Package photo",
+              type: "image",
+              options: { hotspot: true },
+              description: "A car that shows off this level of detail. Landscape crops work best.",
+            }),
+            defineField({ name: "tagline", title: "Tagline", type: "text", rows: 2 }),
+            defineField({
+              name: "price",
+              title: "Price",
+              type: "string",
+              description: 'e.g. "From £200" or "POA"',
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "priceNote",
+              title: "Price note",
+              type: "string",
+              description: 'Small text next to the price, e.g. "per vehicle".',
+            }),
+            defineField({
+              name: "duration",
+              title: "Duration",
+              type: "string",
+              description: 'e.g. "2 hr 30 min"',
+            }),
+            defineField({
+              name: "includes",
+              title: "What's included",
+              type: "array",
+              of: [defineArrayMember({ type: "string" })],
+            }),
+            defineField({
+              name: "featured",
+              title: "Highlight this package",
+              type: "boolean",
+              description: "Lifts the card and adds a badge. Use on one package only.",
+              initialValue: false,
+            }),
+            defineField({
+              name: "badgeLabel",
+              title: "Badge label",
+              type: "string",
+              description: 'Shown when highlighted. Defaults to "Most Popular".',
+              hidden: ({ parent }) => !parent?.featured,
+            }),
+            defineField({ name: "ctaLabel", title: "Button label", type: "string" }),
+            ctaLinkField({
+              name: "ctaLink",
+              title: "Button link",
+              description: "Where the package button goes. Defaults to /contact.",
+            }),
+            defineField({
+              name: "longDescription",
+              title: "Full description",
+              type: "text",
+              rows: 6,
+              description:
+                'Shown on the package\'s own page. Adding this (or the breakdown below) is what makes the "Read More" link appear on the card.',
+            }),
+            defineField({
+              name: "detailSections",
+              title: "Detailed breakdown",
+              description: 'Grouped lists on the package page, e.g. "Exterior" and "Interior".',
+              type: "array",
+              of: [
+                defineArrayMember({
+                  type: "object",
+                  fields: [
+                    defineField({
+                      name: "title",
+                      title: "Section title",
+                      type: "string",
+                      validation: (r) => r.required(),
+                    }),
+                    defineField({
+                      name: "items",
+                      title: "Items",
+                      type: "array",
+                      of: [defineArrayMember({ type: "string" })],
+                    }),
+                  ],
+                  preview: {
+                    select: { title: "title", items: "items" },
+                    prepare: ({ title, items }) => ({
+                      title,
+                      subtitle: `${items?.length ?? 0} item${items?.length === 1 ? "" : "s"}`,
+                    }),
+                  },
+                }),
+              ],
+            }),
+          ],
+          preview: {
+            select: { title: "name", price: "price", duration: "duration", featured: "featured", media: "image" },
+            prepare: ({ title, price, duration, featured, media }) => ({
+              title: featured ? `★ ${title}` : title,
+              subtitle: [price, duration].filter(Boolean).join(" · "),
+              media,
+            }),
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "packagesNote",
+      title: "Packages footnote",
+      type: "text",
+      rows: 2,
+      group: "packages",
+      description: "Small print under the cards, e.g. how size and condition affect the final price.",
+    }),
     defineField({
       name: "services",
       title: "Detailing services",
@@ -223,6 +373,120 @@ export const detailingPage = defineType({
           preview: { select: { title: "title" } },
         }),
       ],
+    }),
+    defineField({ name: "socialEyebrow", title: "Social eyebrow", type: "string", group: "social" }),
+    defineField({ name: "socialHeading", title: "Social heading", type: "string", group: "social" }),
+    defineField({ name: "socialIntro", title: "Social intro", type: "text", rows: 3, group: "social" }),
+    defineField({
+      name: "socialHandles",
+      title: "Follow buttons",
+      description: "Shown above the grid. Usually Instagram and TikTok.",
+      type: "array",
+      group: "social",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "platform",
+              title: "Platform",
+              type: "string",
+              options: {
+                list: [
+                  { title: "Instagram", value: "Instagram" },
+                  { title: "TikTok", value: "TikTok" },
+                  { title: "Facebook", value: "Facebook" },
+                ],
+              },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "handle",
+              title: "Handle",
+              type: "string",
+              description: 'e.g. "@thedoghouse_as"',
+            }),
+            ctaLinkField({ name: "url", title: "Profile URL", description: "Full link to the profile." }),
+          ],
+          preview: { select: { title: "platform", subtitle: "handle" } },
+        }),
+      ],
+    }),
+    defineField({
+      name: "socialFeed",
+      title: "Social posts",
+      description:
+        "Square tiles of recent social content. Upload the photo (or a short clip) and paste the link to the real post — each tile opens that post. Leave empty to hide the section.",
+      type: "array",
+      group: "social",
+      of: [
+        defineArrayMember({
+          type: "object",
+          fields: [
+            defineField({
+              name: "platform",
+              title: "Platform",
+              type: "string",
+              options: {
+                list: [
+                  { title: "Instagram", value: "Instagram" },
+                  { title: "TikTok", value: "TikTok" },
+                  { title: "Facebook", value: "Facebook" },
+                ],
+              },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "image",
+              title: "Photo",
+              type: "image",
+              options: { hotspot: true },
+              description: "Square crops look best. Use this OR a video clip below.",
+            }),
+            defineField({
+              name: "videoFile",
+              title: "Video clip",
+              type: "file",
+              options: { accept: "video/*" },
+              description: "Short MP4. Only used when no photo is uploaded.",
+            }),
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+              description: "Optional — appears on hover.",
+            }),
+            ctaLinkField({
+              name: "postUrl",
+              title: "Link to post",
+              description: "The Instagram / TikTok / Facebook post this tile opens.",
+            }),
+          ],
+          validation: (rule) =>
+            rule.custom((obj) => {
+              const item = obj as { image?: unknown; videoFile?: unknown } | undefined;
+              if (!item?.image && !item?.videoFile) {
+                return "Upload a photo or a video clip";
+              }
+              return true;
+            }),
+          preview: {
+            select: { title: "caption", subtitle: "platform", media: "image" },
+            prepare: ({ title, subtitle, media }) => ({
+              title: title || "Untitled post",
+              subtitle,
+              media,
+            }),
+          },
+        }),
+      ],
+    }),
+    defineField({ name: "socialCtaLabel", title: "Social CTA label", type: "string", group: "social" }),
+    ctaLinkField({
+      name: "socialCtaLink",
+      title: "Social CTA link",
+      group: "social",
+      description: "Where the button under the grid goes — usually the Instagram or TikTok profile.",
     }),
     defineField({ name: "partnerNote", title: "Partner note", type: "text", rows: 2, group: "footer" }),
     defineField({ name: "ctaHeading", title: "CTA heading", type: "string", group: "footer" }),

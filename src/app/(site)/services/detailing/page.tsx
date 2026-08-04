@@ -3,6 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Shield, Wrench, Droplets, CheckCircle, ExternalLink } from "lucide-react";
 import { BeforeAfterGallery } from "@/components/before-after-gallery";
+import { DetailingPackages } from "@/components/detailing-packages";
+import { SocialFeedGrid, type SocialPost } from "@/components/social-feed-grid";
+import { SocialPlatformIcon } from "@/components/social-icons";
+import { DEFAULT_DETAILING_PACKAGES, type DetailingPackage } from "@/lib/detailing-packages";
+import { INSTAGRAM_URL, SOCIAL_ACCOUNTS } from "@/lib/social";
 import { safeSanityFetch } from "@/sanity/client";
 import { detailingPageQuery } from "@/sanity/queries";
 import { CtaLink } from "@/components/cta-link";
@@ -13,6 +18,12 @@ export const metadata: Metadata = {
 };
 
 const SERVICE_ICONS = [Shield, Wrench, Sparkles, Droplets];
+
+const SOCIAL_HANDLE_DEFAULTS = SOCIAL_ACCOUNTS.filter((a) => a.platform !== "Facebook").map((a) => ({
+  platform: a.platform,
+  handle: a.handle,
+  url: a.url,
+}));
 
 const SERVICES = [
   {
@@ -145,11 +156,18 @@ export default async function DetailingPage() {
     icon?: typeof Shield;
   };
 
+  type SocialHandle = { platform?: string; handle?: string; url?: string };
+
   const cms = await safeSanityFetch<{
     eyebrow?: string;
     heading?: string;
     intro?: string;
     pricingBody?: string;
+    packagesEyebrow?: string;
+    packagesHeading?: string;
+    packagesIntro?: string;
+    packages?: DetailingPackage[];
+    packagesNote?: string;
     services?: ServiceItem[];
     partnerNote?: string;
     ctaHeading?: string;
@@ -159,6 +177,13 @@ export default async function DetailingPage() {
     beforeAfterGallery?: BeforeAfterItem[];
     gallery?: GalleryItem[];
     videos?: VideoItem[];
+    socialEyebrow?: string;
+    socialHeading?: string;
+    socialIntro?: string;
+    socialHandles?: SocialHandle[];
+    socialFeed?: SocialPost[];
+    socialCtaLabel?: string;
+    socialCtaLink?: string;
   }>(
     detailingPageQuery,
     {},
@@ -169,6 +194,15 @@ export default async function DetailingPage() {
   const heading = cms?.heading ?? "Detailing";
   const intro = cms?.intro;
   const pricingBody = cms?.pricingBody;
+  const packagesEyebrow = cms?.packagesEyebrow ?? "Packages";
+  const packagesHeading = cms?.packagesHeading ?? "Choose Your Detail";
+  const packagesIntro =
+    cms?.packagesIntro ??
+    "Three levels of detail, from a thorough maintenance clean through to full paint correction and ceramic protection. Not sure which you need? Send us a photo and we'll tell you straight.";
+  const packages: DetailingPackage[] = cms?.packages?.length ? cms.packages : DEFAULT_DETAILING_PACKAGES;
+  const packagesNote =
+    cms?.packagesNote ??
+    "Prices are a guide based on a standard-size car in average condition. Larger vehicles, heavier soiling and severe paint defects are quoted individually — every car is assessed before we commit to a price.";
   const services: ServiceItem[] = cms?.services?.length ? cms.services : SERVICES;
   const partnerNote = cms?.partnerNote;
   const ctaHeading = cms?.ctaHeading ?? "Book Your Detail";
@@ -178,6 +212,15 @@ export default async function DetailingPage() {
   const beforeAfterGallery: BeforeAfterItem[] = cms?.beforeAfterGallery ?? [];
   const gallery: GalleryItem[] = cms?.gallery ?? [];
   const videos: VideoItem[] = cms?.videos ?? [];
+  const socialEyebrow = cms?.socialEyebrow ?? "Straight From The Socials";
+  const socialHeading = cms?.socialHeading ?? "See The Work As It Happens";
+  const socialIntro =
+    cms?.socialIntro ??
+    "Every car that comes through the unit ends up on our Instagram and TikTok. Tap any post to watch the full thing.";
+  const socialHandles: SocialHandle[] = cms?.socialHandles?.length ? cms.socialHandles : SOCIAL_HANDLE_DEFAULTS;
+  const socialFeed: SocialPost[] = cms?.socialFeed ?? [];
+  const socialCtaLabel = cms?.socialCtaLabel ?? "See More On Instagram";
+  const socialCtaLink = cms?.socialCtaLink ?? INSTAGRAM_URL;
 
   return (
     <>
@@ -213,9 +256,41 @@ export default async function DetailingPage() {
             for a tailored quote.
           </p>
         )}
+        {packages.length > 0 && (
+          <a
+            href="#packages"
+            className="inline-flex items-center gap-2 border border-border hover:border-brand text-text px-6 py-3.5 font-medium tracking-wider uppercase text-xs transition-colors mt-8"
+          >
+            View Packages &amp; Prices <ArrowRight size={14} />
+          </a>
+        )}
       </section>
 
-      <section className="container-page pb-24 space-y-16">
+      {/* Tiered packages */}
+      {packages.length > 0 && (
+        <section id="packages" className="border-t border-border bg-bg py-20 md:py-24 scroll-mt-24">
+          <div className="container-page">
+            <div className="max-w-2xl mb-12 md:mb-16">
+              <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{packagesEyebrow}</div>
+              <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-4">{packagesHeading}</h2>
+              <p className="text-text-muted leading-relaxed">{packagesIntro}</p>
+            </div>
+            <DetailingPackages packages={packages} />
+            {packagesNote && (
+              <p className="text-text-subtle text-sm leading-relaxed mt-10 max-w-2xl">{packagesNote}</p>
+            )}
+          </div>
+        </section>
+      )}
+
+      <section className="container-page py-24 space-y-16">
+        <div className="max-w-2xl">
+          <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">Individual Services</div>
+          <h2 className="font-display text-4xl md:text-5xl tracking-tight mb-4">The Work In Detail</h2>
+          <p className="text-text-muted leading-relaxed">
+            Each package is built from the services below. Any of them can also be booked on their own.
+          </p>
+        </div>
         {services.map((svc, i) => {
           const Icon = svc.icon ?? SERVICE_ICONS[i] ?? Sparkles;
           const isEven = i % 2 === 0;
@@ -380,6 +455,48 @@ export default async function DetailingPage() {
                 );
               })}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Social feed — tiles link out to the real posts */}
+      {socialFeed.length > 0 && (
+        <section className="border-t border-border py-24 md:py-28">
+          <div className="container-page">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
+              <div className="max-w-xl">
+                <div className="text-xs tracking-[0.3em] uppercase text-brand-light mb-3">{socialEyebrow}</div>
+                <h2 className="font-display text-4xl md:text-5xl tracking-tight">{socialHeading}</h2>
+                <p className="text-text-muted mt-4 leading-relaxed">{socialIntro}</p>
+              </div>
+              {socialHandles.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  {socialHandles.map((h, i) => (
+                    <CtaLink
+                      key={`${h.platform ?? "social"}-${i}`}
+                      href={h.url}
+                      className="group inline-flex items-center gap-2.5 border border-border hover:border-brand px-4 py-2.5 text-sm text-text-muted hover:text-text transition-colors"
+                    >
+                      <span className="text-text-muted group-hover:text-brand-light transition-colors">
+                        <SocialPlatformIcon platform={h.platform} size={16} />
+                      </span>
+                      {h.handle ?? h.platform}
+                    </CtaLink>
+                  ))}
+                </div>
+              )}
+            </div>
+            <SocialFeedGrid posts={socialFeed} />
+            {socialCtaLabel && (
+              <div className="mt-12 text-center">
+                <CtaLink
+                  href={socialCtaLink}
+                  className="inline-flex items-center gap-2 border border-border hover:border-brand text-text px-8 py-4 font-medium tracking-wider uppercase text-xs transition-colors"
+                >
+                  {socialCtaLabel} <ExternalLink size={14} />
+                </CtaLink>
+              </div>
+            )}
           </div>
         </section>
       )}

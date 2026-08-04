@@ -14,6 +14,7 @@ type Enquiry = {
   phone: string | null;
   car: string | null;
   type: string;
+  package: string | null;
   message: string;
   status: string;
 };
@@ -41,6 +42,9 @@ const PhoneIcon = (
 );
 const CarIcon = (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+);
+const PackageIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
 );
 const EyeIcon = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -239,6 +243,12 @@ export default async function EnquiriesPage({
                         <span className="truncate">{e.car}</span>
                       </p>
                     )}
+                    {e.package && (
+                      <p className="flex items-center gap-2 text-text-muted dark:text-neutral-200">
+                        <span className="text-text-muted">{PackageIcon}</span>
+                        <span className="truncate">{e.package} package</span>
+                      </p>
+                    )}
                   </div>
 
                   {e.message && (
@@ -304,6 +314,11 @@ export default async function EnquiriesPage({
                         <span className={`inline-block text-sm font-medium px-2.5 py-1 ${TYPE_BADGE[e.type] ?? TYPE_BADGE.General}`}>
                           {e.type}
                         </span>
+                        {e.package && (
+                          <p className="text-text-muted dark:text-neutral-200 text-sm mt-1.5 truncate">
+                            {e.package} package
+                          </p>
+                        )}
                         <p className="text-text-muted dark:text-neutral-200 text-sm mt-1.5 truncate">
                           {e.car ?? <span className="text-text-subtle">—</span>}
                         </p>
