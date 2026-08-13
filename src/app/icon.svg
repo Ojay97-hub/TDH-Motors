@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>TDH Motors</title>
+  <!-- Shield crest simplified from the Dog House logo; the 3.2 stroke rounds the corners. -->
+  <path d="M9.6 5.6H54.4V43.6L32 58.4L9.6 43.6Z" fill="#2d6a4f" stroke="#2d6a4f" stroke-width="3.2" stroke-linejoin="round"/>
+  <g fill="#ffffff">
+    <rect x="17" y="14" width="8" height="30"/>
+    <rect x="39" y="14" width="8" height="30"/>
+    <rect x="17" y="25" width="30" height="8"/>
+  </g>
+</svg>

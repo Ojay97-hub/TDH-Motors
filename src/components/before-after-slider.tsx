@@ -33,10 +33,10 @@ function SliderMedia({
       <video
         ref={videoRef}
         src={videoUrl}
-        autoPlay
         loop
         muted={muted}
         playsInline
+        preload="metadata"
         className="absolute inset-0 w-full h-full object-cover"
       />
     );
@@ -77,11 +77,29 @@ export function BeforeAfterSlider({ beforeUrl, beforeVideoUrl, afterUrl, afterVi
     if (afterVideoRef.current) afterVideoRef.current.muted = isMuted;
   }, [isMuted]);
 
+  // Only the sliders on screen play — keeps a long carousel of clips cheap.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !hasVideo) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        for (const video of [beforeVideoRef.current, afterVideoRef.current]) {
+          if (!video) continue;
+          if (entry.isIntersecting) void video.play().catch(() => {});
+          else video.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasVideo]);
+
   return (
     <div className="bg-bg-elevated border border-border overflow-hidden">
       <div
         ref={containerRef}
-        className="relative aspect-4/3 overflow-hidden cursor-ew-resize select-none touch-none"
+        className="relative aspect-4/3 overflow-hidden cursor-ew-resize select-none touch-pan-y"
         onPointerDown={(e) => {
           dragging.current = true;
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
