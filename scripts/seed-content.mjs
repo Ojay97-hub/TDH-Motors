@@ -564,6 +564,22 @@ const INVENTORY_PAGE = {
     "Every car listed below is in our care and available for viewing by appointment. Don't see what you're after? We can source it.",
 };
 
+const SOLD_PAGE = {
+  _id: "soldPage",
+  _type: "soldPage",
+  eyebrow: "Through The Door",
+  heading: "Recently Sold",
+  intro:
+    "A look at some of the cars we've bought, prepared, and sold on to happy owners. If something here is your sort of thing, we can almost certainly find you one.",
+  showPrices: false,
+  emptyMessage: "Sold cars will appear here as they leave the showroom.",
+  ctaHeading: "Looking for something similar?",
+  ctaBody:
+    "Cars like these rarely sit around. Tell us what you're after and we'll use our network to track down the right car, in the right spec, at the right money.",
+  ctaLabel: "Source Me One",
+  ctaLink: "/contact?type=Bespoke+Sourcing",
+};
+
 const MERCH_PRODUCTS = [
   {
     // IDs must NOT contain a dot: on a public dataset Sanity's anonymous read
@@ -652,8 +668,7 @@ async function seedInventoryCarReferences() {
   console.log(`  seeded inventory car links  inventoryPage  (${refs.length} cars)`);
 }
 
-console.log("Seeding CMS content...\n");
-for (const doc of [
+const ALL_DOCS = [
   HOME_PAGE,
   SITE_SETTINGS,
   SERVICES_PAGE,
@@ -665,9 +680,32 @@ for (const doc of [
   MERCH_PAGE,
   CONTACT_PAGE,
   INVENTORY_PAGE,
+  SOLD_PAGE,
   ...MERCH_PRODUCTS,
-]) {
+];
+
+// Optional id filter, e.g. `npm run seed:content -- soldPage`. Adding a new page
+// type to an established dataset only needs that one document; re-running the
+// whole seed would also restore defaults onto fields an editor had deliberately
+// cleared elsewhere.
+const only = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
+const known = new Set(ALL_DOCS.map((doc) => doc._id));
+const unknown = only.filter((id) => !known.has(id));
+
+if (unknown.length > 0) {
+  console.error(`Unknown document id(s): ${unknown.join(", ")}`);
+  console.error(`Known ids: ${[...known].join(", ")}`);
+  process.exit(1);
+}
+
+const docs = only.length > 0 ? ALL_DOCS.filter((doc) => only.includes(doc._id)) : ALL_DOCS;
+
+console.log(`Seeding CMS content${only.length > 0 ? ` (${only.join(", ")})` : ""}...\n`);
+for (const doc of docs) {
   await upsert(doc);
 }
-await seedInventoryCarReferences();
+// The car-reference backfill belongs to a full seed, not a targeted one.
+if (only.length === 0) {
+  await seedInventoryCarReferences();
+}
 console.log("\nDone.");

@@ -18,6 +18,7 @@ const singletonTypeNames = new Set([
   "merchPage",
   "contactPage",
   "inventoryPage",
+  "soldPage",
 ]);
 
 function singletonListItem(S: StructureBuilder, typeName: string, title: string) {
@@ -29,6 +30,44 @@ function singletonListItem(S: StructureBuilder, typeName: string, title: string)
         .id(typeName)
         .schemaType(typeName)
         .documentId(typeName),
+    );
+}
+
+// Cars get their own folder split by lifecycle so "what's in stock" and "what
+// we've sold" are two separate lists — marking a car sold visibly moves it from
+// one to the other, which is exactly what the public pages do.
+function carsListItem(S: StructureBuilder) {
+  return S.listItem()
+    .title("Cars")
+    .id("cars")
+    .child(
+      S.list()
+        .title("Cars")
+        .items([
+          S.listItem()
+            .title("In stock")
+            .id("carsInStock")
+            .child(
+              S.documentTypeList("car")
+                .title("In stock")
+                .filter('_type == "car" && status != "sold"')
+                .defaultOrdering([{ field: "year", direction: "desc" }]),
+            ),
+          S.listItem()
+            .title("Sold")
+            .id("carsSold")
+            .child(
+              S.documentTypeList("car")
+                .title("Sold")
+                .filter('_type == "car" && status == "sold"')
+                .defaultOrdering([{ field: "soldDate", direction: "desc" }]),
+            ),
+          S.divider(),
+          S.listItem()
+            .title("All cars")
+            .id("carsAll")
+            .child(S.documentTypeList("car").title("All cars")),
+        ]),
     );
 }
 
@@ -107,6 +146,7 @@ const pageLocations = {
   merchPage: { title: "Merch", href: "/merch" },
   contactPage: { title: "Contact", href: "/contact" },
   inventoryPage: { title: "Inventory", href: "/inventory" },
+  soldPage: { title: "Recently Sold", href: "/recently-sold" },
   siteSettings: { title: "Home", href: "/" },
 } as const;
 
@@ -134,6 +174,7 @@ export default defineConfig({
           { route: "/merch", filter: `_id == "merchPage"` },
           { route: "/contact", filter: `_id == "contactPage"` },
           { route: "/inventory", filter: `_id == "inventoryPage"` },
+          { route: "/recently-sold", filter: `_id == "soldPage"` },
           {
             route: "/inventory/:slug",
             filter: `_type == "car" && slug.current == $slug`,
@@ -161,7 +202,7 @@ export default defineConfig({
             ],
           },
           car: {
-            select: { title: "model", slug: "slug.current" },
+            select: { title: "model", slug: "slug.current", status: "status" },
             resolve: (value) =>
               value?.slug
                 ? {
@@ -170,6 +211,12 @@ export default defineConfig({
                         title: value.title || "Inventory item",
                         href: `/inventory/${value.slug}`,
                       },
+                      // A sold car drops off /inventory and shows up on the
+                      // showcase instead, so point the editor at the list it
+                      // actually appears in.
+                      value.status === "sold"
+                        ? { title: "Recently Sold", href: "/recently-sold" }
+                        : { title: "Inventory", href: "/inventory" },
                     ],
                   }
                 : null,
@@ -204,11 +251,14 @@ export default defineConfig({
             singletonListItem(S, "merchPage", "Merch Page"),
             singletonListItem(S, "contactPage", "Contact Page"),
             singletonListItem(S, "inventoryPage", "Inventory Page"),
+            singletonListItem(S, "soldPage", "Recently Sold Page"),
             S.divider(),
-            // All non-singleton document types (e.g. Cars)
-            ...S.documentTypeListItems().filter(
-              (item) => !singletonTypeNames.has(item.getId() ?? ""),
-            ),
+            carsListItem(S),
+            // Every other non-singleton document type (e.g. Merch Products)
+            ...S.documentTypeListItems().filter((item) => {
+              const id = item.getId() ?? "";
+              return id !== "car" && !singletonTypeNames.has(id);
+            }),
           ]),
     }),
     ...(isProduction ? [] : [visionTool({ defaultApiVersion: "2025-05-20" })]),

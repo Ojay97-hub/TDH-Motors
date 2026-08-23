@@ -16,6 +16,7 @@ const servicesItems = [
 const leftNav = [
   { href: "/", label: "Home" },
   { href: "/who-we-are", label: "About" },
+  { href: "/recently-sold", label: "Recently Sold" },
 ];
 
 const rightNav = [
@@ -29,6 +30,7 @@ const mobileNav = [
   { href: "/merch", label: "Merch" },
   { href: "/contact", label: "Contact" },
   { href: "/inventory", label: "Inventory" },
+  { href: "/recently-sold", label: "Recently Sold" },
 ];
 
 function isActive(pathname: string, href: string) {

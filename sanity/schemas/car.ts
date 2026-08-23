@@ -72,6 +72,28 @@ export const car = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: "soldDate",
+      title: "Date sold",
+      description:
+        "Filled in automatically when you mark a car as sold. Newest sales appear first on the Recently Sold page.",
+      type: "date",
+      group: "identity",
+      options: { dateFormat: "DD MMM YYYY" },
+      // Only meaningful once the car is sold — hidden the rest of the time so
+      // the form stays short for the common (in-stock) case.
+      hidden: ({ document }) => document?.status !== "sold",
+    }),
+    defineField({
+      name: "hideFromSoldPage",
+      title: "Hide from the Recently Sold page",
+      description:
+        "Tick this if a sold car shouldn't be showcased publicly (e.g. a private sale).",
+      type: "boolean",
+      group: "identity",
+      initialValue: false,
+      hidden: ({ document }) => document?.status !== "sold",
+    }),
+    defineField({
       name: "featured",
       title: "Featured on homepage",
       type: "boolean",
@@ -297,13 +319,18 @@ export const car = defineType({
       variant: "variant",
       year: "year",
       status: "status",
+      soldDate: "soldDate",
       media: "images.0",
     },
-    prepare({ make, model, variant, year, status, media }) {
+    prepare({ make, model, variant, year, status, soldDate, media }) {
       const title = [year, make, model, variant].filter(Boolean).join(" ");
+      const label = status
+        ? `${status.charAt(0).toUpperCase()}${status.slice(1)}`
+        : undefined;
       return {
         title,
-        subtitle: status ? `${status.charAt(0).toUpperCase()}${status.slice(1)}` : undefined,
+        subtitle:
+          status === "sold" && soldDate ? `Sold — ${soldDate}` : label,
         media,
       };
     },
@@ -318,6 +345,11 @@ export const car = defineType({
       title: "Price (high to low)",
       name: "priceDesc",
       by: [{ field: "price", direction: "desc" }],
+    },
+    {
+      title: "Recently sold first",
+      name: "soldDateDesc",
+      by: [{ field: "soldDate", direction: "desc" }],
     },
   ],
 });

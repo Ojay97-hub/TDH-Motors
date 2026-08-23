@@ -11,6 +11,7 @@ import { merchPage } from "./merchPage";
 import { merchProduct } from "./merchProduct";
 import { contactPage } from "./contactPage";
 import { inventoryPage } from "./inventoryPage";
+import { soldPage } from "./soldPage";
 
 export const schemaTypes = [
   car,
@@ -25,5 +26,6 @@ export const schemaTypes = [
   merchPage,
   contactPage,
   inventoryPage,
+  soldPage,
   merchProduct,
 ];

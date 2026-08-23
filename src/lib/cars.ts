@@ -2,9 +2,10 @@ import { safeSanityFetch } from "@/sanity/client";
 import { sanityClient } from "@/sanity/base-client";
 import {
   allCarSlugsQuery,
-  allCarsQuery,
+  availableCarsQuery,
   carBySlugQuery,
   featuredCarsQuery,
+  soldCarsQuery,
 } from "@/sanity/queries";
 
 export type Video = {
@@ -38,6 +39,7 @@ type CarRaw = {
   legacyVideoUrl?: string | null;
   featured?: boolean | null;
   status?: string | null;
+  soldDate?: string | null;
 };
 
 const transmissions = ["Manual", "Automatic", "PDK", "DCT"] as const;
@@ -69,6 +71,8 @@ export type Car = {
   videos?: Video[];
   featured?: boolean;
   status: (typeof statuses)[number];
+  /** ISO date (YYYY-MM-DD) — only set on sold cars. */
+  soldDate?: string;
 };
 
 function stringOr(value: unknown, fallback = ""): string {
@@ -151,6 +155,7 @@ function normalizeCar(car: CarRaw): Car {
     videos: videos.length > 0 ? videos : undefined,
     featured: car.featured === true,
     status: oneOf(car.status, statuses, "available"),
+    soldDate: optionalString(car.soldDate),
   };
 }
 
@@ -168,9 +173,21 @@ export function normalizeCars(
     .map(normalizeCar);
 }
 
-export async function getAllCars(): Promise<Car[]> {
+/** Everything still on the books — sold cars live on the Recently Sold page. */
+export async function getAvailableCars(): Promise<Car[]> {
   const cars = await safeSanityFetch<CarRaw[]>(
-    allCarsQuery,
+    availableCarsQuery,
+    {},
+    { next: { revalidate: 60, tags: ["car"] } },
+    [],
+  );
+  return (cars ?? []).map(normalizeCar);
+}
+
+/** Sold cars, most recent sale first, minus any flagged as hidden. */
+export async function getSoldCars(): Promise<Car[]> {
+  const cars = await safeSanityFetch<CarRaw[]>(
+    soldCarsQuery,
     {},
     { next: { revalidate: 60, tags: ["car"] } },
     [],
@@ -219,4 +236,20 @@ export function formatPrice(price: number): string {
 
 export function formatMileage(miles: number): string {
   return new Intl.NumberFormat("en-GB").format(miles) + " mi";
+}
+
+/**
+ * "August 2026" — month precision only. The exact day a car changed hands is
+ * nobody's business, and a month reads better on the Recently Sold showcase.
+ * Returns null for missing/unparseable dates so callers can omit the label.
+ */
+export function formatSoldDate(soldDate: string | undefined): string | null {
+  if (!soldDate) return null;
+  const parsed = new Date(soldDate);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(parsed);
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InventoryBrowser } from "@/components/inventory-browser";
-import { getAllCars } from "@/lib/cars";
+import { getAvailableCars } from "@/lib/cars";
 import { safeSanityFetch } from "@/sanity/client";
 import { inventoryPageQuery } from "@/sanity/queries";
 
@@ -12,8 +12,9 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function InventoryPage() {
+  // Sold cars are deliberately excluded — they move to /recently-sold.
   const [cars, cms] = await Promise.all([
-    getAllCars(),
+    getAvailableCars(),
     safeSanityFetch(inventoryPageQuery, {}, { next: { revalidate: 60, tags: ["inventoryPage"] } }),
   ]);
 
