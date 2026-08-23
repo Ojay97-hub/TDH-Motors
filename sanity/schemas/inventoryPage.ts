@@ -29,7 +29,7 @@ export const inventoryPage = defineType({
       title: "Current car listings",
       type: "array",
       description:
-        "Quick links to the vehicle documents currently shown on the inventory page. The live page still shows all car documents automatically.",
+        "Quick links to vehicle documents. The live page builds itself automatically from every car that isn't marked as sold — sold cars move to the Recently Sold page.",
       of: [defineArrayMember({ type: "reference", to: [{ type: "car" }] })],
       validation: (r) => r.unique(),
     }),

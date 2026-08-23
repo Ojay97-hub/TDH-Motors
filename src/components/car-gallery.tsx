@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
@@ -10,20 +10,43 @@ type Props = {
   status?: "available" | "reserved" | "sold" | "coming-soon";
 };
 
+/**
+ * Every slide is stacked in the same box, so all of them sit inside the
+ * viewport and `loading="lazy"` buys nothing — the browser fetches the lot on
+ * page load. With a dozen 24-megapixel photos on a listing that's tens of
+ * megabytes in flight at once, and the *visible* photo ends up queued behind
+ * the ones nobody has asked for yet.
+ *
+ * So we track which slides have actually been requested. The first photo loads
+ * on its own; navigating pulls in the target plus its immediate neighbours, so
+ * every click after the first is already there.
+ */
+function withNeighbours(index: number, count: number, current: number[]) {
+  if (count === 0) return current;
+  const next = new Set(current);
+  next.add(index);
+  next.add((index + 1) % count);
+  next.add((index - 1 + count) % count);
+  return [...next];
+}
+
 export function CarGallery({ images, alt, status }: Props) {
   const [active, setActive] = useState(0);
+  const [requested, setRequested] = useState<number[]>([0]);
   const stripRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setActive((current) => {
-      if (images.length === 0) return 0;
-      return Math.min(current, images.length - 1);
-    });
-  }, [images.length]);
 
   if (!images.length) return null;
 
+  // Clamped as we render rather than corrected in an effect, so a shrinking
+  // `images` array (a photo removed in Presentation preview) can never leave
+  // `active` pointing past the end, even for a frame.
   const activeIndex = Math.min(active, images.length - 1);
+
+  function show(index: number) {
+    setActive(index);
+    setRequested((current) => withNeighbours(index, images.length, current));
+    scrollThumbnail(index);
+  }
 
   function scrollThumbnail(index: number) {
     const el = stripRef.current;
@@ -33,34 +56,32 @@ export function CarGallery({ images, alt, status }: Props) {
   }
 
   function navigate(dir: "prev" | "next") {
-    const next =
+    show(
       dir === "next"
         ? (activeIndex + 1) % images.length
-        : (activeIndex - 1 + images.length) % images.length;
-    setActive(next);
-    scrollThumbnail(next);
-  }
-
-  function handleThumbClick(i: number) {
-    setActive(i);
-    scrollThumbnail(i);
+        : (activeIndex - 1 + images.length) % images.length,
+    );
   }
 
   return (
     <div className="space-y-4">
       <div className="relative aspect-video bg-bg-elevated overflow-hidden">
-        {images.map((img, i) => (
-          <Image
-            key={img}
-            src={img}
-            alt={i === 0 ? alt : ""}
-            fill
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            className={`object-cover transition-opacity duration-300 ${i === activeIndex ? "opacity-100" : "opacity-0"}`}
-            sizes="(min-width: 1280px) 1216px, 100vw"
-          />
-        ))}
+        {images.map((img, i) =>
+          requested.includes(i) ? (
+            // Keyed by position, not URL: the same photo can legitimately be
+            // added to a car twice, and duplicate keys make React drop slides.
+            <Image
+              key={i}
+              src={img}
+              alt={i === 0 ? alt : ""}
+              fill
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              className={`object-cover transition-opacity duration-300 ${i === activeIndex ? "opacity-100" : "opacity-0"}`}
+              sizes="(min-width: 1280px) 1216px, 100vw"
+            />
+          ) : null,
+        )}
         {status === "reserved" && (
           <div className="absolute top-4 left-4 bg-accent text-stone-900 px-3 py-1 text-xs uppercase tracking-widest font-medium">
             Reserved
@@ -102,7 +123,7 @@ export function CarGallery({ images, alt, status }: Props) {
             <button
               key={i}
               type="button"
-              onClick={() => handleThumbClick(i)}
+              onClick={() => show(i)}
               aria-label={`View image ${i + 1}`}
               aria-pressed={i === activeIndex}
               className={`relative shrink-0 w-24 sm:w-28 md:w-32 aspect-4/3 overflow-hidden snap-start transition-all ${

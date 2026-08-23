@@ -68,6 +68,7 @@ export async function SiteFooter() {
             </h4>
             <ul className="space-y-3 text-sm text-text-muted">
               <li><Link href="/inventory" className="hover:text-text transition-colors">Inventory</Link></li>
+              <li><Link href="/recently-sold" className="hover:text-text transition-colors">Recently Sold</Link></li>
               <li><Link href="/services" className="hover:text-text transition-colors">Services</Link></li>
               <li><Link href="/who-we-are" className="hover:text-text transition-colors">Who We Are</Link></li>
               <li><Link href="/contact" className="hover:text-text transition-colors">Contact</Link></li>

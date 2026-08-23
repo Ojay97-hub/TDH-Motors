@@ -12,6 +12,7 @@ type InventoryCar = {
   variant?: string;
   year?: number;
   status?: string;
+  soldDate?: string;
   slug?: string;
 };
 
@@ -105,9 +106,46 @@ const styles = {
     textTransform: "capitalize",
     whiteSpace: "nowrap",
   },
+  soldStatus: {
+    color: "#ffb35c",
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "capitalize",
+    whiteSpace: "nowrap",
+  },
+  sectionHeading: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 8,
+    padding: "4px 0",
+    color: "#8b93a7",
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+  },
+  sectionNote: {
+    margin: "0 0 4px",
+    color: "#6f7789",
+    fontSize: 11,
+    letterSpacing: 0,
+    textTransform: "none",
+  },
   actions: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 8,
+  },
+  soldButton: {
+    border: "1px solid #7a5a21",
+    borderRadius: 6,
+    background: "transparent",
+    color: "#ffb35c",
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700,
+    padding: "7px 10px",
   },
   actionLink: {
     border: "1px solid #343949",
@@ -164,6 +202,25 @@ function statusLabel(status: string) {
   return statusLabels[status] ?? status;
 }
 
+/** Today as `YYYY-MM-DD` in the editor's own timezone, not UTC. */
+function todayIsoDate() {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+function formatSoldDate(soldDate: string) {
+  const parsed = new Date(soldDate);
+  if (Number.isNaN(parsed.getTime())) return soldDate;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(parsed);
+}
+
 function documentIdsToDelete(id: string) {
   // Version documents (for example `versions.agent-...`) are standalone Sanity
   // variants. Prefixing them with `drafts.` creates an invalid ID, so delete the
@@ -215,6 +272,7 @@ export function InventoryNavigator() {
   const [cars, setCars] = useState<InventoryCar[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connectionLost, setConnectionLost] = useState(false);
 
@@ -230,6 +288,7 @@ export function InventoryNavigator() {
           variant,
           year,
           status,
+          soldDate,
           "slug": slug.current
         }`,
       );
@@ -307,6 +366,65 @@ export function InventoryNavigator() {
     };
   }, [client, loadCars]);
 
+  /**
+   * Moves a car between the Inventory page and the Recently Sold page by
+   * flipping its `status`. The patch is applied to the published document (so
+   * the change is live immediately, without a separate publish step) and, when
+   * unpublished edits exist, to the draft too — otherwise publishing those edits
+   * later would quietly undo the move.
+   */
+  async function setSoldState(car: InventoryCar, sold: boolean) {
+    const title = carTitle(car);
+    if (
+      !window.confirm(
+        sold
+          ? `Mark ${title} as sold? It moves off the Inventory page and onto the Recently Sold page.`
+          : `Move ${title} back into stock? It returns to the Inventory page and leaves Recently Sold.`,
+      )
+    ) {
+      return;
+    }
+
+    setUpdatingId(car._id);
+    setError(null);
+    try {
+      const publishedId = car._id.replace(/^drafts\./, "");
+      const draftId = car._id.startsWith("versions.")
+        ? null
+        : `drafts.${publishedId}`;
+      const ids = [car._id];
+      // `getDocument` resolves to undefined when there is no draft — patching a
+      // missing id would fail the whole transaction.
+      if (draftId && draftId !== car._id && (await client.getDocument(draftId))) {
+        ids.push(draftId);
+      }
+
+      let transaction = client.transaction();
+      for (const id of ids) {
+        transaction = transaction.patch(
+          id,
+          sold
+            ? // Keep an existing sale date if one was set by hand.
+              (patch) =>
+                patch
+                  .set({ status: "sold" })
+                  .setIfMissing({ soldDate: todayIsoDate() })
+            : (patch) => patch.set({ status: "available" }).unset(["soldDate"]),
+        );
+      }
+      await transaction.commit();
+      await loadCars();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Unable to update ${title}.`,
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   async function deleteCar(car: InventoryCar) {
     const title = carTitle(car);
     const ids = documentIdsToDelete(car._id);
@@ -334,6 +452,78 @@ export function InventoryNavigator() {
     }
   }
 
+  // Two lists, mirroring the two public pages a car can live on.
+  const inStock = cars.filter((car) => car.status !== "sold");
+  const sold = cars.filter((car) => car.status === "sold");
+
+  function renderCar(car: InventoryCar) {
+    const isSold = car.status === "sold";
+    const busy = updatingId === car._id;
+
+    return (
+      <div key={car._id} style={styles.card}>
+        <div style={styles.row}>
+          <div>
+            <p style={styles.name}>{carTitle(car)}</p>
+            <div style={styles.meta}>{car.variant || "No variant set"}</div>
+            {isSold && car.soldDate ? (
+              <div style={styles.meta}>Sold {formatSoldDate(car.soldDate)}</div>
+            ) : null}
+          </div>
+          {car.status ? (
+            <span style={isSold ? styles.soldStatus : styles.status}>
+              {statusLabel(car.status)}
+            </span>
+          ) : null}
+        </div>
+        <div style={styles.actions}>
+          <button
+            type="button"
+            onClick={() => car.slug && navigate(`/inventory/${car.slug}`)}
+            disabled={!car.slug}
+            title={
+              car.slug
+                ? "Open this car's detail page in the preview"
+                : "Add a URL slug first"
+            }
+            style={{
+              ...styles.actionLink,
+              opacity: car.slug ? 1 : 0.5,
+              cursor: car.slug ? "pointer" : "not-allowed",
+            }}
+          >
+            View page
+          </button>
+          <EditCarLink car={car} />
+          <button
+            type="button"
+            onClick={() => void setSoldState(car, !isSold)}
+            disabled={busy}
+            title={
+              isSold
+                ? "Return this car to the Inventory page"
+                : "Move this car to the Recently Sold page"
+            }
+            style={{ ...styles.soldButton, opacity: busy ? 0.5 : 1 }}
+          >
+            {busy ? "Saving..." : isSold ? "Back to stock" : "Mark sold"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void deleteCar(car)}
+            disabled={deletingId === car._id}
+            style={{
+              ...styles.dangerButton,
+              opacity: deletingId === car._id ? 0.5 : 1,
+            }}
+          >
+            {deletingId === car._id ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <aside style={styles.shell}>
       <div style={styles.header}>
@@ -358,48 +548,24 @@ export function InventoryNavigator() {
       ) : null}
 
       <div style={styles.list}>
-        {cars.map((car) => (
-          <div key={car._id} style={styles.card}>
-            <div style={styles.row}>
-              <div>
-                <p style={styles.name}>{carTitle(car)}</p>
-                <div style={styles.meta}>{car.variant || "No variant set"}</div>
-              </div>
-              {car.status ? <span style={styles.status}>{statusLabel(car.status)}</span> : null}
-            </div>
-            <div style={styles.actions}>
-              <button
-                type="button"
-                onClick={() => car.slug && navigate(`/inventory/${car.slug}`)}
-                disabled={!car.slug}
-                title={
-                  car.slug
-                    ? "Open this car's detail page in the preview"
-                    : "Add a URL slug first"
-                }
-                style={{
-                  ...styles.actionLink,
-                  opacity: car.slug ? 1 : 0.5,
-                  cursor: car.slug ? "pointer" : "not-allowed",
-                }}
-              >
-                View page
-              </button>
-              <EditCarLink car={car} />
-              <button
-                type="button"
-                onClick={() => void deleteCar(car)}
-                disabled={deletingId === car._id}
-                style={{
-                  ...styles.dangerButton,
-                  opacity: deletingId === car._id ? 0.5 : 1,
-                }}
-              >
-                {deletingId === car._id ? "Deleting..." : "Delete"}
-              </button>
-            </div>
+        {inStock.length > 0 ? (
+          <div style={styles.sectionHeading}>
+            <span>In stock</span>
+            <span>{inStock.length}</span>
           </div>
-        ))}
+        ) : null}
+        {inStock.map(renderCar)}
+
+        {sold.length > 0 ? (
+          <>
+            <div style={styles.sectionHeading}>
+              <span>Sold</span>
+              <span>{sold.length}</span>
+            </div>
+            <p style={styles.sectionNote}>Shown on the Recently Sold page.</p>
+          </>
+        ) : null}
+        {sold.map(renderCar)}
       </div>
     </aside>
   );

@@ -28,7 +28,8 @@ const carProjection = /* groq */ `
   "legacyVideoFile": video.asset->url,
   "legacyVideoUrl": videoUrl,
   featured,
-  status
+  status,
+  soldDate
 `;
 
 const merchProductProjection = /* groq */ `
@@ -42,14 +43,26 @@ const merchProductProjection = /* groq */ `
   "image": image.asset->url
 `;
 
-export const allCarsQuery = defineQuery(`
-  *[_type == "car"] | order(year desc, _createdAt desc) {
+// The inventory page only lists cars that are still on the books. Sold cars move
+// to their own showcase (`soldCarsQuery`) rather than lingering in stock.
+export const availableCarsQuery = defineQuery(`
+  *[_type == "car" && status != "sold"] | order(year desc, _createdAt desc) {
+    ${carProjection}
+  }
+`);
+
+// Newest sale first. `soldDate` is set automatically when a car is marked sold,
+// but cars sold before that field existed (or hand-edited ones) can be missing
+// it — fall back to when the document last changed so they still sort sensibly.
+export const soldCarsQuery = defineQuery(`
+  *[_type == "car" && status == "sold" && hideFromSoldPage != true]
+    | order(coalesce(soldDate, _updatedAt) desc, year desc) {
     ${carProjection}
   }
 `);
 
 export const featuredCarsQuery = defineQuery(`
-  *[_type == "car" && featured == true] | order(year desc) {
+  *[_type == "car" && featured == true && status != "sold"] | order(year desc) {
     ${carProjection}
   }
 `);
@@ -79,7 +92,7 @@ export const siteSettingsQuery = defineQuery(`*[_id == "siteSettings"][0]`);
 // shows all visible products.
 export const homePageQuery = defineQuery(`*[_id == "homePage"][0]{
   ...,
-  "featuredCars": coalesce(featuredCars[]->{
+  "featuredCars": coalesce(featuredCars[@->status != "sold"]->{
     ${carProjection}
   }, []),
   "homepageMerch": coalesce(homepageMerch[@->status != "hidden"]->{
@@ -109,6 +122,8 @@ export const storagePageQuery = defineQuery(`*[_id == "storagePage"][0]`);
 export const contactPageQuery = defineQuery(`*[_id == "contactPage"][0]`);
 
 export const inventoryPageQuery = defineQuery(`*[_id == "inventoryPage"][0]`);
+
+export const soldPageQuery = defineQuery(`*[_id == "soldPage"][0]`);
 
 // The merch page can curate its own product grid via a reference list. Resolve
 // those references inline so the page gets full product objects (an empty list
