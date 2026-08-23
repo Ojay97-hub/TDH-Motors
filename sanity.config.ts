@@ -5,6 +5,7 @@ import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
 import { InventoryNavigator } from "./sanity/presentation/InventoryNavigator";
 import { ViewDetailPageAction } from "./sanity/presentation/viewDetailPageAction";
+import { renderOptimizedImageInput } from "./sanity/components/OptimizedImageInput";
 
 const singletonTypeNames = new Set([
   "siteSettings",
@@ -263,6 +264,14 @@ export default defineConfig({
     }),
     ...(isProduction ? [] : [visionTool({ defaultApiVersion: "2025-05-20" })]),
   ],
+  form: {
+    // Every image field in the studio gets an upload interceptor that shrinks
+    // camera-sized JPEGs before they're sent. Drag-and-drop, paste and the file
+    // picker all behave exactly as before — see OptimizedImageInput.
+    components: {
+      input: renderOptimizedImageInput,
+    },
+  },
   document: {
     // Singletons must never be duplicated: a second copy of a singleton type
     // breaks resolution (the site/Presentation can pick the wrong/empty one).

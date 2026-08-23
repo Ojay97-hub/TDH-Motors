@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { noDuplicateImages } from "./_uniqueImages";
 
 export const car = defineType({
   name: "car",
@@ -188,7 +189,8 @@ export const car = defineType({
     defineField({
       name: "images",
       title: "Photos",
-      description: "Drag to reorder. The first image is used as the cover.",
+      description:
+        "Drag to reorder. The first image is used as the cover. Photos are shrunk automatically as they upload.",
       type: "array",
       group: "media",
       of: [
@@ -197,7 +199,10 @@ export const car = defineType({
           options: { hotspot: true },
         },
       ],
-      validation: (r) => r.required().min(1).error("Add at least one photo."),
+      validation: (r) => [
+        r.required().min(1).error("Add at least one photo."),
+        r.custom(noDuplicateImages).warning(),
+      ],
     }),
     defineField({
       name: "video",
