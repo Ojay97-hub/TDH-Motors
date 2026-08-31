@@ -190,6 +190,9 @@ export async function POST(request: Request) {
     await sendAdminEmail(parsed.data, data?.id, requestOrigin);
   } catch (error) {
     console.error("Brevo enquiry email error:", error);
+    if (data?.id) {
+      await supabase.from("enquiries").update({ notify_failed: true }).eq("id", data.id);
+    }
   }
 
   return Response.json({ ok: true }, { status: 201 });

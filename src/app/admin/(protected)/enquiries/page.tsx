@@ -17,6 +17,7 @@ type Enquiry = {
   package: string | null;
   message: string;
   status: string;
+  notify_failed: boolean;
 };
 
 const TYPE_BADGE: Record<string, string> = {
@@ -49,6 +50,20 @@ const PackageIcon = (
 const EyeIcon = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
 );
+const AlertIcon = (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+);
+
+function NotifyFailedBadge() {
+  return (
+    <span
+      title="The admin notification email for this enquiry failed to send — check the email provider."
+      className="inline-flex items-center gap-1 text-sm font-medium px-2 py-1 bg-red-100 text-red-700 border border-red-300 dark:bg-red-500/15 dark:text-red-300 dark:border-red-400/30"
+    >
+      {AlertIcon} Email failed
+    </span>
+  );
+}
 
 export default async function EnquiriesPage({
   searchParams,
@@ -257,6 +272,12 @@ export default async function EnquiriesPage({
                     </p>
                   )}
 
+                  {e.notify_failed && (
+                    <div>
+                      <NotifyFailedBadge />
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between gap-3 pt-1">
                     <StatusSelect id={e.id} current={e.status} />
                     <Link
@@ -297,6 +318,11 @@ export default async function EnquiriesPage({
                         <p className="text-sm text-text-muted dark:text-neutral-300 mt-0.5 whitespace-nowrap">
                           {formatDate(e.created_at)}
                         </p>
+                        {e.notify_failed && (
+                          <div className="mt-1.5">
+                            <NotifyFailedBadge />
+                          </div>
+                        )}
                       </td>
                       {/* Contact = email + phone stacked */}
                       <td className={cell}>
