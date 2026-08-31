@@ -30,8 +30,22 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-3xl space-y-8">
           <Section heading="Who we are">
             <p>
-              TDH Motors (&ldquo;we&rdquo;, &ldquo;us&rdquo;), based in Aylesbury, Buckinghamshire. For anything
-              to do with this policy or your data, contact{" "}
+              TDH Motors (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is a trading name of The Dog House
+              Automotive Solutions Ltd, registered at Front Barn, Hatchmead Farm, Lower Icknield
+              Way, Great Kimble, Aylesbury, HP17 9TX. We&apos;re registered with the Information
+              Commissioner&apos;s Office as a data controller, registration reference{" "}
+              <a
+                href="https://ico.org.uk/ESDWebPages/Entry/ZC219720"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-light hover:underline"
+              >
+                ZC219720
+              </a>
+              .
+            </p>
+            <p>
+              For anything to do with this policy or your data, contact{" "}
               <a href="mailto:tony@tdhmotors.co.uk" className="text-brand-light hover:underline">
                 tony@tdhmotors.co.uk
               </a>
