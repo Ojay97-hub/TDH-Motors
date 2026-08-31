@@ -128,7 +128,10 @@ export async function SiteFooter() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-border grid grid-cols-1 md:grid-cols-2 items-center gap-4 text-xs text-text-subtle">
-          <div className="text-center md:text-left">© {new Date().getFullYear()} TDH Motors. All rights reserved.</div>
+          <div className="text-center md:text-left">
+            © {new Date().getFullYear()} TDH Motors. All rights reserved.{" "}
+            <Link href="/privacy" className="hover:text-text-muted transition-colors">Privacy Policy</Link>
+          </div>
           <div className="flex items-center justify-center md:justify-end gap-2">
             <span>A website by</span>
             <Image
