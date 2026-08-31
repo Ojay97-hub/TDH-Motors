@@ -127,9 +127,12 @@ export async function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-xs text-text-subtle">
-          <div className="text-center md:text-left">© {new Date().getFullYear()} TDH Motors. All rights reserved.</div>
-          <div className="flex items-center justify-center gap-2">
+        <div className="mt-12 pt-8 border-t border-border grid grid-cols-1 md:grid-cols-2 items-center gap-4 text-xs text-text-subtle">
+          <div className="text-center md:text-left">
+            © {new Date().getFullYear()} TDH Motors. All rights reserved.{" "}
+            <Link href="/privacy" className="hover:text-text-muted transition-colors">Privacy Policy</Link>
+          </div>
+          <div className="flex items-center justify-center md:justify-end gap-2">
             <span>A website by</span>
             <Image
               src="/logo-idea.svg"
@@ -146,10 +149,6 @@ export async function SiteFooter() {
               className="hidden h-7 w-7 object-contain dark:block"
             />
             <span className="font-nova font-medium text-text-muted">Nova Forma Designs</span>
-          </div>
-          <div className="flex justify-center md:justify-end gap-6">
-            <Link href="/privacy" className="hover:text-text-muted transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-text-muted transition-colors">Terms</Link>
           </div>
         </div>
       </div>
