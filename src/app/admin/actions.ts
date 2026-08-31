@@ -28,6 +28,24 @@ export async function updateEnquiryStatus(id: string, status: string) {
   revalidatePath("/admin/enquiries");
 }
 
+export async function deleteEnquiry(id: string) {
+  if (!id || typeof id !== "string") throw new Error("Invalid enquiry ID");
+
+  const supabaseAuth = await createAuthServerClient();
+  const {
+    data: { user },
+  } = await supabaseAuth.auth.getUser();
+  if (!user) redirect("/admin/login");
+  await assertAdmin(user);
+
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("enquiries").delete().eq("id", id);
+  if (error) throw new Error("Failed to delete enquiry");
+
+  revalidatePath("/admin/enquiries");
+  redirect("/admin/enquiries");
+}
+
 export async function signOut() {
   const supabase = await createAuthServerClient();
   const {

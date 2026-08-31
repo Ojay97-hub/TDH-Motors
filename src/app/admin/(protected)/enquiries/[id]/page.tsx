@@ -5,6 +5,7 @@ import { createAuthServerClient } from "@/lib/supabase-ssr";
 import Link from "next/link";
 import { SignOutButton } from "../../../_components/SignOutButton";
 import { StatusSelect } from "../../../_components/StatusSelect";
+import { DeleteEnquiryButton, TrashIcon } from "../../../_components/DeleteEnquiryButton";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotesForm } from "./NotesForm";
 import { ReplyForm } from "./ReplyForm";
@@ -264,6 +265,14 @@ export default async function EnquiryDetailPage({
                 Call {enquiry.phone}
               </a>
             )}
+
+            <DeleteEnquiryButton
+              id={enquiry.id}
+              name={enquiry.name}
+              className="flex items-center justify-center gap-2 bg-surface border border-border text-text-muted text-sm font-medium px-4 py-2.5 hover:text-red-600 hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
+            >
+              {TrashIcon} Delete enquiry
+            </DeleteEnquiryButton>
           </div>
         </div>
       </main>

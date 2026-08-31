@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { createAuthServerClient } from "@/lib/supabase-ssr";
 import Link from "next/link";
 import { StatusSelect } from "../../_components/StatusSelect";
+import { DeleteEnquiryButton } from "../../_components/DeleteEnquiryButton";
 import { SignOutButton } from "../../_components/SignOutButton";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -280,13 +281,16 @@ export default async function EnquiriesPage({
 
                   <div className="flex items-center justify-between gap-3 pt-1">
                     <StatusSelect id={e.id} current={e.status} />
-                    <Link
-                      href={`/admin/enquiries/${e.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border border-border text-text-muted hover:text-brand hover:border-brand transition-colors"
-                    >
-                      {EyeIcon}
-                      View details
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <DeleteEnquiryButton id={e.id} name={e.name} />
+                      <Link
+                        href={`/admin/enquiries/${e.id}`}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border border-border text-text-muted hover:text-brand hover:border-brand transition-colors"
+                      >
+                        {EyeIcon}
+                        View details
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -357,16 +361,19 @@ export default async function EnquiriesPage({
                       <td className={cell}>
                         <StatusSelect id={e.id} current={e.status} />
                       </td>
-                      {/* View details icon */}
+                      {/* View details / delete */}
                       <td className={`${cell} border-r text-right whitespace-nowrap`}>
-                        <Link
-                          href={`/admin/enquiries/${e.id}`}
-                          aria-label="View details"
-                          title="View details"
-                          className="inline-flex h-9 w-9 items-center justify-center border border-border text-text-muted hover:text-brand hover:border-brand hover:bg-brand/5 transition-colors"
-                        >
-                          {EyeIcon}
-                        </Link>
+                        <div className="inline-flex items-center gap-2">
+                          <DeleteEnquiryButton id={e.id} name={e.name} />
+                          <Link
+                            href={`/admin/enquiries/${e.id}`}
+                            aria-label="View details"
+                            title="View details"
+                            className="inline-flex h-9 w-9 items-center justify-center border border-border text-text-muted hover:text-brand hover:border-brand hover:bg-brand/5 transition-colors"
+                          >
+                            {EyeIcon}
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

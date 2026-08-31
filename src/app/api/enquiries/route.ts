@@ -158,6 +158,70 @@ async function sendAdminEmail(enquiry: Enquiry, enquiryId?: string, requestOrigi
   }
 }
 
+function buildCustomerEmail(enquiry: Enquiry) {
+  const subject = "Thanks for contacting TDH Motors";
+  const text = [
+    `Hi ${enquiry.name},`,
+    "",
+    "Thanks for contacting TDH Motors. We've received your enquiry and will be in touch soon.",
+    "",
+    "Your message:",
+    enquiry.message,
+    "",
+    "TDH Motors",
+  ].join("\n");
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#26231f;line-height:1.5;">
+      <h1 style="font-size:22px;margin:0 0 16px;">Thanks for contacting TDH Motors</h1>
+      <p>Hi ${escapeHtml(enquiry.name)},</p>
+      <p>Thanks for contacting TDH Motors. We've received your enquiry and will be in touch soon.</p>
+      <h2 style="font-size:16px;margin:24px 0 8px;">Your message</h2>
+      <div style="white-space:pre-wrap;background:#f7f5ef;border:1px solid #e6e2da;padding:16px;margin-bottom:20px;">${escapeHtml(enquiry.message)}</div>
+      <p style="margin:24px 0 0;">TDH Motors</p>
+    </div>`;
+
+  return { subject, text, html };
+}
+
+async function sendCustomerEmail(enquiry: Enquiry) {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL;
+  const senderName = process.env.BREVO_SENDER_NAME ?? "TDH Motors";
+  // Replies from the customer should land somewhere a person actually reads,
+  // not necessarily the sending address, so default to the admin inbox.
+  const replyToEmail = splitEmails(process.env.BREVO_ADMIN_EMAILS ?? process.env.ADMIN_EMAILS)[0] ?? senderEmail;
+
+  if (!apiKey || !senderEmail) {
+    throw new Error("Missing Brevo email configuration. Set BREVO_API_KEY and BREVO_SENDER_EMAIL.");
+  }
+
+  const email = buildCustomerEmail(enquiry);
+  const response = await fetch(brevoEndpoint, {
+    method: "POST",
+    signal: AbortSignal.timeout(8000),
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: senderName, email: senderEmail },
+      to: [{ email: enquiry.email, name: enquiry.name }],
+      replyTo: { email: replyToEmail, name: senderName },
+      subject: email.subject,
+      htmlContent: email.html,
+      textContent: email.text,
+      tags: ["contact-enquiry-confirmation", enquiry.type.toLowerCase().replace(/\s+/g, "-")],
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Brevo send failed (${response.status}): ${details}`);
+  }
+}
+
 export async function POST(request: Request) {
   let body: unknown;
 
@@ -186,13 +250,24 @@ export async function POST(request: Request) {
     return Response.json({ error: "Failed to save enquiry" }, { status: 500 });
   }
 
+  let notifyFailed = false;
+
   try {
     await sendAdminEmail(parsed.data, data?.id, requestOrigin);
   } catch (error) {
-    console.error("Brevo enquiry email error:", error);
-    if (data?.id) {
-      await supabase.from("enquiries").update({ notify_failed: true }).eq("id", data.id);
-    }
+    console.error("Brevo admin notification error:", error);
+    notifyFailed = true;
+  }
+
+  try {
+    await sendCustomerEmail(parsed.data);
+  } catch (error) {
+    console.error("Brevo customer confirmation error:", error);
+    notifyFailed = true;
+  }
+
+  if (notifyFailed && data?.id) {
+    await supabase.from("enquiries").update({ notify_failed: true }).eq("id", data.id);
   }
 
   return Response.json({ ok: true }, { status: 201 });
