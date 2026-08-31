@@ -21,6 +21,7 @@ type Enquiry = {
   message: string;
   status: string;
   notes: string | null;
+  notify_failed: boolean;
 };
 
 function formatDate(iso: string) {
@@ -142,11 +143,21 @@ export default async function EnquiryDetailPage({
               Received {formatDate(enquiry.created_at)}
             </p>
           </div>
-          <span
-            className={`text-sm font-medium px-2.5 py-1 capitalize ${getStatusBadge(enquiry.status)}`}
-          >
-            {enquiry.status}
-          </span>
+          <div className="flex items-center gap-2">
+            {enquiry.notify_failed && (
+              <span
+                title="The admin notification email for this enquiry failed to send — check the email provider."
+                className="text-sm font-medium px-2.5 py-1 bg-red-100 text-red-700 border border-red-300 dark:bg-red-500/15 dark:text-red-300 dark:border-red-400/30"
+              >
+                Email failed
+              </span>
+            )}
+            <span
+              className={`text-sm font-medium px-2.5 py-1 capitalize ${getStatusBadge(enquiry.status)}`}
+            >
+              {enquiry.status}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
