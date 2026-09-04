@@ -414,6 +414,12 @@ export default async function Home() {
               {ctaButtonLabel} <ArrowRight size={16} />
             </CtaLink>
           </div>
+
+          <p className="text-xs text-text-subtle leading-relaxed mt-10 pt-6 border-t border-border">
+            The Dog House Automotive Solutions Ltd (FRN: 1062302) is an Introducer Appointed
+            Representative (IAR) of Meridian Finance Partners Ltd (FRN: 661646) which is
+            authorised and regulated by the Financial Conduct Authority.
+          </p>
         </div>
       </section>
     </>
